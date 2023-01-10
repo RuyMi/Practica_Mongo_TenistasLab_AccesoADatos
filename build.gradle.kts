@@ -35,6 +35,8 @@ dependencies {
     implementation("io.ktor:ktor-client-content-negotiation:2.1.3")
     implementation("io.ktor:ktor-serialization-kotlinx-json:2.1.3")
 
+    // Instalamos KMongo para manejar MongoDB
+    implementation("org.litote.kmongo:kmongo:4.7.1")
 }
 
 tasks.test {
