@@ -35,8 +35,14 @@ dependencies {
     implementation("io.ktor:ktor-client-content-negotiation:2.1.3")
     implementation("io.ktor:ktor-serialization-kotlinx-json:2.1.3")
 
-    // Instalamos KMongo para manejar MongoDB
-    implementation("org.litote.kmongo:kmongo:4.7.1")
+    // Opcional, solo si vamos a usar asíncrono
+    implementation("org.litote.kmongo:kmongo-async:4.7.2")
+    // Usamos corrutinas para ello
+    implementation("org.litote.kmongo:kmongo-coroutine:4.7.2")
+
+    // Corrutinas
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+
 }
 
 tasks.test {
