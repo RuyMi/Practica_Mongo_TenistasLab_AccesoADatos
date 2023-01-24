@@ -6,6 +6,7 @@ import kotlinx.coroutines.reactive.asFlow
 import models.Producto
 import mu.KotlinLogging
 import org.litote.kmongo.Id
+import org.litote.kmongo.eq
 import java.util.*
 
 private val logger = KotlinLogging.logger {}
@@ -20,13 +21,12 @@ class ProductoRepositoryImpl: ProductoRepository {
     override suspend fun findById(id: Id<Producto>): Producto? {
         logger.debug { "findById($id)" }
         return MongoDbManager.database.getCollection<Producto>()
-            .findOneById(id) ?: throw Exception("No existe el tenista con id $id")//TODO cambiar las excepciones
+            .findOneById(id) ?: throw Exception("No existe el producto con id $id")//TODO cambiar las excepciones
     }
 
     override suspend fun findByUUID(uuid: UUID): Producto? {
-        TODO("Not yet implemented")
-      // return MongoDbManager.database.getCollection<Producto>()
-       //    .find().publisher? : throw Exception("No existe el tenista con id $uuid")
+        logger.debug { "findByUUID($uuid)" }
+        return MongoDbManager.database.getCollection<Producto>().findOne(Producto::uuid eq uuid)
     }
 
     override suspend fun save(entity: Producto): Producto? {
@@ -34,7 +34,6 @@ class ProductoRepositoryImpl: ProductoRepository {
         return MongoDbManager.database.getCollection<Producto>()
             .save(entity).let { entity }
     }
-
 
     private suspend fun insert(entity: Producto): Producto {
         logger.debug { "save($entity) - creando" }
