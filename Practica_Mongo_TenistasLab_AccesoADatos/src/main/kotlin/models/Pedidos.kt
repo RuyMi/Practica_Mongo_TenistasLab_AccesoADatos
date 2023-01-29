@@ -16,7 +16,7 @@ data class Pedidos(
     @BsonId @Contextual
     val id: Id<Usuario> = newId<Usuario>(),
     @Serializable(UUIDSerializer::class)
-    val uuid: UUID = UUID.randomUUID(),
+    val uuidPedidos: UUID = UUID.randomUUID(),
     val estado: TipoEstado,
     @Serializable(LocalDateSerializer::class)
     val fechaEntrada: LocalDate,

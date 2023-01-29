@@ -14,7 +14,7 @@ data class Usuario(
     @BsonId @Contextual
     val id: Id<Usuario> = newId<Usuario>(),
     @Serializable(UUIDSerializer::class)
-    val uuid: UUID = UUID.randomUUID(),
+    val uuidUsuario: UUID = UUID.randomUUID(),
     val nombre: String,
     val apellido: String,
     val email: String,

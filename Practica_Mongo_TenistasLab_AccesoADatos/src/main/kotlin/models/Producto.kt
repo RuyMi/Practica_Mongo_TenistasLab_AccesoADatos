@@ -13,7 +13,7 @@ data class Producto(
     @BsonId @Contextual
     val id: Id<Producto> = newId<Producto>(), // TODO Comprobar si hace falta tener el producto en lo de newId
     @Serializable(UUIDSerializer::class)
-    val uuid: UUID = UUID.randomUUID(),
+    val uuidProducto: UUID = UUID.randomUUID(),
     val marca: String,
     val modelo: String,
     val precio: Double,
