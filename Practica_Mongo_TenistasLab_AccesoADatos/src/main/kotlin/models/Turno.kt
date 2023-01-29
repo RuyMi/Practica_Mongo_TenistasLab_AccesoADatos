@@ -15,7 +15,7 @@ data class Turno(
     @BsonId @Contextual
     val id : Id<Turno> = newId<Turno>(),
     @Serializable(UUIDSerializer::class)
-    val uuid: UUID = UUID.randomUUID(),
+    val uuidTurno: UUID = UUID.randomUUID(),
     @Serializable(LocalDateTimeSerializer::class)
     val fechaInicio: LocalDateTime,
     @Serializable(LocalDateTimeSerializer::class)

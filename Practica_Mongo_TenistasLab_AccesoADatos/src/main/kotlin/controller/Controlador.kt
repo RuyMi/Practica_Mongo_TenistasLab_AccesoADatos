@@ -317,18 +317,18 @@ class Controlador(
     fun guardarTarea(tarea: Tarea): Tarea? {
         val temp = listarTareas()
         val turnoActual = encontrarTurnoUUID(tarea.turno.uuidTurno)
-        val empleado = encontrarUsuarioUUID(tarea.empleado.uuid)
+        val empleado = encontrarUsuarioUUID(tarea.empleado.uuidUsuario)
         return if (turnoActual != null && empleado != null) {
-            val veces = temp.filter { !it.estadoCompletado }.filter { it.turno.uuidTurno == turnoActual.uuidTurno }.count { it.empleado.uuid == empleado.uuid }
+            val veces = temp.filter { !it.estadoCompletado }.filter { it.turno.uuidTurno == turnoActual.uuidTurno }.count { it.empleado.uuidUsuario == empleado.uuidUsuario }
             if(veces < 2){
                 
                 TareaRepositoryImpl.save(tarea)
             }else{
-                logger.debug { "No puede tener 2 tareas en el mismo turno a la vez el empleado con uuid: ${empleado.uuid}"}
+                logger.debug { "No puede tener 2 tareas en el mismo turno a la vez el empleado con uuid: ${empleado.uuidUsuario}"}
                 null
             }
         }else{
-            logger.debug { "No existe el empleado: ${empleado!!.uuid}"}
+            logger.debug { "No existe el empleado: ${empleado!!.uuidUsuario}"}
             null
         }
 
@@ -458,10 +458,16 @@ class Controlador(
      * @return devuelve true si borra el turno
      */
     fun borrarTurno(turno: Turno): Boolean {
-        return TurnosRepositoryImpl.delete(turno)
+        return if (usuarioActual.perfil == TipoPerfil.ADMINISTRADOR) {
+            TurnosRepositoryImpl.delete(turno)
+        } else {
+            logger.debug("Solo un administrador puede eliminar el turno")
+            false
+        }
     }
 
-
-
-
 }
+
+
+
+
