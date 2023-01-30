@@ -18,9 +18,9 @@ object MongoDbManager {
     private const val MONGO_TYPE = "mongodb+srv://" //"mongodb://" // "mongodb+srv://"
     private const val HOST = "cluster0.pgdqg.mongodb.net" //"localhost" // "cluster0.pgdqg.mongodb.net"
     private const val PORT = 27017
-    private const val DATABASE = "tenistas"
-    private const val USERNAME = "mongo" //"mongoadmin"// "mongo"
-    private const val PASSWORD = "XXXX"//"mongopass" //"xxxx"
+    private const val DATABASE = "test"
+    private const val USERNAME = "ar" //"mongoadmin"// "mongo"
+    private const val PASSWORD = "tiWYOJzN9AzPVjtq"//"mongopass" //"xxxx"
     private const val OPTIONS = "?authSource=admin&retryWrites=true&w=majority"
 
     private const val MONGO_URI =

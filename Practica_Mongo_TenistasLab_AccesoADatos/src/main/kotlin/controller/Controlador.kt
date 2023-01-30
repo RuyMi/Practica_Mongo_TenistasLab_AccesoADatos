@@ -42,32 +42,48 @@ class Controlador(
      * @return devuelve una lista de MaquinaPersonalizacion
      */
     fun listarMaquinasPerso(): List<Maquina.MaquinaPersonalizacion> {
-        return MaquinaPersonalizacionRepositoryImpl.findAll()
+        return if(usuarioActual.perfil != TipoPerfil.USUARIO){
+            MaquinaPersonalizacionRepositoryImpl.findAll()
+        }else{
+            logger.error { "No tienes permiso para buscar máquinas" }
+            emptyList()
+        }
+
     }
 
     /**
-     * Encontrar maquina perso i d
+     * Encontrar maquina perso id
      *
      * @param id
      * @return  Una MaquinaPersonalizacion
      */
     fun encontrarMaquinaPersoID(id: Int): Maquina.MaquinaPersonalizacion? {
-        return if(id > 0){
-            MaquinaPersonalizacionRepositoryImpl.findById(id)
-        } else{
-            logger.debug{"No puedes encontrar una máquina que tenga un id menor que 1. Id introducido: $id"}
+        return if(usuarioActual.perfil != TipoPerfil.USUARIO) {
+            if (id > 0) {
+                MaquinaPersonalizacionRepositoryImpl.findById(id)
+            } else {
+                logger.debug { "No puedes encontrar una máquina que tenga un id menor que 1. Id introducido: $id" }
+                null
+            }
+        }else{
+            logger.error { "No tienes permiso para buscar una máquina" }
             null
         }
     }
 
     /**
-     * Encontrar maquina perso u u i d
+     * Encontrar maquina perso uuid
      *
      * @param uuid
      * @return Una MaquinaPersonalizacion
      */
     fun encontrarMaquinaPersoUUID(uuid: UUID): Maquina.MaquinaPersonalizacion? {
-        return MaquinaPersonalizacionRepositoryImpl.findbyUUID(uuid)
+        return if(usuarioActual.perfil != TipoPerfil.USUARIO) {
+             MaquinaPersonalizacionRepositoryImpl.findbyUUID(uuid)
+        }else{
+            logger.error { "No tienes permiso para buscar una máquina" }
+            null
+        }
     }
 
     /**
@@ -76,8 +92,13 @@ class Controlador(
      * @param maquina
      * @return guarda una MaquinaPersonalizacion
      */
-    fun guardarMaquinaPerso(maquina: Maquina.MaquinaPersonalizacion): Maquina.MaquinaPersonalizacion {
-        return MaquinaPersonalizacionRepositoryImpl.save(maquina)
+    fun guardarMaquinaPerso(maquina: Maquina.MaquinaPersonalizacion): Maquina.MaquinaPersonalizacion? {
+        return if(usuarioActual.perfil != TipoPerfil.USUARIO) {
+            MaquinaPersonalizacionRepositoryImpl.save(maquina)
+        }else{
+            logger.error { "No tienes permiso para guardar una máquina" }
+             null
+        }
     }
 
     /**
@@ -89,8 +110,14 @@ class Controlador(
     fun borrarMaquinaPerso(maquina: Maquina.MaquinaPersonalizacion): Boolean {
         val temp = listarTareas().filter { !it.estadoCompletado }
         return if(temp.count{ it.maquinaPersonalizacion?.numSerie == maquina.numSerie} == 0){
-            MaquinaPersonalizacionRepositoryImpl.delete(maquina)
+            if(usuarioActual.perfil == TipoPerfil.ADMINISTRADOR) {
+                MaquinaPersonalizacionRepositoryImpl.delete(maquina)
+            }else{
+                logger.error { "Solo un administrador puede borrar una máquina" }
+                false
+            }
         }else{
+            logger.error { "No se puede borrar ya que esta máquina tiene asignadas tareas" }
             false
         }
     }
@@ -104,7 +131,12 @@ class Controlador(
      * @return devuelve una lista de MaquinaEncordadora
      */
     fun listarMaquinasEncordar(): List<Maquina.MaquinaEncordadora> {
-        return MaquinaEncordarRepositoryImpl.findAll()
+        return if(usuarioActual.perfil != TipoPerfil.USUARIO) {
+            MaquinaEncordarRepositoryImpl.findAll()
+        }else{
+            logger.error { "No tienes permiso para buscar máquinas" }
+            emptyList()
+        }
     }
 
     /**
@@ -115,7 +147,12 @@ class Controlador(
      */
     fun encontrarMaquinaEncordarID(id: Int): Maquina.MaquinaEncordadora? {
         if(id > 0){
-            return MaquinaEncordarRepositoryImpl.findById(id)
+            return if(usuarioActual.perfil != TipoPerfil.USUARIO) {
+                return MaquinaEncordarRepositoryImpl.findById(id)
+            }else{
+                logger.error { "No tienes permiso para buscar máquinas" }
+                null
+            }
         } else{
             logger.debug{"No puedes encontrar una máquina que tenga un id menor que 1. Id introducido: $id"}
         }
@@ -129,7 +166,13 @@ class Controlador(
      * @return devuelve una MaquinaEncordadora
      */
     fun encontrarMaquinaEncordarUUID(uuid: UUID): Maquina.MaquinaEncordadora? {
-        return MaquinaEncordarRepositoryImpl.findbyUUID(uuid)
+        return if(usuarioActual.perfil != TipoPerfil.USUARIO) {
+            MaquinaEncordarRepositoryImpl.findbyUUID(uuid)
+        }else{
+            logger.error { "No tienes permiso para buscar máquinas" }
+            null
+        }
+
     }
 
     /**
@@ -138,8 +181,14 @@ class Controlador(
      * @param maquina
      * @return guarda una MaquinaEncordadora
      */
-    fun guardarMaquinaEncordar(maquina: Maquina.MaquinaEncordadora): Maquina.MaquinaEncordadora {
-        return MaquinaEncordarRepositoryImpl.save(maquina)
+    fun guardarMaquinaEncordar(maquina: Maquina.MaquinaEncordadora): Maquina.MaquinaEncordadora? {
+        return if(usuarioActual.perfil != TipoPerfil.USUARIO) {
+            MaquinaEncordarRepositoryImpl.save(maquina)
+        }else{
+            logger.error { "No tienes permiso para guardar máquinas" }
+            null
+        }
+
 
     }
 
@@ -152,8 +201,14 @@ class Controlador(
     fun borrarMaquinaEncordar(maquina: Maquina.MaquinaEncordadora): Boolean {
         val temp = listarTareas().filter { !it.estadoCompletado }
         return if (temp.count { it.maquinaEncordar?.numSerie == maquina.numSerie } == 0) {
-            MaquinaEncordarRepositoryImpl.delete(maquina)
+            return if(usuarioActual.perfil != TipoPerfil.USUARIO) {
+                MaquinaEncordarRepositoryImpl.delete(maquina)
+            }else{
+                logger.error { "No tienes permiso para guardar máquinas" }
+                false
+            }
         } else {
+            logger.error { "No se puede borrar ya que esta máquina tiene asignadas tareas" }
             false
         }
     }
@@ -164,7 +219,13 @@ class Controlador(
      * @return una lista de Pedidos
      *///Pedidos
     fun listarPedidos(): List<Pedidos> {
-        return PedidosRepositoryImpl.findAll()
+        return if(usuarioActual.perfil != TipoPerfil.USUARIO) {
+            PedidosRepositoryImpl.findAll()
+        }else{
+            PedidosRepositoryImpl.findAll().filter{
+                it.usuario == usuarioActual.id
+            }
+        }
     }
 
     /**
@@ -174,12 +235,18 @@ class Controlador(
      * @return devuelve un Pedido
      */
     fun encontrarPedidoID(id: Int): Pedidos? {
-        if(id > 0){
-            return PedidosRepositoryImpl.findById(id)
+        return if(id > 0){
+            if(usuarioActual.perfil != TipoPerfil.USUARIO) {
+                PedidosRepositoryImpl.findById(id)
+            }else{
+                logger.error { "No tienes permiso para encontrar pedidos" }
+                null
+            }
         } else{
             logger.debug{"No puedes encontrar una máquina que tenga un id menor que 1. Id introducido: $id"}
+            null
         }
-        return null
+
     }
 
     /**
@@ -189,7 +256,12 @@ class Controlador(
      * @return devuelve un Pedido
      */
     fun encontrarPedidoUUID(uuid: UUID): Pedidos? {
-        return PedidosRepositoryImpl.findbyUUID(uuid)
+        return if(usuarioActual.perfil != TipoPerfil.USUARIO) {
+            PedidosRepositoryImpl.findbyUUID(uuid)
+        }else{
+            logger.error { "No tienes permiso para encontrar pedidos" }
+            null
+        }
     }
 
     /**
