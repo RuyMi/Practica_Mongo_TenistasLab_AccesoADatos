@@ -20,6 +20,6 @@ data class Usuario(
     val email: String,
     val password: String,
     val perfil: TipoPerfil,
-    val turno: Id<Turno>,
-    val pedido: List<Pedidos>
+    val turno: Id<Turno>?,
+    val pedido: List<Pedidos>?
 )

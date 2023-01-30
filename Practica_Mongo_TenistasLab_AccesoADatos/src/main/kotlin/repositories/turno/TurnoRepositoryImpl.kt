@@ -28,7 +28,7 @@ class TurnoRepositoryImpl:TurnoRepository {
 
     override suspend fun findByUUID(uuid: UUID): Turno? {
         logger.debug { "findByUUID($uuid)" }
-        return MongoDbManager.database.getCollection<Turno>().findOne(Turno::uuid eq uuid)
+        return MongoDbManager.database.getCollection<Turno>().findOne(Turno::uuidTurno eq uuid)
     }
 
     override suspend fun save(entity: Turno): Turno? {

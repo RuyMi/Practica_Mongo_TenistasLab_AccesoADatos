@@ -28,7 +28,7 @@ class PedidosRepositoryImpl:PedidosRepository {
 
     override suspend fun findByUUID(uuid: UUID): Pedidos? {
         logger.debug { "findByUUID($uuid)" }
-        return MongoDbManager.database.getCollection<Pedidos>().findOne(Pedidos::uuid eq uuid)
+        return MongoDbManager.database.getCollection<Pedidos>().findOne(Pedidos::uuidPedidos eq uuid)
     }
 
     override suspend fun save(entity: Pedidos): Pedidos? {

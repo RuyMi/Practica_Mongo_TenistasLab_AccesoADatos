@@ -26,7 +26,7 @@ class ProductoRepositoryImpl: ProductoRepository {
 
     override suspend fun findByUUID(uuid: UUID): Producto? {
         logger.debug { "findByUUID($uuid)" }
-        return MongoDbManager.database.getCollection<Producto>().findOne(Producto::uuid eq uuid)
+        return MongoDbManager.database.getCollection<Producto>().findOne(Producto::uuidProducto eq uuid)
     }
 
     override suspend fun save(entity: Producto): Producto? {
