@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 import models.enums.TipoEstado
 import org.bson.codecs.pojo.annotations.BsonId
 import org.bson.types.ObjectId
+import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 import serializers.LocalDateSerializer
 import serializers.UUIDSerializer
@@ -13,7 +14,7 @@ import java.util.*
 
 @Document("pedidos")
 data class Pedidos(
-    @BsonId @Contextual
+    @Id
     val id: ObjectId = ObjectId.get(),
     @Serializable(UUIDSerializer::class)
     val uuidPedidos: UUID = UUID.randomUUID(),

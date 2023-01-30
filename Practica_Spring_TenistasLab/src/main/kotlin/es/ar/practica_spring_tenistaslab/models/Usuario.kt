@@ -13,7 +13,7 @@ import java.util.*
 
 @Document("usuario")
 data class Usuario(
-    @BsonId @Contextual
+    @Id
     val id: ObjectId = ObjectId.get(),
     @Serializable(UUIDSerializer::class)
     val uuidUsuario: UUID = UUID.randomUUID(),
