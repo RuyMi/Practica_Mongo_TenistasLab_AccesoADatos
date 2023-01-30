@@ -20,8 +20,7 @@ import java.util.*
  * @property empleado
  * @property turno
  * @property estadoCompletado
- * @property maquinaEncordar
- * @property maquinaPersonalizacion
+ * @property maquina
  * @property pedido
  * @constructor Create empty Tarea
  */
@@ -37,11 +36,10 @@ data class Tarea(
     val empleado:Usuario,
     val turno:Turno,
     val estadoCompletado:Boolean,
-    val maquinaEncordar: Maquina.MaquinaEncordadora?,
-    val maquinaPersonalizacion: Maquina.MaquinaPersonalizacion?,
+    val maquina: Maquina?,
     val pedido:Pedidos
 ) {
     override fun toString(): String {
-        return "Tarea(id=$id, uuidTarea=$uuidTarea, producto=$producto, precio=$precio, descripcion='$descripcion', empleado=${empleado.nombre}, ${empleado.apellido} turno=$turno, estadoCompletado=$estadoCompletado, maquinaEncordar=$maquinaEncordar, maquinaPersonalizacion=$maquinaPersonalizacion, pedido=$pedido)"
+        return "Tarea(id=$id, uuidTarea=$uuidTarea, producto=$producto, precio=$precio, descripcion='$descripcion', empleado=${empleado.nombre}, ${empleado.apellido} turno=$turno, estadoCompletado=$estadoCompletado, maquina=$maquina, pedido=$pedido)"
     }
 }
