@@ -27,7 +27,7 @@ class UsuarioRepositoryImpl:UsuarioRepository {
 
     override suspend fun findByUUID(uuid: UUID): Usuario? {
         logger.debug { "findByUUID($uuid)" }
-        return MongoDbManager.database.getCollection<Usuario>().findOne(Usuario::uuid eq uuid)
+        return MongoDbManager.database.getCollection<Usuario>().findOne(Usuario::uuidUsuario eq uuid)
     }
 
     override suspend fun save(entity: Usuario): Usuario? {

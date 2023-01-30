@@ -22,25 +22,22 @@ private val logger = KotlinLogging.logger {}
 /**
  * Controlador
  *
- * @property MaquinaEncordarRepositoryImpl
- * @property MaquinaPersonalizacionRepositoryImpl
- * @property PedidosRepositoryImpl
- * @property ProductoRepositoryImpl
- * @property TareaRepositoryImpl
- * @property UsuarioRepositoryImpl
- * @property TurnosRepositoryImpl
+ * @property maquinaRepositoryImpl
+ * @property pedidosRepositoryImpl
+ * @property productoRepositoryImpl
+ * @property tareasRepositoryImpl
+ * @property usuarioRepositoryImpl
+ * @property turnoRepositoryImpl
  * @property usuarioActual
- * @constructor Create empty Controlador
  */
 class Controlador(
-    val MaquinaEncordarRepositoryImpl: MaquinaRepositoryImpl,
-    val MaquinaPersonalizacionRepositoryImpl: MaquinaRepositoryImpl,
-    val PedidosRepositoryImpl: PedidosRepositoryImpl,
-    val ProductoRepositoryImpl: ProductoRepositoryImpl,
-    val TareaRepositoryImpl: TareasRepositoryImpl,
-    val UsuarioRepositoryImpl: UsuarioRepositoryImpl,
-    val TurnosRepositoryImpl: TurnoRepositoryImpl,
-    val usuarioActual: Usuario
+    private val maquinaRepositoryImpl: MaquinaRepositoryImpl,
+    private val pedidosRepositoryImpl: PedidosRepositoryImpl,
+    private val productoRepositoryImpl: ProductoRepositoryImpl,
+    private val tareasRepositoryImpl: TareasRepositoryImpl,
+    private val usuarioRepositoryImpl: UsuarioRepositoryImpl,
+    private val turnoRepositoryImpl: TurnoRepositoryImpl,
+    private val usuarioActual: Usuario
 ) {
 
     //Maquina
@@ -52,7 +49,7 @@ class Controlador(
      */
     fun listarMaquinasPerso(): Flow<Maquina> {
         return if(usuarioActual.perfil != TipoPerfil.USUARIO){
-            MaquinaPersonalizacionRepositoryImpl.findAll()
+            maquinaRepositoryImpl.findAll()
         }else{
             logger.error { "No tienes permiso para buscar máquinas" }
             emptyFlow()
@@ -68,7 +65,7 @@ class Controlador(
      */
     suspend fun encontrarMaquinaID(id: Id<Maquina>): Maquina? {
         return if(usuarioActual.perfil != TipoPerfil.USUARIO) {
-            MaquinaPersonalizacionRepositoryImpl.findById(id)
+            maquinaRepositoryImpl.findById(id)
         }else{
             logger.error { "No tienes permiso para buscar una máquina" }
             null
@@ -83,7 +80,7 @@ class Controlador(
      */
     suspend fun encontrarMaquinaUUID(uuid: UUID): Maquina? {
         return if(usuarioActual.perfil != TipoPerfil.USUARIO) {
-             MaquinaPersonalizacionRepositoryImpl.findByUUID(uuid)
+             maquinaRepositoryImpl.findByUUID(uuid)
         }else{
             logger.error { "No tienes permiso para buscar una máquina" }
             null
@@ -98,7 +95,7 @@ class Controlador(
      */
     suspend fun guardarMaquina(maquina: Maquina): Maquina? {
         return if(usuarioActual.perfil != TipoPerfil.USUARIO) {
-            MaquinaPersonalizacionRepositoryImpl.save(maquina)
+            maquinaRepositoryImpl.save(maquina)
         }else{
             logger.error { "No tienes permiso para guardar una máquina" }
              null
@@ -115,7 +112,7 @@ class Controlador(
         val temp = listarTareas().filter { !it.estadoCompletado }
         return if(temp.count{ it.maquina?.numSerie == maquina.numSerie} == 0){
             if(usuarioActual.perfil == TipoPerfil.ADMINISTRADOR) {
-                MaquinaPersonalizacionRepositoryImpl.delete(maquina)
+                maquinaRepositoryImpl.delete(maquina)
             }else{
                 logger.error { "Solo un administrador puede borrar una máquina" }
                 false
@@ -133,9 +130,9 @@ class Controlador(
      *///Pedidos
     fun listarPedidos(): Flow<Pedidos> {
         return if(usuarioActual.perfil != TipoPerfil.USUARIO) {
-            PedidosRepositoryImpl.findAll()
+            pedidosRepositoryImpl.findAll()
         }else{
-            PedidosRepositoryImpl.findAll().filter{
+            pedidosRepositoryImpl.findAll().filter{
                 it.usuario == usuarioActual.id
             }
         }
@@ -149,7 +146,7 @@ class Controlador(
      */
     suspend fun encontrarPedidoID(id: Id<Pedidos>): Pedidos? {
         return if(usuarioActual.perfil != TipoPerfil.USUARIO) {
-            PedidosRepositoryImpl.findById(id)
+            pedidosRepositoryImpl.findById(id)
         }else{
             logger.error { "No tienes permiso para encontrar pedidos" }
             null
@@ -164,7 +161,7 @@ class Controlador(
      */
     suspend fun encontrarPedidoUUID(uuid: UUID): Pedidos? {
         return if(usuarioActual.perfil != TipoPerfil.USUARIO) {
-            PedidosRepositoryImpl.findByUUID(uuid)
+            pedidosRepositoryImpl.findByUUID(uuid)
         }else{
             logger.error { "No tienes permiso para encontrar pedidos" }
             null
@@ -179,7 +176,7 @@ class Controlador(
      */
     suspend fun guardarPedido(pedidos: Pedidos): Pedidos? {
         return if(usuarioActual.perfil == TipoPerfil.ADMINISTRADOR || usuarioActual.perfil == TipoPerfil.USUARIO){
-            PedidosRepositoryImpl.save(pedidos)
+            pedidosRepositoryImpl.save(pedidos)
         }else{
             logger.debug{"Solo los usuarios o administradores pueden crear o actualizar pedidos"}
             null
@@ -195,7 +192,7 @@ class Controlador(
      */
     suspend fun borrarPedido(pedidos: Pedidos): Boolean {
         return if(usuarioActual.perfil == TipoPerfil.ADMINISTRADOR){
-            PedidosRepositoryImpl.delete(pedidos)
+            pedidosRepositoryImpl.delete(pedidos)
         }else{
             logger.debug{"Solo los administradores pueden eliminar pedidos"}
             false
@@ -211,7 +208,7 @@ class Controlador(
      * @return una lista de productos
      */
     fun listarProductos(): Flow<Producto> {
-        return ProductoRepositoryImpl.findAll()
+        return productoRepositoryImpl.findAll()
     }
 
     /**
@@ -222,7 +219,7 @@ class Controlador(
      */
     suspend fun encontrarProductoID(id: Id<Producto>): Producto? {
         return if(usuarioActual.perfil != TipoPerfil.USUARIO) {
-            ProductoRepositoryImpl.findById(id)
+            productoRepositoryImpl.findById(id)
         }else{
             logger.error { "No tienes permiso para encontrar productos" }
             null
@@ -237,7 +234,7 @@ class Controlador(
      */
     suspend fun encontrarProductoUUID(uuid: UUID): Producto? {
         return if(usuarioActual.perfil != TipoPerfil.USUARIO) {
-            ProductoRepositoryImpl.findByUUID(uuid)
+            productoRepositoryImpl.findByUUID(uuid)
         }else{
             logger.error { "No tienes permiso para encontrar productos" }
             null
@@ -252,7 +249,7 @@ class Controlador(
      */
     suspend fun guardarProducto(producto: Producto): Producto? {
         return if(usuarioActual.perfil == TipoPerfil.ADMINISTRADOR){
-            ProductoRepositoryImpl.save(producto)
+            productoRepositoryImpl.save(producto)
         }else{
             logger.error { "No tienes permiso para crear o actualizar productos" }
             null
@@ -267,7 +264,7 @@ class Controlador(
      */
     suspend fun borrarProducto(producto: Producto): Boolean {
         return if(usuarioActual.perfil == TipoPerfil.ADMINISTRADOR){
-            ProductoRepositoryImpl.delete(producto)
+            productoRepositoryImpl.delete(producto)
         }else{
             logger.error { "Solo los administradores pueden eliminar productos" }
             false
@@ -282,7 +279,7 @@ class Controlador(
      *///Tareas
     fun listarTareas(): Flow<Tarea> {
         return if(usuarioActual.perfil != TipoPerfil.USUARIO) {
-            TareaRepositoryImpl.findAll()
+            tareasRepositoryImpl.findAll()
         }else{
             logger.error { "No tienes permiso para encontrar tareas" }
             emptyFlow()
@@ -297,9 +294,9 @@ class Controlador(
      */
     suspend fun encontrarTareaID(id: Id<Tarea>): Tarea? {
         return if(usuarioActual.perfil != TipoPerfil.USUARIO){
-             TareaRepositoryImpl.findById(id)
+             tareasRepositoryImpl.findById(id)
         } else{
-            logger.debug{"No tienes permiso para encontrar tareas"}
+            logger.error{"No tienes permiso para encontrar tareas"}
             null
         }
 
@@ -313,9 +310,9 @@ class Controlador(
      */
     suspend fun encontrarTareaUUID(uuid: UUID): Tarea? {
         return if(usuarioActual.perfil != TipoPerfil.USUARIO){
-            TareaRepositoryImpl.findByUUID(uuid)
+            tareasRepositoryImpl.findByUUID(uuid)
         } else{
-            logger.debug{"No tienes permiso para encontrar tareas"}
+            logger.error{"No tienes permiso para encontrar tareas"}
             null
         }
     }
@@ -333,16 +330,24 @@ class Controlador(
         val temp = listarTareas()
         val turnoActual = encontrarTurnoUUID(tarea.turno.uuidTurno)
         val empleado = encontrarUsuarioUUID(tarea.empleado.uuidUsuario)
-        return if (turnoActual != null && empleado != null) {
-            val veces = temp.filter { !it.estadoCompletado }.filter { it.turno.uuidTurno == turnoActual.uuidTurno }.count { it.empleado.uuidUsuario == empleado.uuidUsuario }
-            if(veces < 2){
-                TareaRepositoryImpl.save(tarea)
-            }else{
-                logger.debug { "No puede tener 2 tareas en el mismo turno a la vez el empleado con uuid: ${empleado.uuidUsuario}"}
+        return if(usuarioActual.perfil != TipoPerfil.USUARIO) {
+            if (turnoActual != null && empleado != null) {
+                val veces = temp
+                    .filter { !it.estadoCompletado }
+                    .filter { it.turno.uuidTurno == turnoActual.uuidTurno }
+                    .count { it.empleado.uuidUsuario == empleado.uuidUsuario }
+                if (veces < 2) {
+                    tareasRepositoryImpl.save(tarea)
+                } else {
+                    logger.error { "No puede tener 2 tareas en el mismo turno a la vez el empleado con uuid: ${empleado.uuidUsuario}" }
+                    null
+                }
+            } else {
+                logger.error { "No existe el empleado: ${empleado!!.uuidUsuario}" }
                 null
             }
         }else{
-            logger.debug { "No existe el empleado: ${empleado!!.uuidUsuario}"}
+            logger.error{"No tienes permiso para guardar tareas"}
             null
         }
 
@@ -355,41 +360,58 @@ class Controlador(
      * @return devuelve un true si se borra
      */
     suspend fun borrarTarea(tarea: Tarea): Boolean {
-        return TareaRepositoryImpl.delete(tarea)
+        return if(usuarioActual.perfil != TipoPerfil.USUARIO){
+            tareasRepositoryImpl.delete(tarea)
+        } else{
+            logger.error{"No tienes permiso para encontrar tareas"}
+            false
+        }
     }
+
+    //Usuario
 
     /**
      * Listar usuarios
      *
      * @return devuelve una lista de Usuarios
-     *///Usuario
-    fun listarUsuarios(): List<Usuario> {
-        return UsuarioRepositoryImpl.findAll()
+     */
+    fun listarUsuarios(): Flow<Usuario> {
+        return if(usuarioActual.perfil== TipoPerfil.ADMINISTRADOR){
+            usuarioRepositoryImpl.findAll()
+        } else{
+            logger.error{"Solo un administrador puede listar usuarios"}
+            emptyFlow()
+        }
     }
 
     /**
-     * Encontrar usuario i d
+     * Encontrar usuario id
      *
      * @param id
      * @return devuelve un Usuario
      */
-    fun encontrarUsuarioID(id: Int): Usuario? {
-        if(id > 0){
-            return UsuarioRepositoryImpl.findById(id)
+    suspend fun encontrarUsuarioID(id: Id<Usuario>): Usuario? {
+        return if(usuarioActual.perfil == TipoPerfil.ADMINISTRADOR){
+            usuarioRepositoryImpl.findById(id)
         } else{
-            logger.debug{"No puedes encontrar un usuario que tenga un id menor que 1. Id introducido: $id"}
+            logger.error{"Solo un administrador puede encontrar usuarios"}
+            null
         }
-        return null
     }
 
     /**
-     * Encontrar usuario u u i d
+     * Encontrar usuario uuid
      *
      * @param uuid
      * @return devuelve un Usuario
      */
-    fun encontrarUsuarioUUID(uuid: UUID): Usuario? {
-        return UsuarioRepositoryImpl.findbyUUID(uuid)
+    suspend fun encontrarUsuarioUUID(uuid: UUID): Usuario? {
+        return if(usuarioActual.perfil == TipoPerfil.ADMINISTRADOR){
+            usuarioRepositoryImpl.findByUUID(uuid)
+        } else{
+            logger.error{"Solo un administrador puede encontrar usuarios"}
+            null
+        }
     }
 
     /**
@@ -398,8 +420,13 @@ class Controlador(
      * @param usuario
      *@return devuelve el usuario guardado
      */
-    fun guardarUsuario(usuario: Usuario): Usuario {
-        return UsuarioRepositoryImpl.save(usuario)
+    suspend fun guardarUsuario(usuario: Usuario): Usuario? {
+        return if(usuarioActual.perfil != TipoPerfil.USUARIO){
+            usuarioRepositoryImpl.save(usuario)
+        } else{
+            logger.error{"No tienes permisos para guardar usuarios"}
+            null
+        }
     }
 
     /**
@@ -408,16 +435,22 @@ class Controlador(
      * @param usuario
      * @return devuelve true si borra al usuario
      */
-    fun borrarUsuario(usuario: Usuario): Boolean {
-        return if(usuario.perfil == TipoPerfil.ENCORDADOR){
-            val temp = listarTareas().filter { !it.estadoCompletado }.count { it.empleado.uuid == usuario.uuid }
-            if (temp == 0){
-                UsuarioRepositoryImpl.delete(usuario)
-            }else{
-                false
+    suspend fun borrarUsuario(usuario: Usuario): Boolean {
+        return if(usuarioActual.perfil == TipoPerfil.ADMINISTRADOR) {
+            if (usuario.perfil == TipoPerfil.ENCORDADOR) {
+                val temp = listarTareas().filter { !it.estadoCompletado }
+                    .count { it.empleado.uuidUsuario == usuario.uuidUsuario }
+                if (temp == 0) {
+                    usuarioRepositoryImpl.delete(usuario)
+                } else {
+                    false
+                }
+            } else {
+                usuarioRepositoryImpl.delete(usuario)
             }
-        } else{
-            UsuarioRepositoryImpl.delete(usuario)
+        }else{
+            logger.error{"No tienes permisos para borrar usuarios"}
+            false
         }
     }
 
@@ -426,8 +459,13 @@ class Controlador(
      *
      *  @return una lista de turnos
      *///Turnos
-    fun listarTurnos(): List<Turno> {
-        return TurnosRepositoryImpl.findAll()
+    fun listarTurnos(): Flow<Turno> {
+        return if(usuarioActual.perfil == TipoPerfil.ADMINISTRADOR){
+            turnoRepositoryImpl.findAll()
+        } else{
+            logger.error{"Solo un administrador puede listar turnos"}
+            emptyFlow()
+        }
     }
 
     /**
@@ -436,13 +474,14 @@ class Controlador(
      * @param id
      * @return  devuelve un turno
      */
-    fun encontrarTurnoID(id: Int): Turno? {
-        if(id > 0){
-            return TurnosRepositoryImpl.findById(id)
+    suspend fun encontrarTurnoID(id: Id<Turno>): Turno? {
+        return if(usuarioActual.perfil == TipoPerfil.ADMINISTRADOR){
+            turnoRepositoryImpl.findById(id)
         } else{
-            logger.debug{"No puedes encontrar un usuario que tenga un id menor que 1. Id introducido: $id"}
+            logger.debug{"Solo un administrador puede encontrar turnos"}
+            null
         }
-        return null
+
     }
 
     /**
@@ -451,8 +490,13 @@ class Controlador(
      * @param uuid
      * @return devuelve un turno
      */
-    fun encontrarTurnoUUID(uuid: UUID): Turno? {
-        return TurnosRepositoryImpl.findbyUUID(uuid)
+    suspend fun encontrarTurnoUUID(uuid: UUID): Turno? {
+        return if(usuarioActual.perfil == TipoPerfil.ADMINISTRADOR){
+            turnoRepositoryImpl.findByUUID(uuid)
+        } else{
+            logger.debug{"Solo un administrador puede encontrar turnos"}
+            null
+        }
     }
 
     /**
@@ -461,8 +505,14 @@ class Controlador(
      * @param turno
      * @return devuelve el turno guardado
      */
-    fun guardarTurno(turno: Turno): Turno {
-        return TurnosRepositoryImpl.save(turno)
+    suspend fun guardarTurno(turno: Turno): Turno? {
+        return if(usuarioActual.perfil == TipoPerfil.ADMINISTRADOR){
+            turnoRepositoryImpl.save(turno)
+        } else{
+            logger.debug{"Solo un administrador puede crear o actualizar turnos"}
+            null
+        }
+
     }
 
     /**
@@ -471,9 +521,9 @@ class Controlador(
      * @param turno
      * @return devuelve true si borra el turno
      */
-    fun borrarTurno(turno: Turno): Boolean {
+    suspend fun borrarTurno(turno: Turno): Boolean {
         return if (usuarioActual.perfil == TipoPerfil.ADMINISTRADOR) {
-            TurnosRepositoryImpl.delete(turno)
+            turnoRepositoryImpl.delete(turno)
         } else {
             logger.debug("Solo un administrador puede eliminar el turno")
             false

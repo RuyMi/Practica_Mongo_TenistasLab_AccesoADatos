@@ -22,7 +22,6 @@ import java.util.*
  * @property swingweight
  * @property balance
  * @property rigidez
- * @constructor Create empty Maquina personalizacion
  */
 @Serializable
 data class Maquina(

@@ -1,0 +1,46 @@
+-- src/main/sqldelight/database/Usuario.sq
+
+CREATE TABLE Usuario (
+  id INTEGER PRIMARY KEY,
+  uuidUsuario TEXT NOT NULL UNIQUE ,
+  nombre TEXT NOT NULL,
+  apellido TEXT NOT NULL,
+  email TEXT NOT NULL,
+  password TEXT NOT NULL,
+  perfil TEXT NOT NULL,
+  turno TEXT NOT NULL,
+  pedido TEXT NOT NULL
+);
+
+INSERT INTO Usuario (uuidUsuario, nombre, apellido, email, password, perfil, turno, pedido )
+VALUES ('xd', 'Doe', 'Sanchez', 'test@test.com', 'prueba', 'ADMINISTRADOR', 'null', 'null');
+
+removeAllUsers:
+DELETE FROM Usuario;
+
+selectUsers:
+SELECT * FROM Usuario;
+
+selectById:
+SELECT * FROM Usuario WHERE id = ?;
+
+selectLastUser:
+SELECT * FROM Usuario ORDER BY id DESC LIMIT 1;
+
+selectUsersByEmail:
+SELECT * FROM Usuario WHERE email = ?;
+
+insert:
+INSERT INTO Usuario (uuidUsuario, nombre, apellido, email, password, perfil, turno, pedido )
+VALUES(?, ?, ?, ?, ?, ?, ?, ?);
+
+insertUser:
+INSERT INTO Usuario (id, uuidUsuario, nombre, apellido, email, password, perfil, turno, pedido)
+VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+update:
+UPDATE Usuario SET uuidUsuario = ?, nombre = ?, apellido = ?, email = ?, password = ?, perfil = ?, turno = ?, pedido = ? WHERE id = ?;
+
+delete:
+DELETE FROM Usuario WHERE id = ?;
+

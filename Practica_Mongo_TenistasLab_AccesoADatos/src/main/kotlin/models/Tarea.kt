@@ -22,7 +22,6 @@ import java.util.*
  * @property estadoCompletado
  * @property maquina
  * @property pedido
- * @constructor Create empty Tarea
  */
 @Serializable
 data class Tarea(

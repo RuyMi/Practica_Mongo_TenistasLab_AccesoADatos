@@ -1,6 +1,6 @@
 package models.enums
 
-enum class TipoMaquina {
-    PERSONALIZACION, ENCORDAR
+enum class TipoMaquina(tipo: String) {
+    PERSONALIZACION("Personalizacion"), ENCORDAR("Encordar"),
 
 }
