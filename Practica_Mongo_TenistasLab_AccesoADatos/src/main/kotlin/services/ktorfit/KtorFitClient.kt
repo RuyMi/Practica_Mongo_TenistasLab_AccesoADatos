@@ -13,7 +13,8 @@ import mu.KotlinLogging
 private val logger = KotlinLogging.logger {}
 
 object KtorFitClient {
-    private const val API_URL = ": https://jsonplaceholder.typicode.com/"
+    private const val API_URL = "https://jsonplaceholder.typicode.com/"
+
 
     private val ktorfit by lazy {
         Ktorfit.Builder()
@@ -29,7 +30,9 @@ object KtorFitClient {
             .build()
     }
 
+
     val instance by lazy {
+
         ktorfit.create<KtorFitRest>()
     }
 

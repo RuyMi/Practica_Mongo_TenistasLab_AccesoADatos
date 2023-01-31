@@ -10,6 +10,7 @@ plugins {
     id("com.google.devtools.ksp") version "1.7.21-1.0.8"
     // SQLdelight
     id("com.squareup.sqldelight") version "1.5.4"
+
 }
 
 group = "es.ra"
