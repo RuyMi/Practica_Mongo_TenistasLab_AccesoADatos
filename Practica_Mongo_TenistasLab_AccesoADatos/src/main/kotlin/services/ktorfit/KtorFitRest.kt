@@ -12,7 +12,7 @@ interface KtorFitRest {
     suspend fun getAll(): List<UsuarioAPI>
 
     @GET("users/{id}")
-    suspend fun getById(@Path("id") id: Int): GetByIdDto
+    suspend fun getById(@Path("id") id: Int): UsuarioAPI
 
     @POST("users")
     suspend fun create(@Body user: Usuario): CreateDto
