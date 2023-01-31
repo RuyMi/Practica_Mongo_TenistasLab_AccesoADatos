@@ -1,15 +1,16 @@
-package repositories.usuario
+package es.ar.practica_spring_tenistaslab.repositories.KtorFitRepository
 
+import es.ar.practica_spring_tenistaslab.models.Usuario
+import es.ar.practica_spring_tenistaslab.models.UsuarioAPI
 import exceptions.RestException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.withContext
-import models.Usuario
-import models.UsuarioAPI
 import mu.KotlinLogging
-import org.litote.kmongo.newId
 import services.ktorfit.KtorFitClient
+
+
 
 private val logger = KotlinLogging.logger {}
 

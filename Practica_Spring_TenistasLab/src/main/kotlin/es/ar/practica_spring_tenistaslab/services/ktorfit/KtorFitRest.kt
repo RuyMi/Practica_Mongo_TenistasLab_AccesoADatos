@@ -2,8 +2,10 @@ package services.ktorfit
 
 import de.jensklingenberg.ktorfit.http.*
 import dto.*
-import models.Usuario
-import models.UsuarioAPI
+import es.ar.practica_spring_tenistaslab.models.Usuario
+import es.ar.practica_spring_tenistaslab.models.UsuarioAPI
+
+
 
 
 interface KtorFitRest {
