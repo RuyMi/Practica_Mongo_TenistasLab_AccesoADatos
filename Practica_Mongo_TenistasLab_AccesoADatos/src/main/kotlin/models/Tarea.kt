@@ -27,8 +27,7 @@ import java.util.*
 data class Tarea(
     @BsonId @Contextual
     val id: Id<Tarea> = newId<Tarea>(),
-    @Serializable(UUIDSerializer::class)
-    val uuidTarea: UUID,
+    val uuidTarea: String,
     val producto: Producto,
     val precio: Double,
     val descripcion: String,

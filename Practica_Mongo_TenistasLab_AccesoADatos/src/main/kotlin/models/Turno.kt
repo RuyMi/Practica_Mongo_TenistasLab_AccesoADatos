@@ -14,8 +14,7 @@ import java.util.*
 data class Turno(
     @BsonId @Contextual
     val id : Id<Turno> = newId<Turno>(),
-    @Serializable(UUIDSerializer::class)
-    val uuidTurno: UUID = UUID.randomUUID(),
+    val uuidTurno: String = UUID.randomUUID().toString(),
     @Serializable(LocalDateTimeSerializer::class)
     val fechaInicio: LocalDateTime,
     @Serializable(LocalDateTimeSerializer::class)

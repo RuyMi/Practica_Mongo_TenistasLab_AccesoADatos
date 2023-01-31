@@ -14,8 +14,8 @@ class Password {
      * @param originalString Cadena a encriptar
      * @return la cadena encriptada
      */
-    fun encriptar(originalString: String): String {
-        return Bcrypt.hash(originalString, 12).toString()
+    fun encriptar(originalString: String): ByteArray {
+        return Bcrypt.hash(originalString, 12)
     }
 
     /**

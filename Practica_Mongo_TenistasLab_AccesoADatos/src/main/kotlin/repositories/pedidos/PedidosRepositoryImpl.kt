@@ -26,7 +26,7 @@ class PedidosRepositoryImpl:PedidosRepository {
             .findOneById(id) ?: throw Exception("No existe el Pedidos con id $id")//TODO cambiar las excepciones
     }
 
-    override suspend fun findByUUID(uuid: UUID): Pedidos? {
+    override suspend fun findByUUID(uuid: String): Pedidos? {
         logger.debug { "findByUUID($uuid)" }
         return MongoDbManager.database.getCollection<Pedidos>().findOne(Pedidos::uuidPedidos eq uuid)
     }

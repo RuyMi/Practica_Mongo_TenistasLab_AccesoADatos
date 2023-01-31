@@ -24,7 +24,7 @@ class ProductoRepositoryImpl: ProductoRepository {
             .findOneById(id) ?: throw Exception("No existe el producto con id $id")//TODO cambiar las excepciones
     }
 
-    override suspend fun findByUUID(uuid: UUID): Producto? {
+    override suspend fun findByUUID(uuid: String): Producto? {
         logger.debug { "findByUUID($uuid)" }
         return MongoDbManager.database.getCollection<Producto>().findOne(Producto::uuidProducto eq uuid)
     }

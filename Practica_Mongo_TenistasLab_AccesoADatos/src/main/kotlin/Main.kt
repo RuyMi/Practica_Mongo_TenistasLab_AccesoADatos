@@ -2,9 +2,11 @@
 
 import controller.Controlador
 import db.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import models.Tarea
@@ -57,7 +59,7 @@ fun main(args: Array<String>) = runBlocking {
     )
     meterDatos(controlador)
     // Lista de un pedido completo en json
-    val pedido = controlador.encontrarPedidoUUID(UUID.fromString("45c3ca42-dc8f-46c7-9dfe-ff8fd786a77f"))
+    val pedido = controlador.encontrarPedidoUUID("45c3ca42-dc8f-46c7-9dfe-ff8fd786a77f")
     val tareas = controlador.listarTareas().filter { it.pedido.uuidPedidos == pedido!!.uuidPedidos }
     val tarea1 = json.encodeToString(pedido)
     val tarea2 = json.encodeToString(tareas)
@@ -171,7 +173,7 @@ suspend fun iniciarSesion(): Usuario {
     val usuario = readln()
     val password = readln()
     try {
-        val coincidente = UsuarioRepositoryImpl().findAll().first { it.email == usuario && Password().verificar(password, it.password.toByteArray()) }
+        val coincidente = UsuarioRepositoryImpl().findAll().first { it.email == usuario && Password().verificar(password, it.password) }
         println("Bienvenido: ${coincidente.nombre} ${coincidente.apellido}, eres un ${coincidente.perfil}")
         return coincidente
     } catch (e: Exception) {
@@ -182,32 +184,55 @@ suspend fun iniciarSesion(): Usuario {
 
 }
 
-private suspend fun meterDatos(controlador: Controlador) {
-    getTurnos().forEach { controlador.guardarTurno(it) }
-    val listaTurnos = controlador.listarTurnos()
-    listaTurnos.collect { println(it) }
+private suspend fun meterDatos(controlador: Controlador) = withContext(Dispatchers.IO){
+    val tarea1= launch{
+        getTurnos().forEach { controlador.guardarTurno(it) }
+        val listaTurnos = controlador.listarTurnos()
+        listaTurnos.collect { println(it) }
+    }
+    tarea1.join()
 
-    getUsuarios().forEach { it?.let { it1 -> controlador.guardarUsuario(it1) } }
-    val listaUsuarios = controlador.listarUsuarios()
-    listaUsuarios.collect { println(it) }
+    val tarea2= launch{
+        getUsuarios().forEach { it?.let { it1 -> controlador.guardarUsuario(it1) } }
+        val listaUsuarios = controlador.listarUsuarios()
+        listaUsuarios.collect { println(it) }
+    }
+    tarea2.join()
 
-    getMaquinas().forEach { controlador.guardarMaquina(it) }
-    val listaMaquinas = controlador.listarMaquinas()
-    listaMaquinas.collect { println(it) }
+    val tarea3= launch{
+        getMaquinas().forEach { controlador.guardarMaquina(it) }
+        val listaMaquinas = controlador.listarMaquinas()
+        listaMaquinas.collect { println(it) }
+    }
+    tarea3.join()
+
+
+    val tarea4= launch{
+        getProductos().forEach { controlador.guardarProducto(it) }
+        val listaProductos = controlador.listarProductos()
+        listaProductos.collect { println(it) }
+    }
+    tarea4.join()
 
 
 
-    getProductos().forEach { controlador.guardarProducto(it) }
-    val listaProductos = controlador.listarProductos()
-    listaProductos.collect { println(it) }
 
-    getPedidos().forEach { it?.let { it1 -> controlador.guardarPedido(it1) } }
-    val listaPedidos = controlador.listarPedidos()
-    listaPedidos.collect { println(it) }
+    val tarea5= launch{
+        getPedidos().forEach { it?.let { it1 -> controlador.guardarPedido(it1) } }
+        val listaPedidos = controlador.listarPedidos()
+        listaPedidos.collect { println(it) }
+    }
+    tarea5.join()
 
-    getTareas().forEach { controlador.guardarTarea(it) }
-    val listaTareas = controlador.listarTareas()
-    listaTareas.collect { println(it) }
+
+    val tarea6= launch{
+        getTareas().forEach { controlador.guardarTarea(it) }
+        val listaTareas = controlador.listarTareas()
+        listaTareas.collect { println(it) }
+    }
+    tarea6.join()
+
+
 }
 
 /**
@@ -218,7 +243,7 @@ suspend fun initDataBase() {
     borrarDataBase()
     val meterAdmin = Usuario(
         newId(),
-        UUID.randomUUID(),
+        UUID.randomUUID().toString(),
         "Administrador",
         "Prueba",
         "admin@admin.com",

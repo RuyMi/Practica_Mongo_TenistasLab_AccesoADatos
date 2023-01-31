@@ -4,9 +4,11 @@ import db.MongoDbManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.reactive.asFlow
 import models.Maquina
+import models.Pedidos
 import mu.KotlinLogging
 import org.litote.kmongo.Id
 import org.litote.kmongo.MongoOperator
+import org.litote.kmongo.eq
 
 import java.util.*
 
@@ -26,10 +28,9 @@ class MaquinaRepositoryImpl:MaquinaRepository {
             .findOneById(id) ?: throw Exception("No existe el maquina con id $id")//TODO cambiar las excepciones
     }
 
-    override suspend fun findByUUID(uuid: UUID): Maquina? {
-        TODO("Not yet implemented")
-       // logger.debug { "findByUUID($uuid)" }
-      //  return MongoDbManager.database.getCollection<Producto>().findOne(Maquina::num)
+    override suspend fun findByUUID(uuid: String): Maquina? {
+        logger.debug { "findByUUID($uuid)" }
+        return MongoDbManager.database.getCollection<Maquina>().findOne(Maquina::numSerie eq uuid)
     }
 
     override suspend fun save(entity: Maquina): Maquina? {

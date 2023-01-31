@@ -78,7 +78,7 @@ class Controlador(
      * @param uuid
      * @return Una MaquinaPersonalizacion
      */
-    suspend fun encontrarMaquinaUUID(uuid: UUID): Maquina? {
+    suspend fun encontrarMaquinaUUID(uuid: String): Maquina? {
         return if(usuarioActual.perfil != TipoPerfil.USUARIO) {
              maquinaRepositoryImpl.findByUUID(uuid)
         }else{
@@ -159,7 +159,7 @@ class Controlador(
      * @param uuid
      * @return devuelve un Pedido
      */
-    suspend fun encontrarPedidoUUID(uuid: UUID): Pedidos? {
+    suspend fun encontrarPedidoUUID(uuid: String): Pedidos? {
         return if(usuarioActual.perfil != TipoPerfil.USUARIO) {
             pedidosRepositoryImpl.findByUUID(uuid)
         }else{
@@ -232,7 +232,7 @@ class Controlador(
      * @param uuid
      * @return devuelve un Producto
      */
-    suspend fun encontrarProductoUUID(uuid: UUID): Producto? {
+    suspend fun encontrarProductoUUID(uuid: String): Producto? {
         return if(usuarioActual.perfil != TipoPerfil.USUARIO) {
             productoRepositoryImpl.findByUUID(uuid)
         }else{
@@ -308,7 +308,7 @@ class Controlador(
      * @param uuid
      *@return devuelve una Tarea
      */
-    suspend fun encontrarTareaUUID(uuid: UUID): Tarea? {
+    suspend fun encontrarTareaUUID(uuid: String): Tarea? {
         return if(usuarioActual.perfil != TipoPerfil.USUARIO){
             tareasRepositoryImpl.findByUUID(uuid)
         } else{
@@ -405,7 +405,7 @@ class Controlador(
      * @param uuid
      * @return devuelve un Usuario
      */
-    suspend fun encontrarUsuarioUUID(uuid: UUID): Usuario? {
+    suspend fun encontrarUsuarioUUID(uuid: String): Usuario? {
         return if(usuarioActual.perfil == TipoPerfil.ADMINISTRADOR){
             usuarioRepositoryImpl.findByUUID(uuid)
         } else{
@@ -490,7 +490,7 @@ class Controlador(
      * @param uuid
      * @return devuelve un turno
      */
-    suspend fun encontrarTurnoUUID(uuid: UUID): Turno? {
+    suspend fun encontrarTurnoUUID(uuid: String): Turno? {
         return if(usuarioActual.perfil == TipoPerfil.ADMINISTRADOR){
             turnoRepositoryImpl.findByUUID(uuid)
         } else{
