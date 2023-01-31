@@ -2,12 +2,12 @@
 
 import controller.Controlador
 import db.*
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import models.Tarea
 import models.Usuario
 import models.enums.TipoEstado
 import models.enums.TipoPerfil
@@ -27,7 +27,9 @@ private val json = Json {
     prettyPrint = true
     allowStructuredMapKeys = true
 }
-/*
+// ¡ATENCION! Esto borrará la base de datos y la volverá a inicializar con datos por defecto
+private val inicializarDatos = true
+
 /**
  * Main
  *
@@ -35,11 +37,13 @@ private val json = Json {
  */
 fun main(args: Array<String>) = runBlocking {
     var usuarioActual: Usuario? = null
-    val init = launch{
-        initDataBase()
-        usuarioActual = iniciarSesion()
+    if(inicializarDatos) {
+        val init = launch {
+            initDataBase()
+            usuarioActual = iniciarSesion()
+        }
+        init.join()
     }
-    init.join()
 
 
     val controlador = Controlador(
@@ -53,8 +57,8 @@ fun main(args: Array<String>) = runBlocking {
     )
     meterDatos(controlador)
     // Lista de un pedido completo en json
-    val pedido = controlador.encontrarPedidoID(1)
-    val tareas = controlador.listarTareas().filter { it.pedido.uuidPedidos == pedido!!.uuid }
+    val pedido = controlador.encontrarPedidoUUID(UUID.fromString("45c3ca42-dc8f-46c7-9dfe-ff8fd786a77f"))
+    val tareas = controlador.listarTareas().filter { it.pedido.uuidPedidos == pedido!!.uuidPedidos }
     val tarea1 = json.encodeToString(pedido)
     val tarea2 = json.encodeToString(tareas)
     println(
@@ -89,12 +93,13 @@ fun main(args: Array<String>) = runBlocking {
 
     //Listado de asignaciones para los encordadores por fecha en JSON
     //* Hemos entendido que debemos sacar por cada empleado, sus tareas realizadas ordenadas por hora
-
-    val tareasByEmpleadoSortFecha = controlador.listarTareas().sortedBy { it.turno.fechaFin }.groupBy { it.empleado }
-    val tareasByEmpleadoSortFechajson = json.encodeToString(tareasByEmpleadoSortFecha)
+    val tareasByEmpleadoSortFecha = mutableListOf<Tarea>()
+    controlador.listarTareas().onEach { tareasByEmpleadoSortFecha.add(it) }
+        .onCompletion { "Tareas recolectadas correctamente" }
+        .collect()
+    val ordenadoTareas= tareasByEmpleadoSortFecha.sortedBy { it.turno.fechaFin }.groupBy { it.empleado }
+    val tareasByEmpleadoSortFechajson = json.encodeToString(ordenadoTareas)
     println("""Listado de las tareas agrupadas por empleado y ordenadas por fecha: $tareasByEmpleadoSortFechajson""")
-
-
     //mostrarMenuPrincipal(usuarioActual)
 
 
@@ -164,10 +169,9 @@ fun mostrarMenuPrincipal(usuario: Usuario) {
 suspend fun iniciarSesion(): Usuario {
     println("Bienvenido al sistema, por favor introduzca su correo electronico y su contraseña para acceder")
     val usuario = readln()
-    val password = Password().encriptar(readln())
-    println(password)
+    val password = readln()
     try {
-        val coincidente = UsuarioRepositoryImpl().findAll().first { it.email == usuario && it.password == password }
+        val coincidente = UsuarioRepositoryImpl().findAll().first { it.email == usuario && Password().verificar(password, it.password.toByteArray()) }
         println("Bienvenido: ${coincidente.nombre} ${coincidente.apellido}, eres un ${coincidente.perfil}")
         return coincidente
     } catch (e: Exception) {
@@ -178,34 +182,32 @@ suspend fun iniciarSesion(): Usuario {
 
 }
 
-private fun meterDatos(controlador: Controlador) {
+private suspend fun meterDatos(controlador: Controlador) {
     getTurnos().forEach { controlador.guardarTurno(it) }
     val listaTurnos = controlador.listarTurnos()
-    listaTurnos.forEach { println(it) }
+    listaTurnos.collect { println(it) }
 
     getUsuarios().forEach { it?.let { it1 -> controlador.guardarUsuario(it1) } }
     val listaUsuarios = controlador.listarUsuarios()
-    listaUsuarios.forEach { println(it) }
+    listaUsuarios.collect { println(it) }
 
-    getMaquinasEncordar().forEach { controlador.guardarMaquinaEncordar(it) }
-    val listaMaquinas = controlador.listarMaquinasEncordar()
-    listaMaquinas.forEach { println(it) }
+    getMaquinas().forEach { controlador.guardarMaquina(it) }
+    val listaMaquinas = controlador.listarMaquinas()
+    listaMaquinas.collect { println(it) }
 
-    getMaquinasPersonalizacion().forEach { controlador.guardarMaquinaPerso(it) }
-    val listaMaquinasPerso = controlador.listarMaquinasPerso()
-    listaMaquinasPerso.forEach { println(it) }
+
 
     getProductos().forEach { controlador.guardarProducto(it) }
     val listaProductos = controlador.listarProductos()
-    listaProductos.forEach { println(it) }
+    listaProductos.collect { println(it) }
 
     getPedidos().forEach { it?.let { it1 -> controlador.guardarPedido(it1) } }
     val listaPedidos = controlador.listarPedidos()
-    listaPedidos.forEach { println(it) }
+    listaPedidos.collect { println(it) }
 
     getTareas().forEach { controlador.guardarTarea(it) }
     val listaTareas = controlador.listarTareas()
-    listaTareas.forEach { println(it) }
+    listaTareas.collect { println(it) }
 }
 
 /**
@@ -213,19 +215,24 @@ private fun meterDatos(controlador: Controlador) {
  *
  */
 suspend fun initDataBase() {
+    borrarDataBase()
     val meterAdmin = Usuario(
         newId(),
         UUID.randomUUID(),
         "Administrador",
         "Prueba",
         "admin@admin.com",
-        Password().encriptar("1234"),
+        Password().encriptar(readln()),
         TipoPerfil.ADMINISTRADOR,
         null,
         null
     )
     println(meterAdmin.password)
-
     UsuarioRepositoryImpl().save(meterAdmin)
 
-}*/
+}
+
+fun borrarDataBase() {
+
+
+}

@@ -47,7 +47,7 @@ class Controlador(
      *
      * @return devuelve una lista de Maquina
      */
-    fun listarMaquinasPerso(): Flow<Maquina> {
+    fun listarMaquinas(): Flow<Maquina> {
         return if(usuarioActual.perfil != TipoPerfil.USUARIO){
             maquinaRepositoryImpl.findAll()
         }else{

@@ -6,13 +6,16 @@ import models.enums.TipoEstado
 import models.enums.TipoMaquina
 import models.enums.TipoPerfil
 import org.litote.kmongo.newId
+import repositories.maquina.MaquinaRepositoryImpl
+import repositories.pedidos.PedidosRepositoryImpl
+import repositories.producto.ProductoRepositoryImpl
 import repositories.turno.TurnoRepositoryImpl
 import repositories.usuario.UsuarioRepositoryImpl
 import services.password.Password
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
-/*
+
 fun getTurnos(): List<Turno> {
     return listOf(
         Turno(
@@ -97,7 +100,7 @@ return listOf(
 )
 }
 
-fun getMaquinasEncordar(): List<Maquina> {
+fun getMaquinas(): List<Maquina> {
     return listOf(
         Maquina(
             newId(),
@@ -180,46 +183,46 @@ fun getMaquinasEncordar(): List<Maquina> {
 
 suspend fun getPedidos(): List<Pedidos?> {
     return listOf(
-        UsuarioRepositoryImpl().findByUUID(UUID.fromString("4747bf2d-22dd-4a29-89c8-c1a7492769ae"))?.let {
+        UsuarioRepositoryImpl().findByUUID(UUID.fromString("c5991f7a-b450-4a87-ac73-f24738d38fe5"))?.let {
             Pedidos(
-                0,
-                UUID.randomUUID(),
+                newId(),
+                UUID.fromString("45c3ca42-dc8f-46c7-9dfe-ff8fd786a77f"),
                 TipoEstado.EN_PROCESO,
                 LocalDate.now(),
                 LocalDate.of(2022, 12, 6),
                 null,
                 120.5,
-                it,
+                it.id,
             )
         },
-        UsuarioRepositoryImpl().findByUUID(UUID.fromString("4747bf2d-22dd-4a29-89c8-c1a7492769ae"))?.let {
+        UsuarioRepositoryImpl().findByUUID(UUID.fromString("93423f1d-05bf-4f81-8c2f-f8c9bc8c600d"))?.let {
             Pedidos(
-                0,
-                UUID.randomUUID(),
+                newId(),
+                UUID.fromString("84f88209-dee6-461f-a516-b9f2ab7dd643"),
                 TipoEstado.RECIBIDO,
                 LocalDate.now(),
                 LocalDate.of(2022, 12, 6),
                 LocalDate.of(2022, 12, 7),
                 120.5,
-                it,
+                it.id,
             )
         },
-        UsuarioRepositoryImpl().findByUUID(UUID.fromString("4747bf2d-22dd-4a29-89c8-c1a7492769ae"))?.let {
+        UsuarioRepositoryImpl().findByUUID(UUID.fromString("30a1db57-1e0e-4b64-8e41-d1dd0b52e21a"))?.let {
             Pedidos(
-                0,
-                UUID.randomUUID(),
+                newId(),
+                UUID.fromString("cc1278ea-86ce-41de-a84c-c3bff0b97731"),
                 TipoEstado.TERMINADO,
                 LocalDate.now(),
                 LocalDate.of(2022, 12, 6),
                 null,
                 120.5,
-                it,
+                it.id,
             )
         },
-        UsuarioRepositoryImpl().findByUUID(UUID.fromString("4747bf2d-22dd-4a29-89c8-c1a7492769ae"))?.let {
+        UsuarioRepositoryImpl().findByUUID(UUID.fromString("3d3ce8e5-c2c7-4e14-8dd7-219aa47b908b"))?.let {
             Pedidos(
-                0,
-                UUID.randomUUID(),
+                newId(),
+                UUID.fromString("0b1dde0c-9138-418a-b528-62612ecc7782"),
                 TipoEstado.EN_PROCESO,
                 LocalDate.now(),
                 LocalDate.of(2022, 12, 6),
@@ -234,24 +237,24 @@ suspend fun getPedidos(): List<Pedidos?> {
 fun getProductos(): List<Producto>{
     return listOf(
         Producto(
-            1,
-            UUID.randomUUID(),
+            newId(),
+            UUID.fromString("cf1d57ca-410a-45a4-ae9a-dd1f40395aa5"),
             "Wilson",
             "raqueta",
             20.2,
             12
         ),
         Producto(
-            2,
-            UUID.randomUUID(),
+            newId(),
+            UUID.fromString("74a17626-abb6-49a1-8f02-ab48d6a28e7c"),
             "hola",
             "Overgrips",
             20.2,
             12
         ),
         Producto(
-            3,
-            UUID.randomUUID(),
+            newId(),
+            UUID.fromString("d560efac-9996-4272-9baa-e4a5979d3ede"),
             "adios",
             "grips",
             20.2,
@@ -260,62 +263,58 @@ fun getProductos(): List<Producto>{
     )
 }
 
-fun getTareas(): List<Tarea>{
+suspend fun getTareas(): List<Tarea>{
     return listOf(
         Tarea(
-          1,
-            UUID.randomUUID(),
-            ProductosRepositoryImpl().findById(1)!!,
-            20.0,
+            newId(),
+            UUID.fromString("d560efac-9996-4272-9baa-e4a5979d3ede"),
+            ProductoRepositoryImpl().findByUUID(UUID.fromString("cf1d57ca-410a-45a4-ae9a-dd1f40395aa5"))!!,
+            20.2,
             "Personalizacion",
-            UsuarioRepositoryImpl().findById(3)!!,
-            TurnosRepositoryImpl().findById(1)!!,
+            UsuarioRepositoryImpl().findByUUID(UUID.fromString("38ac290a-b3d5-4ef6-a9ab-8f24df5724f1"))!!,
+            TurnoRepositoryImpl().findByUUID(UUID.fromString("5f6cab09-31a4-46d0-8d69-e4e510d2a227"))!!,
             true,
-            MaquinaEncordarRepositoryImpl().findById(1)!!,
-            null,
-            PedidosRepositoryImpl().findById(1)!!
+            MaquinaRepositoryImpl().findByUUID(UUID.fromString("00339a54-6eb4-4a49-820c-dc49183a564a"))!!,
+            PedidosRepositoryImpl().findByUUID(UUID.fromString("45c3ca42-dc8f-46c7-9dfe-ff8fd786a77f"))!!
         ),
         Tarea(
-            2,
-            UUID.randomUUID(),
-            ProductosRepositoryImpl().findById(3)!!,
+            newId(),
+            UUID.fromString("d560efac-9996-4272-9baa-e4a5979d3ede"),
+            ProductoRepositoryImpl().findByUUID(UUID.fromString("d560efac-9996-4272-9baa-e4a5979d3ede"))!!,
             20.0,
             "Personalizacion",
-            UsuarioRepositoryImpl().findById(2)!!,
-            TurnosRepositoryImpl().findById(3)!!,
+            UsuarioRepositoryImpl().findByUUID(UUID.fromString("5e187396-a777-4a07-871d-90ed04e1af8a"))!!,
+            TurnoRepositoryImpl().findByUUID(UUID.fromString("5f6cab09-31a4-46d0-8d69-e4e510d2a227"))!!,
             true,
-            MaquinaEncordarRepositoryImpl().findById(2)!!,
-            null,
-            PedidosRepositoryImpl().findById(3)!!
+            MaquinaRepositoryImpl().findByUUID(UUID.fromString("02c6bb52-ba65-41a9-8458-850d284bab07"))!!,
+            PedidosRepositoryImpl().findByUUID(UUID.fromString("cc1278ea-86ce-41de-a84c-c3bff0b97731"))!!
         ),
         Tarea(
-            3,
-            UUID.randomUUID(),
-            ProductosRepositoryImpl().findById(2)!!,
+            newId(),
+            UUID.fromString("d560efac-9996-4272-9baa-e4a5979d3ede"),
+            ProductoRepositoryImpl().findByUUID(UUID.fromString("74a17626-abb6-49a1-8f02-ab48d6a28e7c"))!!,
             20.0,
             "Personalizacion",
-            UsuarioRepositoryImpl().findById(2)!!,
-            TurnosRepositoryImpl().findById(2)!!,
+            UsuarioRepositoryImpl().findByUUID(UUID.fromString("5e187396-a777-4a07-871d-90ed04e1af8a"))!!,
+            TurnoRepositoryImpl().findByUUID(UUID.fromString("5f6cab09-31a4-46d0-8d69-e4e510d2a227"))!!,
             true,
-            MaquinaEncordarRepositoryImpl().findById(3)!!,
-            null,
-            PedidosRepositoryImpl().findById(3)!!
+            MaquinaRepositoryImpl().findByUUID(UUID.fromString("02c6bb52-ba65-41a9-8458-850d284bab07"))!!,
+            PedidosRepositoryImpl().findByUUID(UUID.fromString("cc1278ea-86ce-41de-a84c-c3bff0b97731"))!!
         ),
         Tarea(
-            4,
-            UUID.randomUUID(),
-            ProductosRepositoryImpl().findById(1)!!,
+            newId(),
+            UUID.fromString("d560efac-9996-4272-9baa-e4a5979d3ede"),
+            ProductoRepositoryImpl().findByUUID(UUID.fromString("45c3ca42-dc8f-46c7-9dfe-ff8fd786a77f"))!!,
             20.0,
-            "Personalizacion",
-            UsuarioRepositoryImpl().findById(3)!!,
-            TurnosRepositoryImpl().findById(3)!!,
-            true,
-            null,
-            MaquinaPersonalizacionRepositoryImpl().findById(1)!!,
-            PedidosRepositoryImpl().findById(3)!!
+            "Encordar",
+            UsuarioRepositoryImpl().findByUUID(UUID.fromString("2c172996-ce30-470a-b796-7b03e6224055"))!!,
+            TurnoRepositoryImpl().findByUUID(UUID.fromString("b4023b8f-68a1-4d93-8519-8d0b54f7013d"))!!,
+            false,
+            MaquinaRepositoryImpl().findByUUID(UUID.fromString("a016f77a-4698-4bd3-8294-1edb74311d27"))!!,
+            PedidosRepositoryImpl().findByUUID(UUID.fromString("0b1dde0c-9138-418a-b528-62612ecc7782"))!!
         )
     )
 }
 
 
- */
+
