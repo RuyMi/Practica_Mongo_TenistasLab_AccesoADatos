@@ -2,6 +2,7 @@
 
 import controller.Controlador
 import db.*
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -11,6 +12,11 @@ import models.Usuario
 import models.enums.TipoEstado
 import models.enums.TipoPerfil
 import org.litote.kmongo.newId
+import repositories.maquina.MaquinaRepositoryImpl
+import repositories.pedidos.PedidosRepositoryImpl
+import repositories.producto.ProductoRepositoryImpl
+import repositories.tarea.TareasRepositoryImpl
+import repositories.turno.TurnoRepositoryImpl
 import repositories.usuario.UsuarioRepositoryImpl
 import services.password.Password
 
@@ -21,7 +27,7 @@ private val json = Json {
     prettyPrint = true
     allowStructuredMapKeys = true
 }
-
+/*
 /**
  * Main
  *
@@ -37,18 +43,18 @@ fun main(args: Array<String>) = runBlocking {
 
 
     val controlador = Controlador(
-        MaquinaEncordarRepositoryImpl(),
+        MaquinaRepositoryImpl(),
         PedidosRepositoryImpl(),
-        ProductosRepositoryImpl(),
+        ProductoRepositoryImpl(),
         TareasRepositoryImpl(),
         UsuarioRepositoryImpl(),
-        TurnosRepositoryImpl(),
+        TurnoRepositoryImpl(),
         usuarioActual!!
     )
     meterDatos(controlador)
     // Lista de un pedido completo en json
     val pedido = controlador.encontrarPedidoID(1)
-    val tareas = controlador.listarTareas().filter { it.pedido.uuid == pedido!!.uuid }
+    val tareas = controlador.listarTareas().filter { it.pedido.uuidPedidos == pedido!!.uuid }
     val tarea1 = json.encodeToString(pedido)
     val tarea2 = json.encodeToString(tareas)
     println(
@@ -222,4 +228,4 @@ suspend fun initDataBase() {
 
     UsuarioRepositoryImpl().save(meterAdmin)
 
-}
+}*/

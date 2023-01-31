@@ -3,12 +3,13 @@ package services.ktorfit
 import de.jensklingenberg.ktorfit.http.*
 import dto.*
 import models.Usuario
+import models.UsuarioAPI
 
 
 interface KtorFitRest {
 
     @GET("users")
-    suspend fun getAll(@Query("page") page: Int = 0, @Query("per_page") perPage: Int = 0): GetAllDto
+    suspend fun getAll(): List<UsuarioAPI>
 
     @GET("users/{id}")
     suspend fun getById(@Path("id") id: Int): GetByIdDto

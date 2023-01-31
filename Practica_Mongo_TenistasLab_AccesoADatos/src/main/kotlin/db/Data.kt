@@ -12,7 +12,7 @@ import services.password.Password
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
-
+/*
 fun getTurnos(): List<Turno> {
     return listOf(
         Turno(
@@ -317,3 +317,5 @@ fun getTareas(): List<Tarea>{
     )
 }
 
+
+ */

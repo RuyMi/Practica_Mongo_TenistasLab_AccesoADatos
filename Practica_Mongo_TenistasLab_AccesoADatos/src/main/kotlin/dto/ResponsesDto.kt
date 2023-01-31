@@ -2,15 +2,12 @@ package dto
 
 import kotlinx.serialization.Serializable
 import models.Usuario
+import models.UsuarioAPI
 
 @Serializable
 data class GetAllDto(
-    var page: Int? = 0,
-    var per_page: Int? = 0,
-    var total: Int? = 0,
-    var total_pages: Int? = 0,
-    var data: ArrayList<Usuario>? = null,
-    var support: SupportDto? = null,
+    var data: List<UsuarioAPI>? = null,
+
 )
 
 @Serializable
