@@ -13,6 +13,7 @@ import models.Tarea
 import models.Usuario
 import models.enums.TipoEstado
 import models.enums.TipoPerfil
+import org.litote.kmongo.id.serialization.IdKotlinXSerializationModule
 import org.litote.kmongo.newId
 import repositories.maquina.MaquinaRepositoryImpl
 import repositories.pedidos.PedidosRepositoryImpl
@@ -28,6 +29,7 @@ import kotlin.system.exitProcess
 private val json = Json {
     prettyPrint = true
     allowStructuredMapKeys = true
+    serializersModule = IdKotlinXSerializationModule
 }
 // ¡ATENCION! Esto borrará la base de datos y la volverá a inicializar con datos por defecto
 private val inicializarDatos = true
@@ -59,6 +61,7 @@ fun main(args: Array<String>) = runBlocking {
     )
     meterDatos(controlador)
     // Lista de un pedido completo en json
+    /*
     val pedido = controlador.encontrarPedidoUUID("45c3ca42-dc8f-46c7-9dfe-ff8fd786a77f")
     val tareas = controlador.listarTareas().filter { it.pedido.uuidPedidos == pedido!!.uuidPedidos }
     val tarea1 = json.encodeToString(pedido)
@@ -92,7 +95,7 @@ fun main(args: Array<String>) = runBlocking {
         | -> Encordar
     """.trimMargin()
     )
-
+*/
     //Listado de asignaciones para los encordadores por fecha en JSON
     //* Hemos entendido que debemos sacar por cada empleado, sus tareas realizadas ordenadas por hora
     val tareasByEmpleadoSortFecha = mutableListOf<Tarea>()
@@ -257,7 +260,7 @@ suspend fun initDataBase() {
 
 }
 
-fun borrarDataBase() {
-
+suspend fun borrarDataBase() {
+    MongoDbManager.database.drop()
 
 }

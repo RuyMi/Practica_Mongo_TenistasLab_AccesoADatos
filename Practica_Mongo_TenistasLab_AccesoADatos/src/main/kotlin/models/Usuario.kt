@@ -12,7 +12,7 @@ import java.util.UUID
 @Serializable
 data class Usuario(
     @BsonId @Contextual
-    val id: Id<Usuario> = newId<Usuario>(),
+    val id: Id<Usuario> = newId(),
     val uuidUsuario: String = UUID.randomUUID().toString(),
     val nombre: String,
     val apellido: String,
