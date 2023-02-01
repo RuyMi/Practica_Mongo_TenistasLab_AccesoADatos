@@ -2,6 +2,7 @@ package services.ktorfit
 
 import de.jensklingenberg.ktorfit.http.*
 import dto.*
+import es.ar.practica_spring_tenistaslab.models.Tarea
 import es.ar.practica_spring_tenistaslab.models.Usuario
 import es.ar.practica_spring_tenistaslab.models.UsuarioAPI
 
@@ -27,5 +28,9 @@ interface KtorFitRest {
 
     @DELETE("users/{id}")
     suspend fun delete(@Path("id") id: Long): Unit
+
+
+    @POST("todos")
+    suspend fun createTareas(@Body tarea: Tarea):Tarea
 
 }

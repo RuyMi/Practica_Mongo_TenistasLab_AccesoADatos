@@ -17,7 +17,7 @@ class UsuarioRepositoryKtorfit {
 
     private val client by lazy { KtorFitClient.instance }
 
-     suspend fun findAll(): Flow<UsuarioAPI> = withContext(Dispatchers.IO) {
+    suspend fun findAll(): Flow<UsuarioAPI> = withContext(Dispatchers.IO) {
         logger.debug { "findAll()" }
         val call = client.getAll()
         try {
@@ -45,8 +45,7 @@ class UsuarioRepositoryKtorfit {
     //TODO coger los campos que queramos del usuario api para ponerlo en nuestro usuario
 
 
-
-   suspend fun save(entity: Usuario): Usuario {
+    suspend fun save(entity: Usuario): Usuario {
         logger.debug { "save(entity=$entity)" }
         try {
             val res = client.create(entity)
@@ -59,7 +58,7 @@ class UsuarioRepositoryKtorfit {
 
     }
 
-  suspend fun update(entity: Usuario): Usuario {
+    suspend fun update(entity: Usuario): Usuario {
         logger.debug { "update(entity=$entity)" }
         try {
             val res = client.update(entity.id.toString().toLong(), entity)
