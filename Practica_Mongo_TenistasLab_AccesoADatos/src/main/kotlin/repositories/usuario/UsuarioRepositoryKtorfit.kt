@@ -35,12 +35,12 @@ class UsuarioRepositoryKtorfit {
 
     }
 
-    suspend fun findById(id: Int): UsuarioAPI? {
+    suspend fun findById(id: Int): Usuario? {
         logger.debug { "finById(id=$id)" }
         val call = client.getById(id)
         try {
             logger.debug { "findById(id=$id) - OK" }
-            return call
+            return call?.toUsuario()
         } catch (e: Exception) {
             logger.error { "findById(id=$id) - ERROR" }
             throw RestException("Error al obtener el usuario con id $id o no existe: ${e.message}")

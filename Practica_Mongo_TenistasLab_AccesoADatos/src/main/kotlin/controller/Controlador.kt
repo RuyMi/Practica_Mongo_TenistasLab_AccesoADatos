@@ -396,7 +396,11 @@ class Controlador(
      */
     suspend fun encontrarUsuarioID(id: Id<Usuario>): Usuario? {
         return if(usuarioActual.perfil == TipoPerfil.ADMINISTRADOR){
-            usuarioRepositoryImpl.findById(id)
+            val res = cacheRepositoryImpl.findById(id.toString().toLong())?.let {
+                return it
+            }
+            return usuarioRepositoryImpl.findById(id)
+
         } else{
             logger.error{"Solo un administrador puede encontrar usuarios"}
             null
@@ -536,6 +540,10 @@ class Controlador(
 
     suspend fun encontrarUsuariosAPI(): Flow<Usuario> {
         return ktorFitUsuario.findAll()
+    }
+
+    suspend fun guardarUsuariosAPI(user: Usuario): Usuario {
+        return ktorFitUsuario.save(user)
     }
 
     suspend fun añadirCacheUsuarios(user: Usuario): Usuario {

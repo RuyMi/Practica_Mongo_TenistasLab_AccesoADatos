@@ -5,6 +5,7 @@ import com.squareup.sqldelight.runtime.coroutines.mapToList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import models.Usuario
@@ -41,17 +42,15 @@ class RemoteCachedRepositoryUsuario(client: SqlDeLightClient) {
         }
 
         fun findAll(): Flow<List<Usuario>> {
-            // De esta manera me quedo escuchando en tiempo real!!!
-            // Si no devolver como una lista
             logger.debug { "RemoteCachedRepository.getAll()" }
             return cached.selectUsers().asFlow().mapToList()
                 .map { it.map { user -> user.toUserModel() } }
         }
 
-        fun findById(id: Long): Usuario {
+        fun findById(id: Long): database.Usuario {
             logger.debug { "RemoteCachedRepository.findById(id=$id)" }
             // consulamos la base de datos local
-            return cached.selectById(id).executeAsOne().toUserModel()
+            return cached.selectById(id).executeAsOne()
         }
 
         suspend fun save(entity: Usuario): Usuario {
