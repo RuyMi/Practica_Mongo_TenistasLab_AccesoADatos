@@ -36,8 +36,6 @@ data class Tarea(
     val estadoCompletado:Boolean,
     val maquina: Maquina?,
     val pedido:Pedidos
-) {
-    override fun toString(): String {
-        return "Tarea(id=$id, uuidTarea=$uuidTarea, producto=$producto, precio=$precio, descripcion='$descripcion', empleado=${empleado.nombre}, ${empleado.apellido} turno=$turno, estadoCompletado=$estadoCompletado, maquina=$maquina, pedido=$pedido)"
-    }
-}
+)
+
+

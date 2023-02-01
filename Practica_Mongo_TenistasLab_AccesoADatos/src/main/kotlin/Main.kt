@@ -7,13 +7,15 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import models.Pedidos
+import models.Producto
 import models.Tarea
 import models.Usuario
 import models.enums.TipoEstado
 import models.enums.TipoPerfil
+import mu.KotlinLogging
 import org.litote.kmongo.id.serialization.IdKotlinXSerializationModule
 import org.litote.kmongo.newId
 import repositories.maquina.MaquinaRepositoryImpl
@@ -23,26 +25,25 @@ import repositories.tarea.TareasRepositoryImpl
 import repositories.turno.TurnoRepositoryImpl
 import repositories.usuario.UsuarioRepositoryImpl
 import services.password.Password
-
 import java.util.*
 import kotlin.system.exitProcess
 
-@OptIn(ExperimentalSerializationApi::class)
 private val json = Json {
     prettyPrint = true
     allowStructuredMapKeys = true
     serializersModule = IdKotlinXSerializationModule
-    explicitNulls = false
 }
 // ¡ATENCION! Esto borrará la base de datos y la volverá a inicializar con datos por defecto
 private val inicializarDatos = true
+
+private val logger = KotlinLogging.logger{}
 
 /**
  * Main
  *
  * @param args
  */
-fun main(args: Array<String>) = runBlocking {
+fun main(args: Array<String>): Unit = runBlocking {
     var usuarioActual: Usuario? = null
     if(inicializarDatos) {
         val init = launch {
@@ -50,6 +51,9 @@ fun main(args: Array<String>) = runBlocking {
             usuarioActual = iniciarSesion()
         }
         init.join()
+    }
+    launch {
+
     }
 
 
@@ -63,33 +67,54 @@ fun main(args: Array<String>) = runBlocking {
         usuarioActual!!
     )
     meterDatos(controlador)
-    // Lista de un pedido completo en json
-    /*
-    val pedido = controlador.encontrarPedidoUUID("45c3ca42-dc8f-46c7-9dfe-ff8fd786a77f")
-    val tareas = controlador.listarTareas().filter { it.pedido.uuidPedidos == pedido!!.uuidPedidos }
-    val tarea1 = json.encodeToString(pedido)
-    val tarea2 = json.encodeToString(tareas)
-    println(
-        """Pedido: $tarea1
-        Las tareas de este producto eran: $tarea2
-    """.trimMargin()
-    )
+    launch {
+        // Lista de un pedido completo en json
+        val pedido = controlador.encontrarPedidoUUID("45c3ca42-dc8f-46c7-9dfe-ff8fd786a77f")
+        val tareas = mutableListOf<Tarea>()
+        val tareasFlow = controlador.listarTareas().onEach {
+            tareas.add(it)
+        }
+        val tareasJson = tareas.filter { it.pedido.uuidPedidos == pedido!!.uuidPedidos }
+        val tarea1 = json.encodeToString(pedido)
+        val tarea2 = json.encodeToString(tareas)
+        println(
+            """Pedido: $tarea1
+            Las tareas de este producto eran: $tarea2
+        """.trimMargin()
+        )
+    }
 
-    //Listado de pedidos pendientes en JSON
-    val pedidosPen = controlador.listarPedidos().filter { it.estado == TipoEstado.EN_PROCESO }
-    val pedidosPenjson = json.encodeToString(pedidosPen)
-    println("Listado de pedidos pendientes: $pedidosPenjson")
+    launch {
+        //Listado de pedidos pendientes en JSON
+        val pedidosList = mutableListOf<Pedidos>()
+        val pedidosPenFlow = controlador.listarPedidos().onEach {
+            pedidosList.add(it)
+        }
+        val pedidosPen = pedidosList.filter { it.estado == TipoEstado.EN_PROCESO }
+        val pedidosPenjson = json.encodeToString(pedidosPen)
+        println("Listado de pedidos pendientes: $pedidosPenjson")
+    }
 
-    //Listado de pedidos completados en JSON
-    val pedidosCom = controlador.listarPedidos().filter { it.estado != TipoEstado.EN_PROCESO }
-    val pedidosComjson = json.encodeToString(pedidosCom)
-    println("Listado de pedidos completados: $pedidosComjson")
+    launch {
+        //Listado de pedidos completados en JSON
+        val pedidosList = mutableListOf<Pedidos>()
+        controlador.listarPedidos().onEach {
+            pedidosList.add(it)
+        }
+            val pedidosCom = pedidosList.filter { it.estado != TipoEstado.EN_PROCESO }
+        val pedidosComjson = json.encodeToString(pedidosCom)
+        println("Listado de pedidos completados: $pedidosComjson")
+    }
 
-    //Listado de productos y servicios en JSON
-    val productos = controlador.listarProductos()
-    val productosjson = json.encodeToString(productos)
-    println(
-        """Productos disponibles: 
+    launch {
+        //Listado de productos y servicios en JSON
+        val productosList = mutableListOf<Producto>()
+        controlador.listarProductos().onEach {
+            productosList.add(it)
+        }
+        val productosjson = json.encodeToString(productosList)
+        println(
+            """Productos disponibles: 
         |$productosjson
         |
         |Servicios que ofrecemos:
@@ -97,17 +122,20 @@ fun main(args: Array<String>) = runBlocking {
         | -> Personalizacion
         | -> Encordar
     """.trimMargin()
-    )
-*/
-    //Listado de asignaciones para los encordadores por fecha en JSON
-    //* Hemos entendido que debemos sacar por cada empleado, sus tareas realizadas ordenadas por hora
-    val tareasByEmpleadoSortFecha = mutableListOf<Tarea>()
-    controlador.listarTareas().onEach { tareasByEmpleadoSortFecha.add(it) }
-        .onCompletion { "Tareas recolectadas correctamente" }
-        .collect()
-    val ordenadoTareas= tareasByEmpleadoSortFecha.sortedBy { it.turno.fechaFin }.groupBy { it.empleado }
-    val tareasByEmpleadoSortFechajson = json.encodeToString(ordenadoTareas)
-    println("""Listado de las tareas agrupadas por empleado y ordenadas por fecha: $tareasByEmpleadoSortFechajson""")
+        )
+    }
+
+    launch {
+        //Listado de asignaciones para los encordadores por fecha en JSON
+        //* Hemos entendido que debemos sacar por cada empleado, sus tareas realizadas ordenadas por hora
+        val tareasByEmpleadoSortFecha = mutableListOf<Tarea>()
+        controlador.listarTareas().onEach { tareasByEmpleadoSortFecha.add(it) }
+            .onCompletion { logger.debug { "Tareas recolectadas correctamente" } }
+            .collect()
+        val ordenadoTareas = tareasByEmpleadoSortFecha.sortedBy { it.turno.fechaFin }.groupBy { it.empleado }
+        val a = json.encodeToString(ordenadoTareas)
+        println("""Listado de las tareas agrupadas por empleado y ordenadas por fecha: ${a}""")
+    }
     //mostrarMenuPrincipal(usuarioActual)
 
 

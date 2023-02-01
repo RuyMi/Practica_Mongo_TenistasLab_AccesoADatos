@@ -1,23 +1,16 @@
 package models
 
 import kotlinx.serialization.Contextual
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.descriptors.PrimitiveKind
-import kotlinx.serialization.descriptors.SerialDescriptor
 import models.enums.TipoPerfil
 import org.bson.codecs.pojo.annotations.BsonId
-import org.litote.kmongo.Id
-import org.litote.kmongo.id.MongoId
-import org.litote.kmongo.newId
+import org.litote.kmongo.*
 import serializers.UUIDSerializer
 import java.util.UUID
 
 @Serializable
 data class Usuario(
-    @SerialName("_id")
-    @Contextual
+    @BsonId @Contextual
     val id: Id<Usuario> = newId(),
     val uuidUsuario: String = UUID.randomUUID().toString(),
     val nombre: String,
@@ -25,7 +18,9 @@ data class Usuario(
     val email: String,
     val password: ByteArray,
     val perfil: TipoPerfil,
+    @Contextual
     val turno: Id<Turno>?,
+    @Contextual
     val pedido: List<Pedidos>?
 ) {
     override fun equals(other: Any?): Boolean {
@@ -59,6 +54,8 @@ data class Usuario(
         result = 31 * result + (pedido?.hashCode() ?: 0)
         return result
     }
+
+
+
+
 }
-
-

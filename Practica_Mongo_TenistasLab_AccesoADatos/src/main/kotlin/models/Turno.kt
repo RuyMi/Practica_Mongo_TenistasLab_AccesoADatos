@@ -19,6 +19,7 @@ data class Turno(
     val fechaInicio: LocalDateTime,
     @Serializable(LocalDateTimeSerializer::class)
     val fechaFin: LocalDateTime
-) {
+)
 
-}
+
+

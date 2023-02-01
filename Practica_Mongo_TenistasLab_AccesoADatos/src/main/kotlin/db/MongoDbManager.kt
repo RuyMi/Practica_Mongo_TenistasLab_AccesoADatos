@@ -6,7 +6,7 @@ import org.litote.kmongo.coroutine.CoroutineDatabase
 import org.litote.kmongo.coroutine.coroutine
 import org.litote.kmongo.reactivestreams.KMongo
 
-private val logger = KotlinLogging.logger {}
+val logger = KotlinLogging.logger {}
 
 object MongoDbManager {
     private lateinit var mongoClient: CoroutineClient
