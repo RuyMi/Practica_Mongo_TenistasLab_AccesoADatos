@@ -57,17 +57,15 @@ class RemoteCachedRepositoryUsuario(client: SqlDeLightClient) {
      */
 
         fun findAll(): Flow<List<Usuario>> {
-            // De esta manera me quedo escuchando en tiempo real!!!
-            // Si no devolver como una lista
             logger.debug { "RemoteCachedRepository.getAll()" }
             return cached.selectUsers().asFlow().mapToList()
                 .map { it.map { user -> user.toUserModel() } }
         }
 
-        fun findById(id: Long): Usuario {
+        fun findById(id: Long): database.Usuario {
             logger.debug { "RemoteCachedRepository.findById(id=$id)" }
             // consulamos la base de datos local
-            return cached.selectById(id).executeAsOne().toUserModel()
+            return cached.selectById(id).executeAsOne()
         }
 
         suspend fun save(entity: Usuario): Usuario {

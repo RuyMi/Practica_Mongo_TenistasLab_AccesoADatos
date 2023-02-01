@@ -27,6 +27,7 @@ import repositories.usuario.RemoteCachedRepositoryUsuario
 import repositories.usuario.UsuarioRepositoryImpl
 import repositories.usuario.UsuarioRepositoryKtorfit
 import services.password.Password
+import services.sqldelight.SqlDeLightClient
 import java.util.*
 import kotlin.system.exitProcess
 
@@ -39,6 +40,7 @@ private val json = Json {
 private val inicializarDatos = true
 
 private val logger = KotlinLogging.logger{}
+private val cliente = SqlDeLightClient
 
 /**
  * Main
