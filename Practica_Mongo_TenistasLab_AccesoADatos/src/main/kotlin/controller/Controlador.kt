@@ -14,7 +14,9 @@ import repositories.pedidos.PedidosRepositoryImpl
 import repositories.producto.ProductoRepositoryImpl
 import repositories.tarea.TareasRepositoryImpl
 import repositories.turno.TurnoRepositoryImpl
+import repositories.usuario.RemoteCachedRepositoryUsuario
 import repositories.usuario.UsuarioRepositoryImpl
+import repositories.usuario.UsuarioRepositoryKtorfit
 import java.util.UUID
 
 private val logger = KotlinLogging.logger {}
@@ -37,6 +39,8 @@ class Controlador(
     private val tareasRepositoryImpl: TareasRepositoryImpl,
     private val usuarioRepositoryImpl: UsuarioRepositoryImpl,
     private val turnoRepositoryImpl: TurnoRepositoryImpl,
+    private val ktorFitUsuario: UsuarioRepositoryKtorfit,
+    private val cacheRepositoryImpl: RemoteCachedRepositoryUsuario,
     private val usuarioActual: Usuario
 ) {
 
@@ -528,6 +532,14 @@ class Controlador(
             logger.debug("Solo un administrador puede eliminar el turno")
             false
         }
+    }
+
+    suspend fun encontrarUsuariosAPI(): Flow<Usuario> {
+        return ktorFitUsuario.findAll()
+    }
+
+    suspend fun añadirCacheUsuarios(user: Usuario): Usuario {
+        return cacheRepositoryImpl.save(user)
     }
 
 }
