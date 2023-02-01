@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import models.Tarea
@@ -26,10 +27,12 @@ import services.password.Password
 import java.util.*
 import kotlin.system.exitProcess
 
+@OptIn(ExperimentalSerializationApi::class)
 private val json = Json {
     prettyPrint = true
     allowStructuredMapKeys = true
     serializersModule = IdKotlinXSerializationModule
+    explicitNulls = false
 }
 // ¡ATENCION! Esto borrará la base de datos y la volverá a inicializar con datos por defecto
 private val inicializarDatos = true
@@ -173,8 +176,8 @@ fun mostrarMenuPrincipal(usuario: Usuario) {
 
 suspend fun iniciarSesion(): Usuario {
     println("Bienvenido al sistema, por favor introduzca su correo electronico y su contraseña para acceder")
-    val usuario = readln()
-    val password = readln()
+    val usuario = "admin@admin.com"
+    val password = "1"
     try {
         val coincidente = UsuarioRepositoryImpl().findAll().first { it.email == usuario && Password().verificar(password, it.password) }
         println("Bienvenido: ${coincidente.nombre} ${coincidente.apellido}, eres un ${coincidente.perfil}")
@@ -250,7 +253,7 @@ suspend fun initDataBase() {
         "Administrador",
         "Prueba",
         "admin@admin.com",
-        Password().encriptar(readln()),
+        Password().encriptar("1"),
         TipoPerfil.ADMINISTRADOR,
         null,
         null

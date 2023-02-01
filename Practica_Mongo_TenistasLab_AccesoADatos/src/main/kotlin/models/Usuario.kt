@@ -1,17 +1,23 @@
 package models
 
 import kotlinx.serialization.Contextual
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.SerialDescriptor
 import models.enums.TipoPerfil
 import org.bson.codecs.pojo.annotations.BsonId
 import org.litote.kmongo.Id
+import org.litote.kmongo.id.MongoId
 import org.litote.kmongo.newId
 import serializers.UUIDSerializer
 import java.util.UUID
 
 @Serializable
 data class Usuario(
-    @BsonId @Contextual
+    @SerialName("_id")
+    @Contextual
     val id: Id<Usuario> = newId(),
     val uuidUsuario: String = UUID.randomUUID().toString(),
     val nombre: String,
@@ -54,3 +60,5 @@ data class Usuario(
         return result
     }
 }
+
+

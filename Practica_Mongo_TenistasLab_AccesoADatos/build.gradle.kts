@@ -23,7 +23,7 @@ repositories {
 dependencies {
     testImplementation(kotlin("test"))
     // Para serializar JSON
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
+   // implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
 
     // Para hacer el logging
     implementation("io.github.microutils:kotlin-logging-jvm:3.0.4")
