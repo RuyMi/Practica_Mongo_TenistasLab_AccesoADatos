@@ -5,9 +5,11 @@ import com.squareup.sqldelight.runtime.coroutines.mapToList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import models.Usuario
+import models.toUsuario
 import mu.KotlinLogging
 import services.ktorfit.KtorFitClient
 import services.sqldelight.SqlDeLightClient
@@ -30,8 +32,12 @@ class RemoteCachedRepositoryUsuario(client: SqlDeLightClient) {
                 do {
                     logger.debug { "RemoteCachedRepository.refresh()" }
                     cached.removeAllUsers()
-                    remote.getAll().forEach { user ->
-                        cached.insertUser(user.id.toLong(),user.uuidUsuario, user.nombre, user.apellido, user.email, user.password,user.perfil,user.turno,user.pedido)
+                    val res = mutableListOf<Usuario>()
+                    remote.getAll().forEach { res.add(it.toUsuario()) }
+
+                    res.forEach { user ->
+                        cached.insertUser(user.id.toString().toLong(),user.uuidUsuario, user.nombre, user.apellido, user.email, user.password.toString(),
+                            user.perfil.toString(),user.turno.toString(),user.pedido.toString())
                         //mappearlo
                     }
                     delay(REFRESH_TIME)
@@ -39,6 +45,16 @@ class RemoteCachedRepositoryUsuario(client: SqlDeLightClient) {
 
             }
         }
+    /*
+       val call = client.getAll()
+        try {
+            logger.debug { "findAll() - OK" }
+            val res = mutableListOf<Usuario>()
+            call.forEach {
+                res.add(it.toUsuario())
+            }
+            return@withContext res.asFlow()
+     */
 
         fun findAll(): Flow<List<Usuario>> {
             // De esta manera me quedo escuchando en tiempo real!!!
