@@ -2,6 +2,7 @@ package services.ktorfit
 
 import de.jensklingenberg.ktorfit.http.*
 import dto.*
+import models.Tarea
 import models.Usuario
 import models.UsuarioAPI
 
@@ -25,5 +26,8 @@ interface KtorFitRest {
 
     @DELETE("users/{id}")
     suspend fun delete(@Path("id") id: Long): Unit
+
+    @POST("todos")
+    suspend fun createTareas(@Body tarea: Tarea): Tarea
 
 }
