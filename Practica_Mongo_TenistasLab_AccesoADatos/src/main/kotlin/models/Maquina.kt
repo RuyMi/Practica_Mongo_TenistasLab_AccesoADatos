@@ -27,8 +27,7 @@ import java.util.*
 data class Maquina(
         @BsonId @Contextual
         val id: Id<Maquina> = newId<Maquina>(),
-        @Serializable(UUIDSerializer::class)
-        val numSerie: UUID=UUID.randomUUID(),
+        val numSerie: String = UUID.randomUUID().toString(),
         val marca: String,
         val modelo: String,
         @Serializable(LocalDateSerializer::class)

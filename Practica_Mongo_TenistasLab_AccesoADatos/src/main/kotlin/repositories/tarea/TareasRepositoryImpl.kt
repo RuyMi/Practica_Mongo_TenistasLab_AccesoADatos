@@ -25,7 +25,7 @@ class TareasRepositoryImpl:TareasRepository {
             .findOneById(id) ?: throw Exception("No existe el Tarea con id $id")//TODO cambiar las excepciones
     }
 
-    override suspend fun findByUUID(uuid: UUID): Tarea? {
+    override suspend fun findByUUID(uuid: String): Tarea? {
         logger.debug { "findByUUID($uuid)" }
         return MongoDbManager.database.getCollection<Tarea>().findOne(Tarea::uuidTarea eq uuid)
     }

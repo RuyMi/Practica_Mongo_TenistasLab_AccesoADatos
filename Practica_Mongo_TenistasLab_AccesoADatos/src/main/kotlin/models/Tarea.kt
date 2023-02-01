@@ -27,8 +27,7 @@ import java.util.*
 data class Tarea(
     @BsonId @Contextual
     val id: Id<Tarea> = newId<Tarea>(),
-    @Serializable(UUIDSerializer::class)
-    val uuidTarea: UUID,
+    val uuidTarea: String,
     val producto: Producto,
     val precio: Double,
     val descripcion: String,
@@ -37,8 +36,6 @@ data class Tarea(
     val estadoCompletado:Boolean,
     val maquina: Maquina?,
     val pedido:Pedidos
-) {
-    override fun toString(): String {
-        return "Tarea(id=$id, uuidTarea=$uuidTarea, producto=$producto, precio=$precio, descripcion='$descripcion', empleado=${empleado.nombre}, ${empleado.apellido} turno=$turno, estadoCompletado=$estadoCompletado, maquina=$maquina, pedido=$pedido)"
-    }
-}
+)
+
+

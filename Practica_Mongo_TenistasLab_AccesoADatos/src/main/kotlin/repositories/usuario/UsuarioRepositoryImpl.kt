@@ -25,7 +25,7 @@ class UsuarioRepositoryImpl:UsuarioRepository {
             .findOneById(id) ?: throw Exception("No existe el Usuario con id $id")//TODO cambiar las excepciones
     }
 
-    override suspend fun findByUUID(uuid: UUID): Usuario? {
+    override suspend fun findByUUID(uuid: String): Usuario? {
         logger.debug { "findByUUID($uuid)" }
         return MongoDbManager.database.getCollection<Usuario>().findOne(Usuario::uuidUsuario eq uuid)
     }

@@ -26,7 +26,7 @@ class TurnoRepositoryImpl:TurnoRepository {
             .findOneById(id) ?: throw Exception("No existe el Turno con id $id")//TODO cambiar las excepciones
     }
 
-    override suspend fun findByUUID(uuid: UUID): Turno? {
+    override suspend fun findByUUID(uuid: String): Turno? {
         logger.debug { "findByUUID($uuid)" }
         return MongoDbManager.database.getCollection<Turno>().findOne(Turno::uuidTurno eq uuid)
     }

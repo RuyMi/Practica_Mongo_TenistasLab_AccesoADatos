@@ -1,6 +1,8 @@
 package models
 
 import kotlinx.serialization.Serializable
+import models.enums.TipoPerfil
+import services.password.Password
 
 
 @Serializable
@@ -14,3 +16,19 @@ data class UsuarioAPI(
     val username: String,
     val website: String
 )
+
+fun UsuarioAPI.toUsuario(): Usuario{
+    return Usuario(
+        nombre = this.name,
+        apellido = this.username,
+        email = this.email,
+        password = Password().encriptar(this.name),
+        perfil = perfilAleatorio(),
+        turno = null,
+        pedido = null
+    )
+}
+
+fun perfilAleatorio(): TipoPerfil {
+    return mutableListOf<TipoPerfil>(TipoPerfil.USUARIO, TipoPerfil.ADMINISTRADOR, TipoPerfil.ENCORDADOR).random()
+}

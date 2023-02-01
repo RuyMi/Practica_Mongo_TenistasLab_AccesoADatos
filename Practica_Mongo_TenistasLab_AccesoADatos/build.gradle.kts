@@ -23,7 +23,7 @@ repositories {
 dependencies {
     testImplementation(kotlin("test"))
     // Para serializar JSON
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
+   // implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
 
     // Para hacer el logging
     implementation("io.github.microutils:kotlin-logging-jvm:3.0.4")
@@ -42,6 +42,8 @@ dependencies {
     implementation("org.litote.kmongo:kmongo-async:4.7.2")
     // Usamos corrutinas para ello
     implementation("org.litote.kmongo:kmongo-coroutine:4.7.2")
+    //Serializar KMongo
+    implementation("org.litote.kmongo:kmongo-id-serialization:4.1.3")
 
     // Corrutinas
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
@@ -55,6 +57,8 @@ dependencies {
 
     // BCrypt
     implementation("com.ToxicBakery.library.bcrypt:bcrypt:1.0.9")
+
+
 
 
 }
@@ -85,3 +89,4 @@ sqldelight {
         packageName = "database"
     }
 }
+
