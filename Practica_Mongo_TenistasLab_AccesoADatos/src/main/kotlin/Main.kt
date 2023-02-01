@@ -23,7 +23,9 @@ import repositories.pedidos.PedidosRepositoryImpl
 import repositories.producto.ProductoRepositoryImpl
 import repositories.tarea.TareasRepositoryImpl
 import repositories.turno.TurnoRepositoryImpl
+import repositories.usuario.RemoteCachedRepositoryUsuario
 import repositories.usuario.UsuarioRepositoryImpl
+import repositories.usuario.UsuarioRepositoryKtorfit
 import services.password.Password
 import java.util.*
 import kotlin.system.exitProcess
@@ -52,11 +54,6 @@ fun main(args: Array<String>): Unit = runBlocking {
         }
         init.join()
     }
-    launch {
-
-    }
-
-
     val controlador = Controlador(
         MaquinaRepositoryImpl(),
         PedidosRepositoryImpl(),
@@ -64,9 +61,20 @@ fun main(args: Array<String>): Unit = runBlocking {
         TareasRepositoryImpl(),
         UsuarioRepositoryImpl(),
         TurnoRepositoryImpl(),
+        UsuarioRepositoryKtorfit(),
+        RemoteCachedRepositoryUsuario(cliente),
         usuarioActual!!
     )
     meterDatos(controlador)
+
+    launch {
+        while(true){
+            val usuarios = mutableListOf<Usuario>()
+             controlador.encontrarUsuariosAPI().onEach {
+                 usuarios.add(it)
+             }.collect()
+        }
+    }
     launch {
         // Lista de un pedido completo en json
         val pedido = controlador.encontrarPedidoUUID("45c3ca42-dc8f-46c7-9dfe-ff8fd786a77f")

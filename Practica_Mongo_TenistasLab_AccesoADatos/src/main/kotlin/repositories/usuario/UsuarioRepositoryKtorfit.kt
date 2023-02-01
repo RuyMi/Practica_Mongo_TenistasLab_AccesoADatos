@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.withContext
 import models.Usuario
 import models.UsuarioAPI
+import models.toUsuario
 import mu.KotlinLogging
 import org.litote.kmongo.newId
 import services.ktorfit.KtorFitClient
@@ -17,13 +18,16 @@ class UsuarioRepositoryKtorfit {
 
     private val client by lazy { KtorFitClient.instance }
 
-    suspend fun findAll(): Flow<UsuarioAPI> = withContext(Dispatchers.IO) {
+    suspend fun findAll(): Flow<Usuario> = withContext(Dispatchers.IO) {
         logger.debug { "findAll()" }
         val call = client.getAll()
         try {
             logger.debug { "findAll() - OK" }
-            logger.debug { call }
-            return@withContext call.asFlow()
+            val res = mutableListOf<Usuario>()
+            call.forEach {
+                res.add(it.toUsuario())
+            }
+            return@withContext res.asFlow()
         } catch (e: Exception) {
             logger.error { "findAll() - ERROR" }
             throw RestException("Error al obtener los usuarios: ${e.message}")
