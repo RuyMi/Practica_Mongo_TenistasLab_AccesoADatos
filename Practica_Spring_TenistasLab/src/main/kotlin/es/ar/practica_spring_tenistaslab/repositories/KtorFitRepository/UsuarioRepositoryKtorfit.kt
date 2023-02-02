@@ -8,12 +8,13 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.withContext
 import mu.KotlinLogging
+import org.springframework.stereotype.Repository
 import services.ktorfit.KtorFitClient
 
 
 
 private val logger = KotlinLogging.logger {}
-
+@Repository
 class UsuarioRepositoryKtorfit {
 
     private val client by lazy { KtorFitClient.instance }
