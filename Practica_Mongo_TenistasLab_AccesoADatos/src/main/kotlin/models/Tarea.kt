@@ -1,5 +1,6 @@
 package models
 
+import dto.UsuarioDTO
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import org.bson.codecs.pojo.annotations.BsonId
@@ -31,7 +32,7 @@ data class Tarea(
     val producto: Producto,
     val precio: Double,
     val descripcion: String,
-    val empleado:Usuario,
+    val empleado: UsuarioDTO,
     val turno:Turno,
     val estadoCompletado:Boolean,
     val maquina: Maquina?,

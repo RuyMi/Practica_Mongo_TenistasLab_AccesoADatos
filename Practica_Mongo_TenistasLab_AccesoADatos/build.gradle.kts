@@ -23,7 +23,7 @@ repositories {
 dependencies {
     testImplementation(kotlin("test"))
     // Para serializar JSON
-   // implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
 
     // Para hacer el logging
     implementation("io.github.microutils:kotlin-logging-jvm:3.0.4")
@@ -59,6 +59,13 @@ dependencies {
     // BCrypt
     implementation("com.ToxicBakery.library.bcrypt:bcrypt:1.0.9")
 
+    // Koin - Core
+    implementation("io.insert-koin:koin-core:3.2.2")
+
+    // Koin Anotaciones
+    implementation("io.insert-koin:koin-annotations:1.0.3")
+    ksp("io.insert-koin:koin-ksp-compiler:1.0.3")
+
 
 
 
@@ -89,5 +96,11 @@ sqldelight {
         // Como se llama el paquete donde esta el código
         packageName = "database"
     }
+}
+
+
+// Para Koin Annotations
+sourceSets.main {
+    java.srcDirs("build/generated/ksp/main/kotlin")
 }
 

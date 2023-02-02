@@ -14,7 +14,7 @@ import java.util.*
 @Serializable
 data class Pedidos(
     @BsonId @Contextual
-    val id: Id<Usuario> = newId<Usuario>(),
+    val id: Id<Pedidos> = newId<Pedidos>(),
     val uuidPedidos: String = UUID.randomUUID().toString(),
     val estado: TipoEstado,
     @Serializable(LocalDateSerializer::class)

@@ -28,6 +28,7 @@ import services.sqldelight.SqlDeLightClient
 import java.util.*
 import kotlin.system.exitProcess
 
+
 private val json = Json {
     prettyPrint = true
     allowStructuredMapKeys = true
@@ -35,6 +36,8 @@ private val json = Json {
 }
 // ¡ATENCION! Esto borrará la base de datos y la volverá a inicializar con datos por defecto
 private val inicializarDatos = true
+
+var usuarioActual: Usuario? = null
 
 private val logger = KotlinLogging.logger{}
 private val cliente = SqlDeLightClient
@@ -45,7 +48,6 @@ private val cliente = SqlDeLightClient
  * @param args
  */
 fun main(args: Array<String>): Unit = runBlocking {
-    var usuarioActual: Usuario? = null
     if(inicializarDatos) {
         val init = launch {
             initDataBase()
@@ -61,13 +63,13 @@ fun main(args: Array<String>): Unit = runBlocking {
         UsuarioRepositoryImpl(),
         TurnoRepositoryImpl(),
         UsuarioRepositoryKtorfit(),
-        RemoteCachedRepositoryUsuario(cliente),
-        usuarioActual!!
+        RemoteCachedRepositoryUsuario(cliente)
     )
     meterDatos(controlador)
 
     launch {
         while(true){
+            println("Actualizando usuarios API")
             val usuarios = mutableListOf<Usuario>()
              controlador.encontrarUsuariosAPI().onEach {
                  usuarios.add(it)

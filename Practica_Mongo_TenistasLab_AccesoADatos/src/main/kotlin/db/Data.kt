@@ -1,6 +1,7 @@
 package db
 
 
+import mapper.toUsuarioDto
 import models.*
 import models.enums.TipoEstado
 import models.enums.TipoMaquina
@@ -268,7 +269,7 @@ suspend fun getTareas(): List<Tarea> {
             ProductoRepositoryImpl().findByUUID("cf1d57ca-410a-45a4-ae9a-dd1f40395aa5")!!,
             20.2,
             "Personalizacion",
-            UsuarioRepositoryImpl().findByUUID("38ac290a-b3d5-4ef6-a9ab-8f24df5724f1")!!,
+            UsuarioRepositoryImpl().findByUUID("38ac290a-b3d5-4ef6-a9ab-8f24df5724f1")!!.toUsuarioDto(),
             TurnoRepositoryImpl().findByUUID("5f6cab09-31a4-46d0-8d69-e4e510d2a227")!!,
             true,
             MaquinaRepositoryImpl().findByUUID("00339a54-6eb4-4a49-820c-dc49183a564a")!!,
@@ -280,7 +281,7 @@ suspend fun getTareas(): List<Tarea> {
             ProductoRepositoryImpl().findByUUID("d560efac-9996-4272-9baa-e4a5979d3ede")!!,
             20.0,
             "Personalizacion",
-            UsuarioRepositoryImpl().findByUUID("5e187396-a777-4a07-871d-90ed04e1af8a")!!,
+            UsuarioRepositoryImpl().findByUUID("5e187396-a777-4a07-871d-90ed04e1af8a")!!.toUsuarioDto(),
             TurnoRepositoryImpl().findByUUID("5f6cab09-31a4-46d0-8d69-e4e510d2a227")!!,
             true,
             MaquinaRepositoryImpl().findByUUID("02c6bb52-ba65-41a9-8458-850d284bab07")!!,
@@ -292,7 +293,7 @@ suspend fun getTareas(): List<Tarea> {
             ProductoRepositoryImpl().findByUUID("74a17626-abb6-49a1-8f02-ab48d6a28e7c")!!,
             20.0,
             "Personalizacion",
-            UsuarioRepositoryImpl().findByUUID("5e187396-a777-4a07-871d-90ed04e1af8a")!!,
+            UsuarioRepositoryImpl().findByUUID("5e187396-a777-4a07-871d-90ed04e1af8a")!!.toUsuarioDto(),
             TurnoRepositoryImpl().findByUUID("5f6cab09-31a4-46d0-8d69-e4e510d2a227")!!,
             true,
             MaquinaRepositoryImpl().findByUUID("02c6bb52-ba65-41a9-8458-850d284bab07")!!,
@@ -304,7 +305,7 @@ suspend fun getTareas(): List<Tarea> {
             ProductoRepositoryImpl().findByUUID("d560efac-9996-4272-9baa-e4a5979d3ede")!!,
             20.0,
             "Encordar",
-            UsuarioRepositoryImpl().findByUUID("2c172996-ce30-470a-b796-7b03e6224055")!!,
+            UsuarioRepositoryImpl().findByUUID("2c172996-ce30-470a-b796-7b03e6224055")!!.toUsuarioDto(),
             TurnoRepositoryImpl().findByUUID("b4023b8f-68a1-4d93-8519-8d0b54f7013d")!!,
             false,
             MaquinaRepositoryImpl().findByUUID("a016f77a-4698-4bd3-8294-1edb74311d27")!!,
