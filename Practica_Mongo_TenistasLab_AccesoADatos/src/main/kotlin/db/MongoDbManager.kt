@@ -5,23 +5,25 @@ import org.litote.kmongo.coroutine.CoroutineClient
 import org.litote.kmongo.coroutine.CoroutineDatabase
 import org.litote.kmongo.coroutine.coroutine
 import org.litote.kmongo.reactivestreams.KMongo
+import utils.PropertiesReader
 
 val logger = KotlinLogging.logger {}
+val properties = PropertiesReader("application.properties")
 
 object MongoDbManager {
     private lateinit var mongoClient: CoroutineClient
     lateinit var database: CoroutineDatabase
 
     // Para Mongo Atlas
-    private const val MONGO_TYPE = "mongodb+srv://"
-    private const val HOST = "cluster0.myhaiqw.mongodb.net"
-    private const val PORT = 27017
-    private const val DATABASE = "test"
-    private const val USERNAME = "ar" //"mongoadmin"// "mongo"
-    private const val PASSWORD = "tenistaslab"//"mongopass" //"xxxx"
-    private const val OPTIONS = "?authSource=admin&retryWrites=true&w=majority"
+    private val MONGO_TYPE = properties.getProperty("MONGO_TYPE")
+    private val HOST = properties.getProperty("HOST")
+    private val PORT = properties.getProperty("PORT")
+    private val DATABASE = properties.getProperty("DATABASE")
+    private val USERNAME = properties.getProperty("USERNAME")
+    private val PASSWORD = properties.getProperty("PASSWORD")
+    private val OPTIONS = properties.getProperty("OPTIONS")
 
-    private const val MONGO_URI = "$MONGO_TYPE$USERNAME:$PASSWORD@$HOST/$DATABASE"
+    private val MONGO_URI = "$MONGO_TYPE$USERNAME:$PASSWORD@$HOST/$DATABASE"
 
     init {
         logger.debug("Inicializando conexion a MongoDB")

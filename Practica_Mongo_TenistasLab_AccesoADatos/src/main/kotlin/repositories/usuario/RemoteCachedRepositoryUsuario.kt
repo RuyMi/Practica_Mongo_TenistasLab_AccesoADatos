@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import mapper.toUserModel
 import models.Usuario
 import models.toUsuario
 import mu.KotlinLogging
@@ -36,7 +37,7 @@ class RemoteCachedRepositoryUsuario(client: SqlDeLightClient) {
                     remote.getAll().forEach { res.add(it.toUsuario()) }
 
                     res.forEach { user ->
-                        cached.insertUser(user.id.toString().toLong(),user.uuidUsuario, user.nombre, user.apellido, user.email, user.password.toString(),
+                        cached.insertUser(user.id.toString(),user.uuidUsuario, user.nombre, user.apellido, user.email, user.password.toString(),
                             user.perfil.toString(),user.turno.toString(),user.pedido.toString())
                         //mappearlo
                     }
@@ -62,57 +63,42 @@ class RemoteCachedRepositoryUsuario(client: SqlDeLightClient) {
                 .map { it.map { user -> user.toUserModel() } }
         }
 
-        fun findById(id: Long): database.Usuario {
+        suspend fun findById(id: Long): Usuario {
             logger.debug { "RemoteCachedRepository.findById(id=$id)" }
-            // consulamos la base de datos local
-            return cached.selectById(id).executeAsOne()
+            return cached.selectById(id.toString()).executeAsOne().toUserModel()
         }
 
         suspend fun save(entity: Usuario): Usuario {
-            // Insertamos remotamente y localmente (mirar el orden por la id, si es uuid lo hacemos antes localmente)
-            // si dependemos de una base de datos remota se lo debemos pedir a la base de datos remota
             logger.debug { "RemoteCachedRepository.save(entity=$entity)" }
             val dto = remote.create(entity)
-            val user = Usuario(
-                id = dto.id,
-                first_name = dto.first_name!!,
-                last_name = dto.last_name!!,
-                avatar = dto.avatar,
-                email = dto.email
-            )
-            cached.insertUser(user.id.toLong(), user.first_name, user.last_name, user.email, user.avatar)
-            // Devolvemos pero con la id que nos ha devuelto el servidor
-            //return cached.selectLastUser().executeAsOne().toUserModel()
-            return user
+            cached.insertUser(dto.id.toString(), dto.uuidUsuario, dto.nombre, dto.apellido, dto.email, dto.password.toString(), dto.perfil.num, dto.turno.toString(), dto.pedido.toString())
+            return cached.selectLastUser().executeAsOne().toUserModel()
         }
 
         suspend fun update(entity: Usuario): Usuario {
             // actualizamos localmente y remotamente
             logger.debug { "RemoteCachedRepository.update(entity=$entity)" }
             cached.update(
-                id = entity.id,
-                first_name = entity.first_name,
-                last_name = entity.last_name,
+                id = entity.id.toString(),
+                uuidUsuario = entity.uuidUsuario,
+                nombre = entity.nombre,
+                apellido = entity.apellido,
                 email = entity.email,
-                avatar = entity.avatar
+                password = entity.password.toString(),
+                perfil = entity.perfil.num,
+                turno = entity.turno.toString(),
+                pedido = entity.pedido.toString()
             )
-            val dto = remote.update(entity.id, entity)
-            return User(
-                id = dto.id,
-                first_name = dto.first_name,
-                last_name = dto.last_name,
-                avatar = dto.avatar,
-                email = dto.email
-            )
+            val dto = remote.update(entity.id.toString().toLong(), entity)
+            return dto.toUsuario()
         }
 
 
-        suspend fun delete(entity: Usuario): Usuario {
+        suspend fun delete(entity: Usuario): Boolean {
             // borramos localmente y remotamente
             logger.debug { "RemoteCachedRepository.delete(entity=$entity)" }
-            cached.delete(entity.id)
-            remote.delete(entity.id)
-            return entity
+            cached.delete(entity.id.toString())
+            remote.delete(entity.id.toString().toLong())
+            return true
         }
-    }
 }

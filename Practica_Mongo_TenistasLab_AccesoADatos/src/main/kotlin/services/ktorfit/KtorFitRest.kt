@@ -16,13 +16,13 @@ interface KtorFitRest {
     suspend fun getById(@Path("id") id: Int): UsuarioAPI?
 
     @POST("users")
-    suspend fun create(@Body user: Usuario): CreateDto
+    suspend fun create(@Body user: Usuario): Usuario
 
     @PUT("users/{id}")
-    suspend fun update(@Path("id") id: Long, @Body user: Usuario): UpdateDto
+    suspend fun update(@Path("id") id: Long, @Body user: Usuario): UsuarioAPI
 
     @PATCH("users/{id}")
-    suspend fun upgrade(@Path("id") id: Long, @Body user: Usuario): UpdateDto
+    suspend fun upgrade(@Path("id") id: Long, @Body user: Usuario): UsuarioAPI
 
     @DELETE("users/{id}")
     suspend fun delete(@Path("id") id: Long): Unit
