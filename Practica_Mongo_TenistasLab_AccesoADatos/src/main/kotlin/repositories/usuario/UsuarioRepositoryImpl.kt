@@ -19,6 +19,7 @@ private val logger = KotlinLogging.logger {}
 class UsuarioRepositoryImpl:UsuarioRepository {
 
     val cache = SqlDeLightClient.queries
+    val ktorfit = UsuarioRepositoryKtorfit()
     override fun findAll(): Flow<Usuario> {
         logger.debug { "findAll($)" }
         return MongoDbManager.database.getCollection<Usuario>()
@@ -66,6 +67,8 @@ class UsuarioRepositoryImpl:UsuarioRepository {
 
     override suspend fun delete(entity: Usuario): Boolean {
         logger.debug { "delete($entity)" }
+        cache.delete(entity.id.toString())
+        ktorfit.delete(entity)
         return MongoDbManager.database.getCollection<Usuario>()
             .deleteOneById(entity.id).let { true }
     }
