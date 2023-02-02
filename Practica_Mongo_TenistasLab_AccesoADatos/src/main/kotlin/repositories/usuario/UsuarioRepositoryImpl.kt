@@ -68,7 +68,6 @@ class UsuarioRepositoryImpl:UsuarioRepository {
     override suspend fun delete(entity: Usuario): Boolean {
         logger.debug { "delete($entity)" }
         cache.delete(entity.id.toString())
-        ktorfit.delete(entity)
         return MongoDbManager.database.getCollection<Usuario>()
             .deleteOneById(entity.id).let { true }
     }
