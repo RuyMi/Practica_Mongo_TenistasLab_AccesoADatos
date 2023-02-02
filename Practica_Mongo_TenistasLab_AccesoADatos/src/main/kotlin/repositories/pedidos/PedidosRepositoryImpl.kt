@@ -6,6 +6,8 @@ import kotlinx.coroutines.reactive.asFlow
 import models.Pedidos
 import models.Producto
 import mu.KotlinLogging
+import org.koin.core.annotation.Named
+import org.koin.core.annotation.Single
 import org.litote.kmongo.Id
 import org.litote.kmongo.eq
 import java.util.*
@@ -13,6 +15,8 @@ import java.util.*
 private val logger = KotlinLogging.logger {}
 
 
+@Single
+@Named("PedidosRepositoryImpl")
 class PedidosRepositoryImpl:PedidosRepository {
     override fun findAll(): Flow<Pedidos> {
        logger.debug { "findAll($)" }

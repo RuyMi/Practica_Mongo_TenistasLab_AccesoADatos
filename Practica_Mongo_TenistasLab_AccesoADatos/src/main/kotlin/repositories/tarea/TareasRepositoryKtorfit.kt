@@ -3,10 +3,15 @@ package repositories.tarea
 import exceptions.RestException
 import models.Tarea
 import mu.KotlinLogging
+import org.koin.core.annotation.Named
+import org.koin.core.annotation.Single
 import services.ktorfit.KtorFitClient
 
 
 private val logger = KotlinLogging.logger {}
+
+@Single
+@Named("TareasRepositoryKtorfit")
 class TareasRepositoryKtorfit {
 
     private val client by lazy { KtorFitClient.instance }

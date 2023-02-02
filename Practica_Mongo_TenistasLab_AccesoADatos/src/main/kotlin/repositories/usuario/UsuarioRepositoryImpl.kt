@@ -3,16 +3,22 @@ package repositories.usuario
 import db.MongoDbManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.reactive.asFlow
-import models.Producto
 import models.Usuario
 import mu.KotlinLogging
+import org.koin.core.annotation.Named
+import org.koin.core.annotation.Single
 import org.litote.kmongo.Id
 import org.litote.kmongo.eq
+import services.sqldelight.SqlDeLightClient
 import java.util.*
 
 private val logger = KotlinLogging.logger {}
 
+@Single
+@Named("UsuarioRepositoryImpl")
 class UsuarioRepositoryImpl:UsuarioRepository {
+
+    val cache = SqlDeLightClient.queries
     override fun findAll(): Flow<Usuario> {
         logger.debug { "findAll($)" }
         return MongoDbManager.database.getCollection<Usuario>()
@@ -22,7 +28,7 @@ class UsuarioRepositoryImpl:UsuarioRepository {
     override suspend fun findById(id: Id<Usuario>): Usuario? {
         logger.debug { "findById($id)" }
         return MongoDbManager.database.getCollection<Usuario>()
-            .findOneById(id) ?: throw Exception("No existe el Usuario con id $id")//TODO cambiar las excepciones
+            .findOneById(id) ?: throw Exception("No existe el Usuario con id $id")
     }
 
     override suspend fun findByUUID(uuid: String): Usuario? {
@@ -32,6 +38,16 @@ class UsuarioRepositoryImpl:UsuarioRepository {
 
     override suspend fun save(entity: Usuario): Usuario? {
         logger.debug { "save($entity)" }
+        cache.insertUser(
+            entity.id.toString(),
+            entity.uuidUsuario,
+            entity.nombre,
+            entity.apellido,
+            entity.email,
+            entity.password.toString(),
+            entity.perfil.name,
+            entity.turno.toString(),
+            entity.pedido.toString())
         return MongoDbManager.database.getCollection<Usuario>()
             .save(entity).let { entity }
     }

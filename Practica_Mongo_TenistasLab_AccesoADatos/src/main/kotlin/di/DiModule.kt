@@ -9,41 +9,49 @@ import org.koin.core.annotation.ComponentScan
 import org.koin.core.annotation.Module
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
+import repositories.maquina.MaquinaRepository
 import repositories.maquina.MaquinaRepositoryImpl
+import repositories.pedidos.PedidosRepository
 import repositories.pedidos.PedidosRepositoryImpl
+import repositories.producto.ProductoRepository
 import repositories.producto.ProductoRepositoryImpl
+import repositories.tarea.TareasRepository
 import repositories.tarea.TareasRepositoryImpl
 import repositories.tarea.TareasRepositoryKtorfit
+import repositories.turno.TurnoRepository
 import repositories.turno.TurnoRepositoryImpl
 import repositories.usuario.RemoteCachedRepositoryUsuario
+import repositories.usuario.UsuarioRepository
 import repositories.usuario.UsuarioRepositoryImpl
 import repositories.usuario.UsuarioRepositoryKtorfit
+import services.usuarios.UsuariosService
 
 //https://insert-koin.io/docs/reference/koin-annotations/modules
 @Module
 @ComponentScan("koin")
-class DiAnnotationModule
+class DiAnnotationModule {
+    val DiDslModule = module {
+        // StringFormat
+        single<StringFormat>(named("StringFormatJson")) { Json { prettyPrint = true } }
 
-// si quiero hacerlo manuales
-// https://insert-koin.io/docs/reference/koin-core/dsl
-val DiDslModule = module {
-    // StringFormat
-    single<StringFormat>(named("StringFormatJson")) { Json { prettyPrint = true } }
-
-    // Repository
-    single<MaquinaRepositoryImpl> { MaquinaRepositoryImpl() }
-    single<PedidosRepositoryImpl> { PedidosRepositoryImpl() }
-    single<ProductoRepositoryImpl> { ProductoRepositoryImpl() }
-    single<TareasRepositoryImpl> { TareasRepositoryImpl() }
-    single<TareasRepositoryKtorfit> { TareasRepositoryKtorfit() }
-    single<TurnoRepositoryImpl> { TurnoRepositoryImpl() }
-    single<UsuarioRepositoryKtorfit> { UsuarioRepositoryKtorfit() }
-    single<UsuarioRepositoryImpl> { UsuarioRepositoryImpl() }
-    single<RemoteCachedRepositoryUsuario> { RemoteCachedRepositoryUsuario(get()) }
+        // Repository
+        single<MaquinaRepository> { MaquinaRepositoryImpl() }
+        single<PedidosRepository> { PedidosRepositoryImpl() }
+        single<ProductoRepository> { ProductoRepositoryImpl() }
+        single<TareasRepository> { TareasRepositoryImpl() }
+        single<TareasRepositoryKtorfit> { TareasRepositoryKtorfit() }
+        single<TurnoRepository> { TurnoRepositoryImpl() }
+        single<UsuarioRepositoryKtorfit> { UsuarioRepositoryKtorfit() }
+        single<UsuarioRepository> { UsuarioRepositoryImpl() }
+        single<RemoteCachedRepositoryUsuario> { RemoteCachedRepositoryUsuario() }
+        single<UsuariosService> { UsuariosService() }
 
 
-    // Controlador con Json
-    single(named("ControladorTenistas")) { Controlador(get(), get(), get(), get(), get(), get(), get(), get()) }
+        // Controlador con Json
+        single(named("ControladorTenistas")) { Controlador(get(), get(),
+            get(), get(), get(), get(),
+            get(), get(), get()) }
 
+    }
 }
 

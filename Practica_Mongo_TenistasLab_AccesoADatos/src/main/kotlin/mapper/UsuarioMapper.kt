@@ -33,7 +33,7 @@ fun UsuarioModel.toUserEntity(): UsuarioEntity {
         apellido = apellido,
         email = email,
         password = password.toString(),
-        perfil = perfil.num,
+        perfil = perfil.name,
         turno = turno.toString(),
         pedido = pedido.toString()
     )

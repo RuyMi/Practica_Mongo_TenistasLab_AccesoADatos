@@ -6,6 +6,8 @@ import kotlinx.coroutines.reactive.asFlow
 import models.Producto
 import models.Turno
 import mu.KotlinLogging
+import org.koin.core.annotation.Named
+import org.koin.core.annotation.Single
 import org.litote.kmongo.Id
 import org.litote.kmongo.eq
 
@@ -13,6 +15,9 @@ import java.util.*
 
 private val logger = KotlinLogging.logger {}
 
+
+@Single
+@Named("TurnoRepositoryImpl")
 class TurnoRepositoryImpl:TurnoRepository {
     override fun findAll(): Flow<Turno> {
         logger.debug { "findAll($)" }
