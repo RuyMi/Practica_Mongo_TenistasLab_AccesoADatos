@@ -1,5 +1,6 @@
 package mapper
 
+import dto.UsuarioDTO
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.toList
 import models.enums.TipoPerfil
@@ -35,5 +36,18 @@ fun UsuarioModel.toUserEntity(): UsuarioEntity {
         perfil = perfil.num,
         turno = turno.toString(),
         pedido = pedido.toString()
+    )
+}
+
+fun UsuarioModel.toUsuarioDto(): UsuarioDTO{
+    return UsuarioDTO(
+        id = id,
+        uuidUsuario = uuidUsuario,
+        nombre = nombre,
+        apellido = apellido,
+        email = email,
+        perfil = perfil,
+        turno = turno,
+        pedido = pedido
     )
 }
