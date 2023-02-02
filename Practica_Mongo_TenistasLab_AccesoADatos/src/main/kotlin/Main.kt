@@ -2,8 +2,10 @@
 
 import controller.Controlador
 import db.*
+import di.DiAnnotationModule
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.reactive.collect
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import models.Pedidos
@@ -13,16 +15,13 @@ import models.Usuario
 import models.enums.TipoEstado
 import models.enums.TipoPerfil
 import mu.KotlinLogging
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import org.koin.core.context.GlobalContext.startKoin
+import org.koin.core.qualifier.named
 import org.litote.kmongo.id.serialization.IdKotlinXSerializationModule
 import org.litote.kmongo.newId
-import repositories.maquina.MaquinaRepositoryImpl
-import repositories.pedidos.PedidosRepositoryImpl
-import repositories.producto.ProductoRepositoryImpl
-import repositories.tarea.TareasRepositoryImpl
-import repositories.turno.TurnoRepositoryImpl
-import repositories.usuario.RemoteCachedRepositoryUsuario
 import repositories.usuario.UsuarioRepositoryImpl
-import repositories.usuario.UsuarioRepositoryKtorfit
 import services.password.Password
 import services.sqldelight.SqlDeLightClient
 import java.util.*
@@ -34,97 +33,136 @@ private val json = Json {
     allowStructuredMapKeys = true
     serializersModule = IdKotlinXSerializationModule
 }
+private val logger = KotlinLogging.logger{}
+private val cliente = SqlDeLightClient
 // ¡ATENCION! Esto borrará la base de datos y la volverá a inicializar con datos por defecto
 private val inicializarDatos = true
 
 var usuarioActual: Usuario? = null
-
-private val logger = KotlinLogging.logger{}
-private val cliente = SqlDeLightClient
-
 /**
  * Main
  *
  * @param args
  */
-fun main(args: Array<String>): Unit = runBlocking {
-    if(inicializarDatos) {
+fun main(){
+    startKoin {
+        printLogger()
+        // Puedo meter todos los módulos que quiera y en cada uno configurarlo como guste
+        modules(DiAnnotationModule().DiDslModule)
+    }
+    KoinApp().run()
+}
+
+/**
+ * Init data base
+ *
+ */
+suspend fun initDataBase() {
+    borrarDataBase()
+    val meterAdmin = Usuario(
+        newId(),
+        UUID.randomUUID().toString(),
+        "Administrador",
+        "Prueba",
+        "admin@admin.com",
+        Password().encriptar("1"),
+        TipoPerfil.ADMINISTRADOR,
+        null,
+        null
+    )
+    println(meterAdmin.password)
+    UsuarioRepositoryImpl().save(meterAdmin)
+}
+
+suspend fun borrarDataBase() {
+    MongoDbManager.database.drop()
+}
+
+class KoinApp : KoinComponent {
+
+    private val controlador: Controlador by inject(named("ControladorTenistas"))
+    fun run() {
+        controller()
+    }
+
+    private fun controller() = runBlocking {
         val init = launch {
-            initDataBase()
+            if(inicializarDatos) {
+                initDataBase()
+            }
             usuarioActual = iniciarSesion()
         }
         init.join()
-    }
-    val controlador = Controlador(
-        MaquinaRepositoryImpl(),
-        PedidosRepositoryImpl(),
-        ProductoRepositoryImpl(),
-        TareasRepositoryImpl(),
-        UsuarioRepositoryImpl(),
-        TurnoRepositoryImpl(),
-        UsuarioRepositoryKtorfit(),
-        RemoteCachedRepositoryUsuario(cliente)
-    )
-    meterDatos(controlador)
+        launch {
+            println("✔ Escuchando cambios en Tenistas...")
+            controlador.watchUsuarios()
+                .collect {
+                    println("Evento Usuario: ${it.operationType.value}")
+                }
+        }
 
-    launch {
-        while(true){
-            println("Actualizando usuarios API")
-            val usuarios = mutableListOf<Usuario>()
-             controlador.encontrarUsuariosAPI().onEach {
-                 usuarios.add(it)
-             }.collect()
-            delay(6000L)
+        meterDatos(controlador)
+
+        launch {
+            while(true){
+                println("Actualizando usuarios API")
+                val usuarios = mutableListOf<Usuario>()
+                controlador.encontrarUsuariosAPI().onEach {
+                    usuarios.add(it)
+                }.collect()
+                delay(6000L)
+            }
         }
-    }
-    launch {
-        // Lista de un pedido completo en json
-        val pedido = controlador.encontrarPedidoUUID("45c3ca42-dc8f-46c7-9dfe-ff8fd786a77f")
-        val tareas = mutableListOf<Tarea>()
-        controlador.listarTareas().onEach {
-            tareas.add(it)
-        }
-        val tareasJson = tareas.filter { it.pedido.uuidPedidos == pedido!!.uuidPedidos }
-        val tarea1 = json.encodeToString(pedido)
-        val tarea2 = json.encodeToString(tareas)
-        println(
-            """Pedido: $tarea1
+
+
+        launch {
+            // Lista de un pedido completo en json
+            val pedido = controlador.encontrarPedidoUUID("45c3ca42-dc8f-46c7-9dfe-ff8fd786a77f")
+            val tareas = mutableListOf<Tarea>()
+            controlador.listarTareas().onEach {
+                tareas.add(it)
+            }
+            val tareasJson = tareas.filter { it.pedido.uuidPedidos == pedido!!.uuidPedidos }
+            val tarea1 = json.encodeToString(pedido)
+            val tarea2 = json.encodeToString(tareas)
+            println(
+                """Pedido: $tarea1
             Las tareas de este producto eran: $tarea2
         """.trimMargin()
-        )
-    }
-
-    launch {
-        //Listado de pedidos pendientes en JSON
-        val pedidosList = mutableListOf<Pedidos>()
-        controlador.listarPedidos().onEach {
-            pedidosList.add(it)
+            )
         }
-        val pedidosPen = pedidosList.filter { it.estado == TipoEstado.EN_PROCESO }
-        val pedidosPenjson = json.encodeToString(pedidosPen)
-        println("Listado de pedidos pendientes: $pedidosPenjson")
-    }
 
-    launch {
-        //Listado de pedidos completados en JSON
-        val pedidosList = mutableListOf<Pedidos>()
-        controlador.listarPedidos().onEach {
-            pedidosList.add(it)
+        launch {
+            //Listado de pedidos pendientes en JSON
+            val pedidosList = mutableListOf<Pedidos>()
+            controlador.listarPedidos().onEach {
+                pedidosList.add(it)
+            }
+            val pedidosPen = pedidosList.filter { it.estado == TipoEstado.EN_PROCESO }
+            val pedidosPenjson = json.encodeToString(pedidosPen)
+            println("Listado de pedidos pendientes: $pedidosPenjson")
         }
+
+        launch {
+            //Listado de pedidos completados en JSON
+            val pedidosList = mutableListOf<Pedidos>()
+            controlador.listarPedidos().onEach {
+                pedidosList.add(it)
+            }
             val pedidosCom = pedidosList.filter { it.estado != TipoEstado.EN_PROCESO }
-        val pedidosComjson = json.encodeToString(pedidosCom)
-        println("Listado de pedidos completados: $pedidosComjson")
-    }
-
-    launch {
-        //Listado de productos y servicios en JSON
-        val productosList = mutableListOf<Producto>()
-        controlador.listarProductos().onEach {
-            productosList.add(it)
+            val pedidosComjson = json.encodeToString(pedidosCom)
+            println("Listado de pedidos completados: $pedidosComjson")
         }
-        val productosjson = json.encodeToString(productosList)
-        println(
-            """Productos disponibles: 
+
+        launch {
+            //Listado de productos y servicios en JSON
+            val productosList = mutableListOf<Producto>()
+            controlador.listarProductos().onEach {
+                productosList.add(it)
+            }
+            val productosjson = json.encodeToString(productosList)
+            println(
+                """Productos disponibles: 
         |$productosjson
         |
         |Servicios que ofrecemos:
@@ -132,30 +170,30 @@ fun main(args: Array<String>): Unit = runBlocking {
         | -> Personalizacion
         | -> Encordar
     """.trimMargin()
-        )
+            )
+        }
+
+        launch {
+            //Listado de asignaciones para los encordadores por fecha en JSON
+            // Hemos entendido que debemos sacar por cada empleado, sus tareas realizadas ordenadas por hora
+            val tareasByEmpleadoSortFecha = mutableListOf<Tarea>()
+            controlador.listarTareas().onEach { tareasByEmpleadoSortFecha.add(it) }
+                .onCompletion { logger.debug { "Tareas recolectadas correctamente" } }
+                .collect()
+            val ordenadoTareas = tareasByEmpleadoSortFecha.sortedBy { it.turno.fechaFin }.groupBy { it.empleado }
+            val a = json.encodeToString(ordenadoTareas)
+            println("""Listado de las tareas agrupadas por empleado y ordenadas por fecha: ${a}""")
+        }
+        //mostrarMenuPrincipal(usuarioActual)
+
+
     }
 
-    launch {
-        //Listado de asignaciones para los encordadores por fecha en JSON
-        //* Hemos entendido que debemos sacar por cada empleado, sus tareas realizadas ordenadas por hora
-        val tareasByEmpleadoSortFecha = mutableListOf<Tarea>()
-        controlador.listarTareas().onEach { tareasByEmpleadoSortFecha.add(it) }
-            .onCompletion { logger.debug { "Tareas recolectadas correctamente" } }
-            .collect()
-        val ordenadoTareas = tareasByEmpleadoSortFecha.sortedBy { it.turno.fechaFin }.groupBy { it.empleado }
-        val a = json.encodeToString(ordenadoTareas)
-        println("""Listado de las tareas agrupadas por empleado y ordenadas por fecha: ${a}""")
-    }
-    //mostrarMenuPrincipal(usuarioActual)
-
-
-}
-
-fun mostrarMenuPrincipal(usuario: Usuario) {
-    when (usuario.perfil) {
-        TipoPerfil.ENCORDADOR -> {
-            println(
-                """
+    fun mostrarMenuPrincipal(usuario: Usuario) {
+        when (usuario.perfil) {
+            TipoPerfil.ENCORDADOR -> {
+                println(
+                    """
                 Seleccione una de las siguientes opciones:
                 1. Crear Pedido
                 2. Modificar Pedido
@@ -169,12 +207,12 @@ fun mostrarMenuPrincipal(usuario: Usuario) {
                 Cambiar. Cambiar usuario
                 Exit. Salir del programa
             """.trimIndent()
-            )
-        }
+                )
+            }
 
-        TipoPerfil.USUARIO -> {
-            println(
-                """
+            TipoPerfil.USUARIO -> {
+                println(
+                    """
                 Seleccione una de las siguientes opciones:
                 1. Crear Pedido
                 2. Modificar Pedido 
@@ -188,12 +226,12 @@ fun mostrarMenuPrincipal(usuario: Usuario) {
                 Cambiar. Cambiar usuario
                 Exit. Salir del programa
             """.trimIndent()
-            )
-        }
+                )
+            }
 
-        TipoPerfil.ADMINISTRADOR -> {
-            println(
-                """
+            TipoPerfil.ADMINISTRADOR -> {
+                println(
+                    """
                 Seleccione una de las siguientes opciones:
                 1. Crear Pedido
                 2. Modificar Pedido 
@@ -207,11 +245,12 @@ fun mostrarMenuPrincipal(usuario: Usuario) {
                 Cambiar. Cambiar usuario
                 Exit. Salir del programa
             """.trimIndent()
-            )
+                )
+            }
         }
     }
-}
 
+}
 suspend fun iniciarSesion(): Usuario {
     println("Bienvenido al sistema, por favor introduzca su correo electronico y su contraseña para acceder")
     val usuario = "admin@admin.com"
@@ -275,33 +314,5 @@ private suspend fun meterDatos(controlador: Controlador) = withContext(Dispatche
         listaTareas.collect { println(it) }
     }
     tarea6.join()
-
-
-}
-
-/**
- * Init data base
- *
- */
-suspend fun initDataBase() {
-    borrarDataBase()
-    val meterAdmin = Usuario(
-        newId(),
-        UUID.randomUUID().toString(),
-        "Administrador",
-        "Prueba",
-        "admin@admin.com",
-        Password().encriptar("1"),
-        TipoPerfil.ADMINISTRADOR,
-        null,
-        null
-    )
-    println(meterAdmin.password)
-    UsuarioRepositoryImpl().save(meterAdmin)
-
-}
-
-suspend fun borrarDataBase() {
-    MongoDbManager.database.drop()
 
 }

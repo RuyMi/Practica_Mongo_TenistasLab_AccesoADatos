@@ -12,17 +12,21 @@ import mapper.toUserModel
 import models.Usuario
 import models.toUsuario
 import mu.KotlinLogging
+import org.koin.core.annotation.Named
+import org.koin.core.annotation.Single
 import services.ktorfit.KtorFitClient
 import services.sqldelight.SqlDeLightClient
 
 private val logger = KotlinLogging.logger {}
 private const val REFRESH_TIME = 6 * 10000L // 60 seconds, el tiempo que tarda en refrescar
 
-class RemoteCachedRepositoryUsuario(client: SqlDeLightClient) {
 
-
+@Single
+@Named("RemoteCachedRepositoryUsuario")
+class RemoteCachedRepositoryUsuario() {
         // Inyectar dependencias
         private val remote = KtorFitClient.instance
+        private val client = SqlDeLightClient
         private val cached = client.queries
 
 
@@ -46,16 +50,6 @@ class RemoteCachedRepositoryUsuario(client: SqlDeLightClient) {
 
             }
         }
-    /*
-       val call = client.getAll()
-        try {
-            logger.debug { "findAll() - OK" }
-            val res = mutableListOf<Usuario>()
-            call.forEach {
-                res.add(it.toUsuario())
-            }
-            return@withContext res.asFlow()
-     */
 
         fun findAll(): Flow<List<Usuario>> {
             logger.debug { "RemoteCachedRepository.getAll()" }
@@ -63,15 +57,20 @@ class RemoteCachedRepositoryUsuario(client: SqlDeLightClient) {
                 .map { it.map { user -> user.toUserModel() } }
         }
 
-        suspend fun findById(id: Long): Usuario {
+        suspend fun findById(id: Long): Usuario? {
             logger.debug { "RemoteCachedRepository.findById(id=$id)" }
             return cached.selectById(id.toString()).executeAsOne().toUserModel()
         }
 
+        suspend fun findByUuid(uuid: String): Usuario? {
+        logger.debug { "RemoteCachedRepository.findByUuid(uuid=$uuid)" }
+        return cached.selectByUuid(uuid).executeAsOne().toUserModel()
+    }
+
         suspend fun save(entity: Usuario): Usuario {
             logger.debug { "RemoteCachedRepository.save(entity=$entity)" }
             val dto = remote.create(entity)
-            cached.insertUser(dto.id.toString(), dto.uuidUsuario, dto.nombre, dto.apellido, dto.email, dto.password.toString(), dto.perfil.num, dto.turno.toString(), dto.pedido.toString())
+            cached.insertUser(dto.id.toString(), dto.uuidUsuario, dto.nombre, dto.apellido, dto.email, dto.password.toString(), dto.perfil.name, dto.turno.toString(), dto.pedido.toString())
             return cached.selectLastUser().executeAsOne().toUserModel()
         }
 
@@ -85,7 +84,7 @@ class RemoteCachedRepositoryUsuario(client: SqlDeLightClient) {
                 apellido = entity.apellido,
                 email = entity.email,
                 password = entity.password.toString(),
-                perfil = entity.perfil.num,
+                perfil = entity.perfil.name,
                 turno = entity.turno.toString(),
                 pedido = entity.pedido.toString()
             )

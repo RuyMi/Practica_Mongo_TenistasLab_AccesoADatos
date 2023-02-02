@@ -6,6 +6,8 @@ import kotlinx.coroutines.reactive.asFlow
 import models.Maquina
 import models.Pedidos
 import mu.KotlinLogging
+import org.koin.core.annotation.Named
+import org.koin.core.annotation.Single
 import org.litote.kmongo.Id
 import org.litote.kmongo.MongoOperator
 import org.litote.kmongo.eq
@@ -19,6 +21,8 @@ private val logger = KotlinLogging.logger {}
  *
  * @constructor Create empty Maquina repository impl
  */
+@Single
+@Named("MaquinaRepositoryImpl")
 class MaquinaRepositoryImpl:MaquinaRepository {
 
 

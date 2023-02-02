@@ -9,11 +9,16 @@ import models.Usuario
 import models.UsuarioAPI
 import models.toUsuario
 import mu.KotlinLogging
+import org.koin.core.annotation.Named
+import org.koin.core.annotation.Single
 import org.litote.kmongo.newId
 import services.ktorfit.KtorFitClient
 
 private val logger = KotlinLogging.logger {}
 
+
+@Single
+@Named("UsuarioRepositoryKtorfit")
 class UsuarioRepositoryKtorfit {
 
     private val client by lazy { KtorFitClient.instance }
