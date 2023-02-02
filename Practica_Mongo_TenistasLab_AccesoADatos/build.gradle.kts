@@ -28,6 +28,7 @@ dependencies {
     // Para hacer el logging
     implementation("io.github.microutils:kotlin-logging-jvm:3.0.4")
     implementation("ch.qos.logback:logback-classic:1.4.5")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
 
     // Ktorfit, es decir Ktor client modificado para parecerse a Retrofit
     ksp("de.jensklingenberg.ktorfit:ktorfit-ksp:1.0.0-beta16")

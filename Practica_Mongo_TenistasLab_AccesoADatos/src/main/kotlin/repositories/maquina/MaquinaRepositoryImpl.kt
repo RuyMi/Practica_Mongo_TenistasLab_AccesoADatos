@@ -14,7 +14,13 @@ import java.util.*
 
 private val logger = KotlinLogging.logger {}
 
+/**
+ * Maquina repository impl
+ *
+ * @constructor Create empty Maquina repository impl
+ */
 class MaquinaRepositoryImpl:MaquinaRepository {
+
 
     override fun findAll(): Flow<Maquina> {
         logger.debug { "findAll($)" }

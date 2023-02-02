@@ -1,7 +1,7 @@
 -- src/main/sqldelight/database/Usuario.sq
 
 CREATE TABLE Usuario (
-  id INTEGER PRIMARY KEY,
+  id TEXT PRIMARY KEY,
   uuidUsuario TEXT NOT NULL UNIQUE ,
   nombre TEXT NOT NULL,
   apellido TEXT NOT NULL,

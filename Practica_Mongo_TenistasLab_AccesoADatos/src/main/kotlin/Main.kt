@@ -2,11 +2,8 @@
 
 import controller.Controlador
 import db.*
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import models.Pedidos
@@ -75,13 +72,14 @@ fun main(args: Array<String>): Unit = runBlocking {
              controlador.encontrarUsuariosAPI().onEach {
                  usuarios.add(it)
              }.collect()
+            delay(6000L)
         }
     }
     launch {
         // Lista de un pedido completo en json
         val pedido = controlador.encontrarPedidoUUID("45c3ca42-dc8f-46c7-9dfe-ff8fd786a77f")
         val tareas = mutableListOf<Tarea>()
-        val tareasFlow = controlador.listarTareas().onEach {
+        controlador.listarTareas().onEach {
             tareas.add(it)
         }
         val tareasJson = tareas.filter { it.pedido.uuidPedidos == pedido!!.uuidPedidos }
@@ -97,7 +95,7 @@ fun main(args: Array<String>): Unit = runBlocking {
     launch {
         //Listado de pedidos pendientes en JSON
         val pedidosList = mutableListOf<Pedidos>()
-        val pedidosPenFlow = controlador.listarPedidos().onEach {
+        controlador.listarPedidos().onEach {
             pedidosList.add(it)
         }
         val pedidosPen = pedidosList.filter { it.estado == TipoEstado.EN_PROCESO }

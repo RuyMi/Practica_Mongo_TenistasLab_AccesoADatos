@@ -7,6 +7,11 @@ import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger {}
 
+
+/**
+ * Objeto de SqlDelight para poder utilizar una caché en local.
+ *
+ */
 object SqlDeLightClient {
     private val driver: SqlDriver = JdbcSqliteDriver(JdbcSqliteDriver.IN_MEMORY)
 
