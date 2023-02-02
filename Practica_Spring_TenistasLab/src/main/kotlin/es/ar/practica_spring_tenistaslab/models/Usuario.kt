@@ -1,9 +1,7 @@
 package es.ar.practica_spring_tenistaslab.models
 
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import models.enums.TipoPerfil
-import org.bson.codecs.pojo.annotations.BsonId
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
@@ -16,13 +14,14 @@ data class Usuario(
     @Id
     val id: ObjectId = ObjectId.get(),
     @Serializable(UUIDSerializer::class)
-    val uuidUsuario: UUID = UUID.randomUUID(),
+    val uuidUsuario:String = UUID.randomUUID().toString(),
     val nombre: String,
     val apellido: String,
     val email: String,
-    val password: String,
+    val password: ByteArray,
     val perfil: TipoPerfil,
-    val turno: Turno,
-    @DocumentReference()//lookup = "{'tenistas':?#{#self._id} }"
-    val pedido: List<Pedidos>
+    @DocumentReference()
+    val turno: String?,//es el id
+    @DocumentReference()
+    val pedido: List<String>?
 )

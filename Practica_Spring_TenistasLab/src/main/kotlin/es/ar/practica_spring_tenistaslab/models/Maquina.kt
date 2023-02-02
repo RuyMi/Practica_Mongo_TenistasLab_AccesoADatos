@@ -16,7 +16,7 @@ data class Maquina(
     @Id
     val id: ObjectId = ObjectId.get(),
     @Serializable(UUIDSerializer::class)
-    val numSerie: UUID = UUID.randomUUID(),
+    val numSerie:String = UUID.randomUUID().toString(),
     val marca: String,
     val modelo: String,
     @Serializable(LocalDateSerializer::class)

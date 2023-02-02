@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository
 import java.util.UUID
 @Repository
 interface UsuariosRepository: CoroutineCrudRepository<Usuario, ObjectId> {
-    fun findByUuidUsuario(uuid:UUID):Usuario
+    fun findByUuidUsuario(uuid:String):Usuario
 }
