@@ -15,7 +15,7 @@ data class Turno(
     @Id
     val id: ObjectId = ObjectId.get(),
     @Serializable(UUIDSerializer::class)
-    val uuidTurno: UUID = UUID.randomUUID(),
+    val uuidTurno: String = UUID.randomUUID().toString(),
     @Serializable(LocalDateTimeSerializer::class)
     val fechaInicio: LocalDateTime,
     @Serializable(LocalDateTimeSerializer::class)

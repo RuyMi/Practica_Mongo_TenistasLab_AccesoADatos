@@ -14,7 +14,7 @@ data class Tarea(
     @Id
     val id: ObjectId = ObjectId.get(),
     @Serializable(UUIDSerializer::class)
-    val uuidTarea: UUID,
+    val uuidTarea: String = UUID.randomUUID().toString(),
     val producto: Producto,
     val precio: Double,
     val descripcion: String,

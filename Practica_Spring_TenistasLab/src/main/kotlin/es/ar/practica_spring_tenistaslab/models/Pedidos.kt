@@ -17,7 +17,7 @@ data class Pedidos(
     @Id
     val id: ObjectId = ObjectId.get(),
     @Serializable(UUIDSerializer::class)
-    val uuidPedidos: UUID = UUID.randomUUID(),
+    val uuidPedidos: String = UUID.randomUUID().toString(),
     val estado: TipoEstado,
     @Serializable(LocalDateSerializer::class)
     val fechaEntrada: LocalDate,

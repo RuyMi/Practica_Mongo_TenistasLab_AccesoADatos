@@ -9,6 +9,9 @@ plugins {
     // Para ktorfit que usa KSP
     // Plugin KSP para generar código en tiempo de compilación ktorfit
     id("com.google.devtools.ksp") version "1.7.21-1.0.8"
+
+    // SQLdelight
+    id("com.squareup.sqldelight") version "1.5.4"
 }
 
 group = "es.ar"
@@ -41,6 +44,12 @@ dependencies {
     // Para hacer el logging
     implementation("io.github.microutils:kotlin-logging-jvm:3.0.4")
     implementation("ch.qos.logback:logback-classic:1.4.5")
+    // SqlDeLight
+    implementation("com.squareup.sqldelight:runtime:1.5.4")
+    // SQLite para SqlDeLight native
+    implementation("com.squareup.sqldelight:sqlite-driver:1.5.4")
+    // Para poder usar corrutias en SqlDeLight y conectarnos a la base de datos para cambios
+    implementation("com.squareup.sqldelight:coroutines-extensions-jvm:1.5.4")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("io.projectreactor:reactor-test")
@@ -55,4 +64,20 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+
+// Donde vamos a generar el código
+buildscript {
+    dependencies {
+        classpath("com.squareup.sqldelight:gradle-plugin:1.5.4")
+    }
+}
+
+sqldelight {
+    // Debemos colocarlo en el main
+    database("AppDatabase") {
+        // Como se llama el paquete donde esta el código
+        packageName = "database"
+    }
 }

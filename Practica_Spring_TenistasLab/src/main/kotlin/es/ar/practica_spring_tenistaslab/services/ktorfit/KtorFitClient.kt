@@ -10,6 +10,8 @@ import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
 import mu.KotlinLogging
+import org.springframework.context.annotation.Bean
+import org.springframework.stereotype.Repository
 
 
 private val logger = KotlinLogging.logger {}

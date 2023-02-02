@@ -4,10 +4,11 @@ import es.ar.practica_spring_tenistaslab.models.Tarea
 
 import exceptions.RestException
 import mu.KotlinLogging
+import org.springframework.stereotype.Repository
 import services.ktorfit.KtorFitClient
 
 private val logger = KotlinLogging.logger {}
-
+@Repository
 class TareaRepositoryKtorfit {
 
 

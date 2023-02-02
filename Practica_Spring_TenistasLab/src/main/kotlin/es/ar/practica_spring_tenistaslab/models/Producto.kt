@@ -15,7 +15,7 @@ data class Producto(
     @Id
     val id: ObjectId= ObjectId.get(), // TODO Comprobar si hace falta tener el producto en lo de newId
     @Serializable(UUIDSerializer::class)
-    val uuidProducto: UUID = UUID.randomUUID(),
+    val uuidProducto:  String = UUID.randomUUID().toString(),
     val marca: String,
     val modelo: String,
     val precio: Double,
