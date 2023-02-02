@@ -35,14 +35,13 @@ private val json = Json {
 }
 private val logger = KotlinLogging.logger{}
 private val cliente = SqlDeLightClient
-// ¡ATENCION! Esto borrará la base de datos y la volverá a inicializar con datos por defecto
-private val inicializarDatos = true
+// ¡ATENCIÓN! Esto borrará la base de datos y la volverá a inicializar con datos por defecto
+private const val INICIALIZAR_DATOS = true
 
 var usuarioActual: Usuario? = null
 /**
  * Main
  *
- * @param args
  */
 fun main(){
     startKoin {
@@ -87,7 +86,7 @@ class KoinApp : KoinComponent {
 
     private fun controller() = runBlocking {
         val init = launch {
-            if(inicializarDatos) {
+            if(INICIALIZAR_DATOS) {
                 initDataBase()
             }
             usuarioActual = iniciarSesion()
@@ -107,9 +106,9 @@ class KoinApp : KoinComponent {
             while(true){
                 println("Actualizando usuarios API")
                 val usuarios = mutableListOf<Usuario>()
-                controlador.encontrarUsuariosAPI().onEach {
+                controlador.encontrarUsuariosAPI().collect{
                     usuarios.add(it)
-                }.collect()
+                }
                 delay(6000L)
             }
         }
@@ -119,12 +118,12 @@ class KoinApp : KoinComponent {
             // Lista de un pedido completo en json
             val pedido = controlador.encontrarPedidoUUID("45c3ca42-dc8f-46c7-9dfe-ff8fd786a77f")
             val tareas = mutableListOf<Tarea>()
-            controlador.listarTareas().onEach {
+            controlador.listarTareas().collect {
                 tareas.add(it)
             }
             val tareasJson = tareas.filter { it.pedido.uuidPedidos == pedido!!.uuidPedidos }
             val tarea1 = json.encodeToString(pedido)
-            val tarea2 = json.encodeToString(tareas)
+            val tarea2 = json.encodeToString(tareasJson)
             println(
                 """Pedido: $tarea1
             Las tareas de este producto eran: $tarea2
@@ -135,7 +134,7 @@ class KoinApp : KoinComponent {
         launch {
             //Listado de pedidos pendientes en JSON
             val pedidosList = mutableListOf<Pedidos>()
-            controlador.listarPedidos().onEach {
+            controlador.listarPedidos().collect {
                 pedidosList.add(it)
             }
             val pedidosPen = pedidosList.filter { it.estado == TipoEstado.EN_PROCESO }
@@ -146,7 +145,7 @@ class KoinApp : KoinComponent {
         launch {
             //Listado de pedidos completados en JSON
             val pedidosList = mutableListOf<Pedidos>()
-            controlador.listarPedidos().onEach {
+            controlador.listarPedidos().collect {
                 pedidosList.add(it)
             }
             val pedidosCom = pedidosList.filter { it.estado != TipoEstado.EN_PROCESO }
@@ -157,7 +156,7 @@ class KoinApp : KoinComponent {
         launch {
             //Listado de productos y servicios en JSON
             val productosList = mutableListOf<Producto>()
-            controlador.listarProductos().onEach {
+            controlador.listarProductos().collect {
                 productosList.add(it)
             }
             val productosjson = json.encodeToString(productosList)
@@ -177,12 +176,13 @@ class KoinApp : KoinComponent {
             //Listado de asignaciones para los encordadores por fecha en JSON
             // Hemos entendido que debemos sacar por cada empleado, sus tareas realizadas ordenadas por hora
             val tareasByEmpleadoSortFecha = mutableListOf<Tarea>()
-            controlador.listarTareas().onEach { tareasByEmpleadoSortFecha.add(it) }
+            controlador.listarTareas()
                 .onCompletion { logger.debug { "Tareas recolectadas correctamente" } }
-                .collect()
+                .collect { tareasByEmpleadoSortFecha.add(it) }
+
             val ordenadoTareas = tareasByEmpleadoSortFecha.sortedBy { it.turno.fechaFin }.groupBy { it.empleado }
-            val a = json.encodeToString(ordenadoTareas)
-            println("""Listado de las tareas agrupadas por empleado y ordenadas por fecha: ${a}""")
+            val jsonTareas = json.encodeToString(ordenadoTareas)
+            println("""Listado de las tareas agrupadas por empleado y ordenadas por fecha: $jsonTareas""")
         }
         //mostrarMenuPrincipal(usuarioActual)
 
