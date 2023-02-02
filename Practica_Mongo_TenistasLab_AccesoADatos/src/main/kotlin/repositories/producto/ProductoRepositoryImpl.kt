@@ -5,12 +5,16 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.reactive.asFlow
 import models.Producto
 import mu.KotlinLogging
+import org.koin.core.annotation.Named
+import org.koin.core.annotation.Single
 import org.litote.kmongo.Id
 import org.litote.kmongo.eq
 import java.util.*
 
 private val logger = KotlinLogging.logger {}
 
+@Single
+@Named("ProductoRepositoryImpl")
 class ProductoRepositoryImpl: ProductoRepository {
     override fun findAll(): Flow<Producto> {
         logger.debug { "findAll($)" }

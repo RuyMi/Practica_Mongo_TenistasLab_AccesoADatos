@@ -1,6 +1,7 @@
 package controller
 
 
+import com.mongodb.reactivestreams.client.ChangeStreamPublisher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.flow.emptyFlow
@@ -8,15 +9,25 @@ import kotlinx.coroutines.flow.filter
 import models.*
 import models.enums.TipoPerfil
 import mu.KotlinLogging
+import org.koin.core.annotation.Named
+import org.koin.core.annotation.Single
 import org.litote.kmongo.Id
+import repositories.maquina.MaquinaRepository
 import repositories.maquina.MaquinaRepositoryImpl
+import repositories.pedidos.PedidosRepository
 import repositories.pedidos.PedidosRepositoryImpl
+import repositories.producto.ProductoRepository
 import repositories.producto.ProductoRepositoryImpl
+import repositories.tarea.TareasRepository
 import repositories.tarea.TareasRepositoryImpl
+import repositories.turno.TurnoRepository
 import repositories.turno.TurnoRepositoryImpl
 import repositories.usuario.RemoteCachedRepositoryUsuario
+import repositories.usuario.UsuarioRepository
 import repositories.usuario.UsuarioRepositoryImpl
 import repositories.usuario.UsuarioRepositoryKtorfit
+import services.ktorfit.KtorFitRest
+import services.usuarios.UsuariosService
 import usuarioActual
 import java.util.UUID
 
@@ -33,15 +44,19 @@ private val logger = KotlinLogging.logger {}
  * @property turnoRepositoryImpl
  * @property usuarioActual
  */
+@Single
+@Named("ControladorTenistas")
 class Controlador(
-    private val maquinaRepositoryImpl: MaquinaRepositoryImpl,
-    private val pedidosRepositoryImpl: PedidosRepositoryImpl,
-    private val productoRepositoryImpl: ProductoRepositoryImpl,
-    private val tareasRepositoryImpl: TareasRepositoryImpl,
-    private val usuarioRepositoryImpl: UsuarioRepositoryImpl,
-    private val turnoRepositoryImpl: TurnoRepositoryImpl,
-    private val ktorFitUsuario: UsuarioRepositoryKtorfit,
-    private val cacheRepositoryImpl: RemoteCachedRepositoryUsuario,
+    @Named("MaquinaRepositoryImpl") private val maquinaRepositoryImpl: MaquinaRepository,
+    @Named("PedidosRepositoryImpl") private val pedidosRepositoryImpl: PedidosRepository,
+    @Named("ProductoRepositoryImpl") private val productoRepositoryImpl: ProductoRepository,
+    @Named("TareasRepositoryImpl") private val tareasRepositoryImpl: TareasRepository,
+    @Named("UsuarioRepositoryImpl") private val usuarioRepositoryImpl: UsuarioRepository,
+    @Named("TurnoRepositoryImpl") private val turnoRepositoryImpl: TurnoRepository,
+    @Named("UsuarioRepositoryKtorfit") private val ktorFitUsuario: UsuarioRepositoryKtorfit,
+    @Named("RemoteCachedRepositoryUsuario") private val cacheRepositoryImpl: RemoteCachedRepositoryUsuario,
+    @Named("UsuarioService") private val usuarioService: UsuariosService,
+
 ) {
 
     //Maquina
@@ -415,6 +430,9 @@ class Controlador(
      */
     suspend fun encontrarUsuarioUUID(uuid: String): Usuario? {
         return if(usuarioActual!!.perfil == TipoPerfil.ADMINISTRADOR){
+            val res = cacheRepositoryImpl.findByUuid(uuid)?.let {
+                return it
+            }
             usuarioRepositoryImpl.findByUUID(uuid)
         } else{
             logger.error{"Solo un administrador puede encontrar usuarios"}
@@ -550,6 +568,11 @@ class Controlador(
         return cacheRepositoryImpl.save(user)
     }
 
+
+    fun watchUsuarios(): ChangeStreamPublisher<Usuario> {
+        logger.info("cambios en Tenistas")
+        return UsuariosService().watch()
+    }
 }
 
 

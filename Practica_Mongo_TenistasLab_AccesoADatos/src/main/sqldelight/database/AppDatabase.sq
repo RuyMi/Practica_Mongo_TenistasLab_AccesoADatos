@@ -24,6 +24,9 @@ SELECT * FROM Usuario;
 selectById:
 SELECT * FROM Usuario WHERE id = ?;
 
+selectByUuid:
+SELECT * FROM Usuario WHERE uuidUsuario = ?;
+
 selectLastUser:
 SELECT * FROM Usuario ORDER BY id DESC LIMIT 1;
 
