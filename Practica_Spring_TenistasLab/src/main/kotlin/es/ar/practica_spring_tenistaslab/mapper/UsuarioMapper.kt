@@ -12,7 +12,7 @@ fun UsuarioModel.toUsuarioDto(): UsuarioDTO {
         apellido = apellido,
         email = email,
         perfil = perfil,
-        turno = turno,
-        pedido = pedido
+        turno = turno
+        //pedido = pedido
     )
 }

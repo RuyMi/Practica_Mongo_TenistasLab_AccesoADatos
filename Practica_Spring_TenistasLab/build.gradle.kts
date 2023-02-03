@@ -5,6 +5,7 @@ plugins {
     id("io.spring.dependency-management") version "1.1.0"
     kotlin("jvm") version "1.7.22"
     kotlin("plugin.spring") version "1.7.22"
+    kotlin("plugin.serialization") version "1.7.21"
 
     // Para ktorfit que usa KSP
     // Plugin KSP para generar código en tiempo de compilación ktorfit
