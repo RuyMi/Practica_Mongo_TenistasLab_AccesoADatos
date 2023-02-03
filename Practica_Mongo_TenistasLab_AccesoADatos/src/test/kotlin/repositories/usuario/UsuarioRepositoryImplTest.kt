@@ -3,6 +3,7 @@ package repositories.usuario
 import db.MongoDbManager
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.Contextual
 import models.Usuario
 import models.enums.TipoPerfil
 import org.junit.jupiter.api.Test
@@ -16,11 +17,13 @@ import services.password.Password
 import services.sqldelight.SqlDeLightClient
 import java.util.*
 
+
 class UsuarioRepositoryImplTest {
 
 
     val dataBaseService = MongoDbManager.database
     val repositorio = UsuarioRepositoryImpl()
+    @Contextual
     val usuarioTest =  Usuario(
         newId(),
         "492a7f86-c34d-43e3-ba77-8083a542f427",
@@ -40,19 +43,7 @@ class UsuarioRepositoryImplTest {
         repositorio.save(usuarioTest)
     }
 
-
     @Test
-    fun getCache(): Unit = runBlocking {
-    }
-
-    @Test
-    fun getKtorfit(): Unit = runBlocking {
-    }
-
-
-
-    @Test
-    @Order(1)
     fun findAll(): Unit = runBlocking {
         val test = repositorio.findAll().toList()
         assertAll(
@@ -67,7 +58,6 @@ class UsuarioRepositoryImplTest {
     }
 
     @Test
-    @Order(2)
     fun findById(): Unit = runBlocking {
         val testId = repositorio.findById(usuarioTest.id)
         assertAll(
@@ -79,7 +69,6 @@ class UsuarioRepositoryImplTest {
     }
 
     @Test
-    @Order(3)
     fun findbyUUID(): Unit = runBlocking {
         val testUUId = repositorio.findByUUID(usuarioTest.uuidUsuario)
         assertAll(
@@ -91,7 +80,6 @@ class UsuarioRepositoryImplTest {
     }
 
     @Test
-    @Order(4)
     fun save(): Unit = runBlocking {
         SqlDeLightClient.queries.deleteAll()
         val testSave = repositorio.save(usuarioTest)!!
@@ -104,7 +92,6 @@ class UsuarioRepositoryImplTest {
     }
 
     @Test
-    @Order(5)
     fun delete(): Unit = runBlocking {
         val testDelete = repositorio.delete(usuarioTest)
         assertAll(

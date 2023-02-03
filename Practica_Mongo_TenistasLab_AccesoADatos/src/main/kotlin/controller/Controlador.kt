@@ -2,6 +2,7 @@ package controller
 
 
 import com.mongodb.reactivestreams.client.ChangeStreamPublisher
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.flow.emptyFlow
@@ -13,23 +14,15 @@ import org.koin.core.annotation.Named
 import org.koin.core.annotation.Single
 import org.litote.kmongo.Id
 import repositories.maquina.MaquinaRepository
-import repositories.maquina.MaquinaRepositoryImpl
 import repositories.pedidos.PedidosRepository
-import repositories.pedidos.PedidosRepositoryImpl
 import repositories.producto.ProductoRepository
-import repositories.producto.ProductoRepositoryImpl
 import repositories.tarea.TareasRepository
-import repositories.tarea.TareasRepositoryImpl
 import repositories.turno.TurnoRepository
-import repositories.turno.TurnoRepositoryImpl
 import repositories.usuario.RemoteCachedRepositoryUsuario
 import repositories.usuario.UsuarioRepository
-import repositories.usuario.UsuarioRepositoryImpl
 import repositories.usuario.UsuarioRepositoryKtorfit
-import services.ktorfit.KtorFitRest
 import services.usuarios.UsuariosService
 import usuarioActual
-import java.util.UUID
 
 private val logger = KotlinLogging.logger {}
 
@@ -56,7 +49,7 @@ class Controlador(
     @Named("UsuarioRepositoryKtorfit") private val ktorFitUsuario: UsuarioRepositoryKtorfit,
     @Named("RemoteCachedRepositoryUsuario") private val cacheRepositoryImpl: RemoteCachedRepositoryUsuario,
     @Named("UsuarioService") private val usuarioService: UsuariosService,
-
+    val usuarioActual: Usuario? = null
 ) {
 
     //Maquina
@@ -411,11 +404,7 @@ class Controlador(
      */
     suspend fun encontrarUsuarioID(id: Id<Usuario>): Usuario? {
         return if(usuarioActual!!.perfil == TipoPerfil.ADMINISTRADOR){
-            val res = cacheRepositoryImpl.findById(id.toString().toLong())?.let {
-                return it
-            }
             return usuarioRepositoryImpl.findById(id)
-
         } else{
             logger.error{"Solo un administrador puede encontrar usuarios"}
             null
@@ -430,9 +419,6 @@ class Controlador(
      */
     suspend fun encontrarUsuarioUUID(uuid: String): Usuario? {
         return if(usuarioActual!!.perfil == TipoPerfil.ADMINISTRADOR){
-            val res = cacheRepositoryImpl.findByUuid(uuid)?.let {
-                return it
-            }
             usuarioRepositoryImpl.findByUUID(uuid)
         } else{
             logger.error{"Solo un administrador puede encontrar usuarios"}
@@ -572,6 +558,10 @@ class Controlador(
     fun watchUsuarios(): ChangeStreamPublisher<Usuario> {
         logger.info("cambios en Tenistas")
         return UsuariosService().watch()
+    }
+
+    suspend fun refreshUsuarios(): Job {
+        return cacheRepositoryImpl.refresh()
     }
 }
 

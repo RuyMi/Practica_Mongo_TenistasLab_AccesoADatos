@@ -1,6 +1,7 @@
 package repositories.tarea
 
 import exceptions.RestException
+import mapper.toTareaDto
 import models.Tarea
 import mu.KotlinLogging
 import org.koin.core.annotation.Named
@@ -19,7 +20,8 @@ class TareasRepositoryKtorfit {
     suspend fun save(entity: Tarea): Tarea {
         logger.debug { "save(entity=$entity)" }
         try {
-            val res = client.createTareas(entity)
+            val tarea = entity.toTareaDto()
+            val res = client.createTareas(tarea)
             logger.debug { "save(entity=$entity) - OK" }
             return entity
         } catch (e: Exception) {

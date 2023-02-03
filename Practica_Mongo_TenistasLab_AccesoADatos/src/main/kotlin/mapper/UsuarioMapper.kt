@@ -41,13 +41,13 @@ fun UsuarioModel.toUserEntity(): UsuarioEntity {
 
 fun UsuarioModel.toUsuarioDto(): UsuarioDTO{
     return UsuarioDTO(
-        id = id,
+        id = id.toString(),
         uuidUsuario = uuidUsuario,
         nombre = nombre,
         apellido = apellido,
         email = email,
-        perfil = perfil,
-        turno = turno,
-        pedido = pedido
+        perfil = perfil.toString(),
+        turno = turno.toString(),
+        pedido = pedido.toString()
     )
 }

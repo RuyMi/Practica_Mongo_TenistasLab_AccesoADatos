@@ -31,7 +31,7 @@ class ProductoRepositoryImplTest {
         repositorio.save(productoTest)
 
     }
-    @Order(1)
+
     @Test
     fun findAll(): Unit = runBlocking {
         val test = repositorio.findAll().toList()
@@ -46,7 +46,7 @@ class ProductoRepositoryImplTest {
         )
     }
 
-    @Order(2)
+
     @Test
     fun findById(): Unit = runBlocking {
         val testID = repositorio.findById(productoTest.id)
@@ -59,7 +59,7 @@ class ProductoRepositoryImplTest {
         )
     }
 
-    @Order(3)
+
     @Test
     fun findbyUUID(): Unit = runBlocking {
         val testUUID = repositorio.findByUUID(productoTest.uuidProducto)
@@ -72,7 +72,7 @@ class ProductoRepositoryImplTest {
         )
     }
 
-    @Order(4)
+
     @Test
     fun save(): Unit = runBlocking {
         val testSave = repositorio.save(productoTest)
@@ -85,7 +85,7 @@ class ProductoRepositoryImplTest {
         )
     }
 
-    @Order(5)
+
     @Test
     fun delete(): Unit = runBlocking {
         val testDelete = repositorio.delete(productoTest)

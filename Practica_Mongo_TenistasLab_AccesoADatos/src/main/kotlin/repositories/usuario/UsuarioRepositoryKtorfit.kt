@@ -5,6 +5,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.withContext
+import mapper.toUsuarioDto
 import models.Usuario
 import models.UsuarioAPI
 import models.toUsuario
@@ -51,13 +52,13 @@ class UsuarioRepositoryKtorfit {
             throw RestException("Error al obtener el usuario con id $id o no existe: ${e.message}")
         }
     }
-    //TODO coger los campos que queramos del usuario api para ponerlo en nuestro usuario
 
 
     suspend fun save(entity: Usuario): Usuario {
         logger.debug { "save(entity=$entity)" }
         try {
-            val res = client.create(entity)
+            val dto = entity.toUsuarioDto()
+            val res = client.create(dto)
             logger.debug { "save(entity=$entity) - OK" }
             return entity
         } catch (e: Exception) {
@@ -70,7 +71,8 @@ class UsuarioRepositoryKtorfit {
     suspend fun update(entity: Usuario): Usuario {
         logger.debug { "update(entity=$entity)" }
         try {
-            val res = client.update(entity.id.toString().toLong(), entity)
+            val dto = entity.toUsuarioDto()
+            val res = client.update(entity.id.toString(), dto)
             logger.debug { "update(entity=$entity) - OK" }
             return entity
         } catch (e: RestException) {
@@ -82,7 +84,7 @@ class UsuarioRepositoryKtorfit {
     suspend fun delete(entity: Usuario): Usuario {
         logger.debug { "delete(entity=$entity)" }
         try {
-            client.delete(entity.id.toString().toLong())
+            client.delete(entity.id.toString())
             logger.debug { "delete(entity=$entity) - OK" }
             return entity
         } catch (e: Exception) {
@@ -92,6 +94,5 @@ class UsuarioRepositoryKtorfit {
     }
 
 
-//TODO MIRAR COMENTARIOS DEL LOGGEr
 
 }

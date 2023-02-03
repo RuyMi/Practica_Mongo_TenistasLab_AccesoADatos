@@ -13,16 +13,13 @@ import java.util.*
 
 @Serializable
 data class UsuarioDTO(
-    @BsonId @Contextual
-    val id: Id<Usuario>,
+    val id: String,
     val uuidUsuario: String,
     val nombre: String,
     val apellido: String,
     val email: String,
-    val perfil: TipoPerfil,
-    @Contextual
-    val turno: Id<Turno>?,
-    @Contextual
-    val pedido: List<Pedidos>?
+    val perfil: String,
+    val turno: String,
+    val pedido: String
 ) {
 }
