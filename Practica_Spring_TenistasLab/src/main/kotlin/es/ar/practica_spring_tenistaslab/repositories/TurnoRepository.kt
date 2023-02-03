@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository
 import java.util.*
 @Repository
 interface TurnoRepository: CoroutineCrudRepository<Turno, ObjectId> {
-    fun findByUuidTurno(uuid: UUID):Turno?
+    fun findTurnoByUuidTurno(uuid: String):Turno?
 
 }

@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository
 import java.util.UUID
 @Repository
 interface PedidosRepository: CoroutineCrudRepository<Pedidos, ObjectId> {
-    fun findByUuidPedidos(uuid: UUID):Pedidos?
+    fun findPedidosByUuidPedidos(uuid: String):Pedidos?
 }
