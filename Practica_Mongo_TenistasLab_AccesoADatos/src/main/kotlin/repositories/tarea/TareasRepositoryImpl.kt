@@ -17,6 +17,8 @@ private val logger = KotlinLogging.logger {}
 @Single
 @Named("TareasRepositoryImpl")
 class TareasRepositoryImpl:TareasRepository {
+
+    val remote = TareasRepositoryKtorfit()
     override fun findAll(): Flow<Tarea> {
         logger.debug { "findAll($)" }
         return MongoDbManager.database.getCollection<Tarea>()
@@ -36,6 +38,7 @@ class TareasRepositoryImpl:TareasRepository {
 
     override suspend fun save(entity: Tarea): Tarea? {
        logger.debug { "save($entity)" }
+        remote.save(entity)
         return MongoDbManager.database.getCollection<Tarea>()
             .save(entity).let { entity }
     }

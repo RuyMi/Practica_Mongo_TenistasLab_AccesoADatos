@@ -46,7 +46,6 @@ var usuarioActual: Usuario? = null
 fun main(){
     startKoin {
         printLogger()
-        // Puedo meter todos los módulos que quiera y en cada uno configurarlo como guste
         modules(DiAnnotationModule().DiDslModule)
     }
     KoinApp().run()
@@ -100,19 +99,11 @@ class KoinApp : KoinComponent {
                 }
         }
 
-        meterDatos(controlador)
-
+        launch {meterDatos(controlador)}.join()
+        //Lanzamos una corutina para refrescar la cache de usuarios con la api cada 60 segundos
         launch {
-            while(true){
-                println("Actualizando usuarios API")
-                val usuarios = mutableListOf<Usuario>()
-                controlador.encontrarUsuariosAPI().collect{
-                    usuarios.add(it)
-                }
-                delay(6000L)
-            }
+            controlador.refreshUsuarios()
         }
-
 
         launch {
             // Lista de un pedido completo en json

@@ -61,7 +61,7 @@ class MaquinaRepositoryImplTest {
     @Test
     fun findById(): Unit = runBlocking  {
         val testID = repository.findById(maquinaTest.id)
-        Assertions.assertAll(
+        assertAll(
             { assertEquals(testID!!.id, maquinaTest.id) },
             { assertEquals(testID!!.numSerie, maquinaTest.numSerie) },
             { assertEquals(testID!!.marca, maquinaTest.marca) },
@@ -75,7 +75,7 @@ class MaquinaRepositoryImplTest {
     @Test
     fun findbyUUID(): Unit = runBlocking  {
         val testUUID = repository.findByUUID(maquinaTest.numSerie)
-        Assertions.assertAll(
+        assertAll(
             { assertEquals(testUUID!!.id, maquinaTest.id) },
             { assertEquals(testUUID!!.numSerie, maquinaTest.numSerie) },
             { assertEquals(testUUID!!.marca, maquinaTest.marca) },
@@ -89,14 +89,13 @@ class MaquinaRepositoryImplTest {
     @Test
     fun save(): Unit = runBlocking  {
         val testSave = repository.save(maquinaTest)
-        Assertions.assertAll(
+        assertAll(
             { assertEquals(testSave!!.id, maquinaTest.id) },
             { assertEquals(testSave!!.numSerie, maquinaTest.numSerie) },
             { assertEquals(testSave!!.marca, maquinaTest.marca) },
             { assertEquals(testSave!!.modelo, maquinaTest.modelo) },
             { assertEquals(testSave!!.descripcion, maquinaTest.descripcion) },
             { assertEquals(testSave!!.fechaAdquisicion, maquinaTest.fechaAdquisicion) },
-
         )
     }
 
@@ -104,7 +103,7 @@ class MaquinaRepositoryImplTest {
     @Test
     fun delete(): Unit = runBlocking  {
         val testDelete = repository.delete(maquinaTest)
-        Assertions.assertAll(
+        assertAll(
             { assertTrue(testDelete) },
         )
     }

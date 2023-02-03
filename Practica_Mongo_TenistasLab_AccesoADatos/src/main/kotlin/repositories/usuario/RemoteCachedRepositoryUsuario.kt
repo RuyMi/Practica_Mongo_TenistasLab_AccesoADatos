@@ -8,7 +8,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import mapper.toUserEntity
 import mapper.toUserModel
+import mapper.toUsuarioDto
 import models.Usuario
 import models.toUsuario
 import mu.KotlinLogging
@@ -18,7 +20,7 @@ import services.ktorfit.KtorFitClient
 import services.sqldelight.SqlDeLightClient
 
 private val logger = KotlinLogging.logger {}
-private const val REFRESH_TIME = 6 * 10000L // 60 seconds, el tiempo que tarda en refrescar
+private const val REFRESH_TIME = 4000L // 60 seconds, el tiempo que tarda en refrescar
 
 
 @Single
@@ -31,7 +33,6 @@ class RemoteCachedRepositoryUsuario() {
 
 
         suspend fun refresh() = withContext(Dispatchers.IO) {
-            // Lanzamos una corutina para que se ejecute en segundo plano
             logger.debug { "RemoteCachedRepository.refresh()" }
             launch {
                 do {
@@ -43,7 +44,6 @@ class RemoteCachedRepositoryUsuario() {
                     res.forEach { user ->
                         cached.insertUser(user.id.toString(),user.uuidUsuario, user.nombre, user.apellido, user.email, user.password.toString(),
                             user.perfil.toString(),user.turno.toString(),user.pedido.toString())
-                        //mappearlo
                     }
                     delay(REFRESH_TIME)
                 } while (true)
@@ -69,8 +69,12 @@ class RemoteCachedRepositoryUsuario() {
 
         suspend fun save(entity: Usuario): Usuario {
             logger.debug { "RemoteCachedRepository.save(entity=$entity)" }
-            val dto = remote.create(entity)
-            cached.insertUser(dto.id.toString(), dto.uuidUsuario, dto.nombre, dto.apellido, dto.email, dto.password.toString(), dto.perfil.name, dto.turno.toString(), dto.pedido.toString())
+            val remote = remote.create(entity.toUsuarioDto())
+            val dto = entity.toUserEntity()
+            cached.insertUser(
+                dto.id, dto.uuidUsuario, dto.nombre, dto.apellido, dto.email, dto.password, dto.perfil,
+                dto.turno, dto.pedido
+            )
             return cached.selectLastUser().executeAsOne().toUserModel()
         }
 
@@ -88,8 +92,8 @@ class RemoteCachedRepositoryUsuario() {
                 turno = entity.turno.toString(),
                 pedido = entity.pedido.toString()
             )
-            val dto = remote.update(entity.id.toString().toLong(), entity)
-            return dto.toUsuario()
+            val dto = remote.update(entity.id.toString(), entity.toUsuarioDto())
+            return entity
         }
 
 
@@ -97,7 +101,7 @@ class RemoteCachedRepositoryUsuario() {
             // borramos localmente y remotamente
             logger.debug { "RemoteCachedRepository.delete(entity=$entity)" }
             cached.delete(entity.id.toString())
-            remote.delete(entity.id.toString().toLong())
+            remote.delete(entity.id.toString())
             return true
         }
 }

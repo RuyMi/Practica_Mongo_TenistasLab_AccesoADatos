@@ -110,7 +110,7 @@ class TareasRepositoryImplTest {
 
     }
 
-    @Order(1)
+
     @Test
     fun findAll(): Unit = runBlocking  {
         val test = repositorio.findAll().toList()
@@ -129,7 +129,7 @@ class TareasRepositoryImplTest {
         )
     }
 
-    @Order(2)
+
     @Test
     fun findById(): Unit = runBlocking {
         val testID = repositorio.findById(tareaTest!!.id)
@@ -146,7 +146,7 @@ class TareasRepositoryImplTest {
         )
     }
 
-    @Order(3)
+
     @Test
     fun findbyUUID(): Unit = runBlocking {
         val testUUID = repositorio.findByUUID(tareaTest!!.uuidTarea)
@@ -163,7 +163,7 @@ class TareasRepositoryImplTest {
         )
     }
 
-    @Order(4)
+
     @Test
     fun save(): Unit = runBlocking {
         val testSave = repositorio.save(tareaTest!!)
@@ -180,7 +180,7 @@ class TareasRepositoryImplTest {
         )
     }
 
-    @Order(5)
+
     @Test
     fun delete(): Unit = runBlocking {
         val testDelete = tareaTest?.let { repositorio.delete(it) }
@@ -199,7 +199,6 @@ class TareasRepositoryImplTest {
         @BeforeAll
         fun setUpAll(): Unit = runBlocking{
             MongoDbManager.database.drop()
-
         }
     }
 
