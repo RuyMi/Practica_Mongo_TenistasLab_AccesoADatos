@@ -11,6 +11,18 @@ import serializers.UUIDSerializer
 import java.time.LocalDate
 import java.util.*
 
+/**
+ *
+ *
+ * @property id
+ * @property uuidPedidos
+ * @property estado
+ * @property fechaEntrada
+ * @property fechaSalidaProgramada
+ * @property fechaEntrega
+ * @property precio
+ * @property usuario
+ */
 @Serializable
 data class Pedidos(
     @BsonId @Contextual

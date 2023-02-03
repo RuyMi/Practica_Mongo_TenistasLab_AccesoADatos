@@ -10,6 +10,11 @@ import repositories.pedidos.PedidosRepositoryImpl
 import database.Usuario as UsuarioEntity
 import models.Usuario as UsuarioModel
 
+/**
+ * Metodo que pasa el modelo usuario al modelo usuario utilizado en la cache(sql)
+ *
+ * @return
+ */
 
 suspend fun UsuarioEntity.toUserModel(): UsuarioModel {
     return UsuarioModel(
@@ -24,6 +29,12 @@ suspend fun UsuarioEntity.toUserModel(): UsuarioModel {
         pedido = PedidosRepositoryImpl().findAll().filter { it.usuario.toString() == id }.toList()
     )
 }
+
+/**
+ *
+ *
+ * @return
+ */
 
 fun UsuarioModel.toUserEntity(): UsuarioEntity {
     return UsuarioEntity(

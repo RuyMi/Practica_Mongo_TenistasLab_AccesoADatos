@@ -8,6 +8,20 @@ import org.litote.kmongo.*
 import serializers.UUIDSerializer
 import java.util.UUID
 
+/**
+ *
+ *
+ * @property id
+ * @property uuidUsuario
+ * @property nombre
+ * @property apellido
+ * @property email
+ * @property password
+ * @property perfil
+ * @property turno
+ * @property pedido
+ */
+
 @Serializable
 data class Usuario(
     @BsonId @Contextual

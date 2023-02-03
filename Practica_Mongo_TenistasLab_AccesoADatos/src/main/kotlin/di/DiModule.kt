@@ -27,6 +27,10 @@ import repositories.usuario.UsuarioRepositoryKtorfit
 import services.usuarios.UsuariosService
 
 //https://insert-koin.io/docs/reference/koin-annotations/modules
+/**
+ * Clase que se encarga de generar las dependencias con Koin
+ *
+ */
 @Module
 @ComponentScan("koin")
 class DiAnnotationModule {
