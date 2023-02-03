@@ -52,16 +52,20 @@ class PracticaSpringTenistasLabApplication
             controlador.usuarioActual = usuarioActual
         }
         init.join()
+
         launch {
-            println("✔ Escuchando cambios en Tenistas...")
-            controlador.watchUsuarios()
-                .collect {
-                    println("Evento Usuario: ${it.operationType?.value}")
-                }
+            while (true){
+                println("Escuchando cambios en Usuarios...")
+                controlador.watchUsuarios()
+                    .collect {
+                        println("Evento Usuario: ${it.operationType!!.value}")
+                    }
+            }
+
         }
 
         launch {meterDatos(controlador)}.join()
-        //Lanzamos una corutina para refrescar la cache de usuarios con la api cada 60 segundos
+        //Lanzamos una corutina para refrescar la caché de usuarios con la api cada 60 segundos
         launch {
             controlador.refreshUsuarios()
         }

@@ -567,7 +567,7 @@ class Controlador
 
 
     fun watchUsuarios(): Flow<ChangeStreamEvent<Usuario>> {
-        logger.info("cambios en Tenistas")
+        logger.info("cambios en Usuarios")
         return usuarioService.watch()
     }
 
@@ -581,14 +581,12 @@ class Controlador
 
     suspend fun borrarDatos() {
         maquinaRepositoryImpl.deleteAll()
-        pedidosRepositoryImpl
-        productoRepositoryImpl
-        tareasRepositoryImpl
-        usuarioRepositoryImpl
-        turnoRepositoryImpl
-        ktorFitUsuario
-        cacheRepositoryImpl
-        usuarioService
+        pedidosRepositoryImpl.deleteAll()
+        productoRepositoryImpl.deleteAll()
+        tareasRepositoryImpl.deleteAll()
+        usuarioRepositoryImpl.deleteAll()
+        turnoRepositoryImpl.deleteAll()
+        cacheRepositoryImpl.deleteAll()
     }
 
 
