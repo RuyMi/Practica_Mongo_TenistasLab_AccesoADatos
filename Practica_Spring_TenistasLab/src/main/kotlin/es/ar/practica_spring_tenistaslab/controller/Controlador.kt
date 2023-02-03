@@ -2,6 +2,9 @@ package controller
 
 
 import com.mongodb.reactivestreams.client.ChangeStreamPublisher
+import es.ar.practica_spring_tenistaslab.models.Maquina
+import es.ar.practica_spring_tenistaslab.repositories.*
+import es.ar.practica_spring_tenistaslab.repositories.KtorFitRepository.UsuarioRepositoryKtorfit
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.count
@@ -13,6 +16,8 @@ import mu.KotlinLogging
 import org.koin.core.annotation.Named
 import org.koin.core.annotation.Single
 import org.litote.kmongo.Id
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.annotation.Id
 import repositories.maquina.MaquinaRepository
 import repositories.pedidos.PedidosRepository
 import repositories.producto.ProductoRepository
@@ -22,6 +27,7 @@ import repositories.usuario.RemoteCachedRepositoryUsuario
 import repositories.usuario.UsuarioRepository
 import repositories.usuario.UsuarioRepositoryKtorfit
 import services.usuarios.UsuariosService
+import usuarioActual
 
 private val logger = KotlinLogging.logger {}
 
@@ -36,14 +42,13 @@ private val logger = KotlinLogging.logger {}
  * @property turnoRepositoryImpl
  * @property usuarioActual
  */
-@Single
-@Named("ControladorTenistas")
+
 class Controlador(
     @Named("MaquinaRepositoryImpl") private val maquinaRepositoryImpl: MaquinaRepository,
     @Named("PedidosRepositoryImpl") private val pedidosRepositoryImpl: PedidosRepository,
     @Named("ProductoRepositoryImpl") private val productoRepositoryImpl: ProductoRepository,
-    @Named("TareasRepositoryImpl") private val tareasRepositoryImpl: TareasRepository,
-    @Named("UsuarioRepositoryImpl") private val usuarioRepositoryImpl: UsuarioRepository,
+    @Named("TareasRepositoryImpl") private val tareasRepositoryImpl: TareaRepository,
+    @Named("UsuarioRepositoryImpl") private val usuarioRepositoryImpl: UsuariosRepository,
     @Named("TurnoRepositoryImpl") private val turnoRepositoryImpl: TurnoRepository,
     @Named("UsuarioRepositoryKtorfit") private val ktorFitUsuario: UsuarioRepositoryKtorfit,
     @Named("RemoteCachedRepositoryUsuario") private val cacheRepositoryImpl: RemoteCachedRepositoryUsuario,

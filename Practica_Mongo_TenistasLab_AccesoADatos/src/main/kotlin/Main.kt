@@ -89,6 +89,7 @@ class KoinApp : KoinComponent {
                 initDataBase()
             }
             usuarioActual = iniciarSesion()
+            controlador.usuarioActual = usuarioActual
         }
         init.join()
         launch {
