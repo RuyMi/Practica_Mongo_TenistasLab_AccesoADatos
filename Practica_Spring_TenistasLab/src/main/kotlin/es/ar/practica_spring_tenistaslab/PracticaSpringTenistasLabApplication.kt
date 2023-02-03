@@ -228,7 +228,11 @@ private suspend fun meterDatos(controlador: Controlador) = withContext(Dispatche
     tarea1.join()
 
     val tarea2= launch{
-        getUsuarios(controlador).forEach { it?.let { it1 -> controlador.guardarUsuario(it1) } }
+        getUsuarios(controlador).forEach {  it1 ->
+            if (it1 != null) {
+                controlador.guardarUsuario(it1)
+            }
+        }
         val listaUsuarios = controlador.listarUsuarios()
         listaUsuarios.collect { println(it) }
     }

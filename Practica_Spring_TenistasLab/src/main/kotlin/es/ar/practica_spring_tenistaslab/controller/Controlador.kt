@@ -512,12 +512,12 @@ class Controlador
      * @param uuid
      * @return devuelve un turno
      */
-    suspend fun encontrarTurnoUUID(uuid: String): Flow<Turno?>? {
+    suspend fun encontrarTurnoUUID(uuid: String): Flow<Turno> {
         return if(usuarioActual!!.perfil == TipoPerfil.ADMINISTRADOR){
             turnoRepositoryImpl.findByUuidTurno(uuid)
         } else{
             logger.debug{"Solo un administrador puede encontrar turnos"}
-            null
+            emptyFlow()
         }
     }
 
