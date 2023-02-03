@@ -136,7 +136,7 @@ class PracticaSpringTenistasLabApplication
                 .onCompletion { logger.debug { "Tareas recolectadas correctamente" } }
                 .collect { tareasByEmpleadoSortFecha.add(it) }
 
-            val ordenadoTareas = tareasByEmpleadoSortFecha.sortedBy { it.turno.fechaFin }.groupBy { it.empleado }
+            val ordenadoTareas = tareasByEmpleadoSortFecha.sortedBy { it.turno?.fechaFin }.groupBy { it.empleado }
             val jsonTareas = json.encodeToString(ordenadoTareas)
             println("""Listado de las tareas agrupadas por empleado y ordenadas por fecha: $jsonTareas""")
         }
