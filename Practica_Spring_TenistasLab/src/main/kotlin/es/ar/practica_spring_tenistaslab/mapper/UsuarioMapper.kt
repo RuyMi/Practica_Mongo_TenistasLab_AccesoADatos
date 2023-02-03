@@ -12,7 +12,7 @@ fun UsuarioModel.toUsuarioDto(): UsuarioDTO {
         apellido = apellido,
         email = email,
         perfil = perfil,
-        turno = turno.toString(),
-        pedido = pedido
+        turno = turno
+        //pedido = pedido
     )
 }

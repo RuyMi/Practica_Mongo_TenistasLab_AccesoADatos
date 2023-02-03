@@ -1,21 +1,23 @@
 package es.ar.practica_spring_tenistaslab.models
 
+import es.ar.practica_spring_tenistaslab.dto.UsuarioDTO
 import kotlinx.serialization.Serializable
 import models.enums.TipoEstado
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 import es.ar.practica_spring_tenistaslab.serializers.LocalDateSerializer
+import es.ar.practica_spring_tenistaslab.serializers.ObjectIdSerializer
 import es.ar.practica_spring_tenistaslab.serializers.UUIDSerializer
-import org.springframework.data.mongodb.core.mapping.DocumentReference
+import kotlinx.serialization.Contextual
 import java.time.LocalDate
 import java.util.*
 
+@Serializable
 @Document("pedidos")
 data class Pedidos(
-    @Id
+    @Id @Serializable(ObjectIdSerializer::class)
     val id: ObjectId = ObjectId.get(),
-    @Serializable(UUIDSerializer::class)
     val uuidPedidos: String = UUID.randomUUID().toString(),
     val estado: TipoEstado,
     @Serializable(LocalDateSerializer::class)
@@ -25,8 +27,7 @@ data class Pedidos(
     @Serializable(LocalDateSerializer::class)
     val fechaEntrega: LocalDate?,
     val precio: Double,
-    @DocumentReference(lookup = "{'usuarios':?#{#self._id} }")
-    val usuario: Usuario,
+    val usuario: UsuarioDTO,
 ) {
 
 }

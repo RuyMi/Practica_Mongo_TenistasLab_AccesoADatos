@@ -2,9 +2,11 @@ package db
 
 
 import es.ar.practica_spring_tenistaslab.controller.Controlador
+import es.ar.practica_spring_tenistaslab.mapper.toUsuarioDto
 import es.ar.practica_spring_tenistaslab.models.*
 import es.ar.practica_spring_tenistaslab.models.enums.TipoMaquina
 import es.ar.practica_spring_tenistaslab.services.password.Password
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.toList
 import models.enums.TipoEstado
 import models.enums.TipoPerfil
@@ -42,8 +44,12 @@ fun getTurnos(): List<Turno> {
 }
 
 suspend fun getUsuarios(controlador: Controlador): List<Usuario?> {
+    val res = mutableListOf<Turno>()
+     controlador.listarTurnos().collect{
+         println(it)
+        res.add(it)
+    }
     return listOf(
-       /* controlador.encontrarTurnoUUID("5f6cab09-31a4-46d0-8d69-e4e510d2a227")?.toList()?.firstOrNull()?.let {
             Usuario(
                 ObjectId(),
                 "5e187396-a777-4a07-871d-90ed04e1af8a",
@@ -52,9 +58,8 @@ suspend fun getUsuarios(controlador: Controlador): List<Usuario?> {
                 "mario.sanchez@gmail.com",
                 Password().encriptar("marioSanchez"),
                 TipoPerfil.ENCORDADOR,
-                it,
-            )
-        },*/
+                res[0]
+            ),
         Usuario(
             ObjectId(),
             "4747bf2d-22dd-4a29-89c8-c1a7492769ae",
@@ -66,28 +71,15 @@ suspend fun getUsuarios(controlador: Controlador): List<Usuario?> {
             null,
         ),
         Usuario(
-            ObjectId(),
-            "4747bf2d-22dd-4a29-89c9-c1a7492769ae",
-            "pruebna",
-            "pruebna",
-            "pruebna.pruebna@gmail.com",
-            Password().encriptar("pruebna"),
-            TipoPerfil.USUARIO,
-            null,
-        ),
-        controlador.encontrarTurnoUUID("ee56f791-f545-466f-959f-4683d558c692")?.toList()?.firstOrNull()?.let {
-            Usuario(
-                ObjectId(),
-                "38ac290a-b3d5-4ef6-a9ab-8f24df5724f1",
-                "Rubén",
-                "García-Redondo",
-                "rubengrm@gmail.com",
-                Password().encriptar("rubengrm"),
-                TipoPerfil.ENCORDADOR,
-                it,
-            )
-        },
-        controlador.encontrarTurnoUUID("b4023b8f-68a1-4d93-8519-8d0b54f7013d")?.toList()?.firstOrNull()?.let {
+               ObjectId(),
+               "38ac290a-b3d5-4ef6-a9ab-8f24df5724f1",
+               "Rubén",
+               "García-Redondo",
+               "rubengrm@gmail.com",
+               Password().encriptar("rubengrm"),
+               TipoPerfil.ENCORDADOR,
+               res[1],
+            ),
             Usuario(
                 ObjectId(),
                 "2c172996-ce30-470a-b796-7b03e6224055",
@@ -96,9 +88,8 @@ suspend fun getUsuarios(controlador: Controlador): List<Usuario?> {
                 "alvaro.yubero@gmail.com",
                 Password().encriptar("alvaroYubero"),
                 TipoPerfil.ENCORDADOR,
-                it,
+                res[2],
             )
-        }
     )
 }
 
@@ -191,7 +182,7 @@ suspend fun getPedidos(controlador: Controlador): List<Pedidos?> {
                 LocalDate.of(2022, 12, 6),
                 null,
                 120.5,
-                it,
+                it.toUsuarioDto(),
             )
         },
         controlador.encontrarUsuarioUUID("4747bf2d-22dd-4a29-89c8-c1a7492769ae")?.toList()?.firstOrNull()?.let {
@@ -203,7 +194,7 @@ suspend fun getPedidos(controlador: Controlador): List<Pedidos?> {
                 LocalDate.of(2022, 12, 6),
                 LocalDate.of(2022, 12, 7),
                 120.5,
-                it,
+                it.toUsuarioDto(),
             )
         },
         controlador.encontrarUsuarioUUID("4747bf2d-22dd-4a29-89c8-c1a7492769ae")?.toList()?.firstOrNull()?.let {
@@ -215,7 +206,7 @@ suspend fun getPedidos(controlador: Controlador): List<Pedidos?> {
                 LocalDate.of(2022, 12, 6),
                 null,
                 120.5,
-                it,
+                it.toUsuarioDto(),
             )
         },
         controlador.encontrarUsuarioUUID("4747bf2d-22dd-4a29-89c8-c1a7492769ae")?.toList()?.firstOrNull()?.let {
@@ -227,7 +218,7 @@ suspend fun getPedidos(controlador: Controlador): List<Pedidos?> {
                 LocalDate.of(2022, 12, 6),
                 null,
                 120.5,
-                it,
+                it.toUsuarioDto(),
             )
         }
     )
@@ -270,7 +261,7 @@ suspend fun getTareas(controlador: Controlador): List<Tarea> {
             controlador.encontrarProductoUUID("cf1d57ca-410a-45a4-ae9a-dd1f40395aa5")?.toList()?.firstOrNull()!!,
             20.2,
             "Personalizacion",
-            controlador.encontrarUsuarioUUID("38ac290a-b3d5-4ef6-a9ab-8f24df5724f1")?.toList()?.firstOrNull()!!,
+            controlador.encontrarUsuarioUUID("38ac290a-b3d5-4ef6-a9ab-8f24df5724f1")?.toList()?.firstOrNull()!!.toUsuarioDto(),
             controlador.encontrarTurnoUUID("5f6cab09-31a4-46d0-8d69-e4e510d2a227")?.toList()?.firstOrNull()!!,
             true,
             controlador.encontrarMaquinaUUID("00339a54-6eb4-4a49-820c-dc49183a564a")?.toList()?.firstOrNull()!!,
@@ -282,7 +273,7 @@ suspend fun getTareas(controlador: Controlador): List<Tarea> {
             controlador.encontrarProductoUUID("d560efac-9996-4272-9baa-e4a5979d3ede")?.toList()?.firstOrNull()!!,
             20.0,
             "Personalizacion",
-            controlador.encontrarUsuarioUUID("5e187396-a777-4a07-871d-90ed04e1af8a")?.toList()?.firstOrNull()!!,
+            controlador.encontrarUsuarioUUID("5e187396-a777-4a07-871d-90ed04e1af8a")?.toList()?.firstOrNull()!!.toUsuarioDto(),
             controlador.encontrarTurnoUUID("5f6cab09-31a4-46d0-8d69-e4e510d2a227")?.toList()?.firstOrNull()!!,
             true,
             controlador.encontrarMaquinaUUID("02c6bb52-ba65-41a9-8458-850d284bab07")?.toList()?.firstOrNull()!!,
@@ -294,7 +285,7 @@ suspend fun getTareas(controlador: Controlador): List<Tarea> {
             controlador.encontrarProductoUUID("74a17626-abb6-49a1-8f02-ab48d6a28e7c")?.toList()?.firstOrNull()!!,
             20.0,
             "Personalizacion",
-            controlador.encontrarUsuarioUUID("5e187396-a777-4a07-871d-90ed04e1af8a")?.toList()?.firstOrNull()!!,
+            controlador.encontrarUsuarioUUID("5e187396-a777-4a07-871d-90ed04e1af8a")?.toList()?.firstOrNull()!!.toUsuarioDto(),
             controlador.encontrarTurnoUUID("5f6cab09-31a4-46d0-8d69-e4e510d2a227")?.toList()?.firstOrNull()!!,
             true,
             controlador.encontrarMaquinaUUID("02c6bb52-ba65-41a9-8458-850d284bab07")?.toList()?.firstOrNull()!!,
@@ -306,7 +297,7 @@ suspend fun getTareas(controlador: Controlador): List<Tarea> {
             controlador.encontrarProductoUUID("d560efac-9996-4272-9baa-e4a5979d3ede")?.toList()?.firstOrNull()!!,
             20.0,
             "Encordar",
-            controlador.encontrarUsuarioUUID("2c172996-ce30-470a-b796-7b03e6224055")?.toList()?.firstOrNull()!!,
+            controlador.encontrarUsuarioUUID("2c172996-ce30-470a-b796-7b03e6224055")?.toList()?.firstOrNull()!!.toUsuarioDto(),
             controlador.encontrarTurnoUUID("b4023b8f-68a1-4d93-8519-8d0b54f7013d")?.toList()?.firstOrNull()!!,
             false,
             controlador.encontrarMaquinaUUID("a016f77a-4698-4bd3-8294-1edb74311d27")?.toList()?.firstOrNull()!!,

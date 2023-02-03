@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository
 import java.util.*
 @Repository
 interface TurnoRepository: CoroutineCrudRepository<Turno, ObjectId> {
-    fun findByUuidTurno(uuid: String): Flow<Turno?>
+    fun findByUuidTurno(uuid: String): Flow<Turno>
 
 
 }

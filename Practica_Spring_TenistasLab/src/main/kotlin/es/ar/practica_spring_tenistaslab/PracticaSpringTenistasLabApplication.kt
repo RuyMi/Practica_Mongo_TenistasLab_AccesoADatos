@@ -52,16 +52,20 @@ class PracticaSpringTenistasLabApplication
             controlador.usuarioActual = usuarioActual
         }
         init.join()
+
         launch {
-            println("✔ Escuchando cambios en Tenistas...")
-            controlador.watchUsuarios()
-                .collect {
-                    println("Evento Usuario: ${it.operationType?.value}")
-                }
+            while (true){
+                println("Escuchando cambios en Usuarios...")
+                controlador.watchUsuarios()
+                    .collect {
+                        println("Evento Usuario: ${it.operationType!!.value}")
+                    }
+            }
+
         }
 
         launch {meterDatos(controlador)}.join()
-        //Lanzamos una corutina para refrescar la cache de usuarios con la api cada 60 segundos
+        //Lanzamos una corutina para refrescar la caché de usuarios con la api cada 60 segundos
         launch {
             controlador.refreshUsuarios()
         }
@@ -228,7 +232,11 @@ private suspend fun meterDatos(controlador: Controlador) = withContext(Dispatche
     tarea1.join()
 
     val tarea2= launch{
-        getUsuarios(controlador).forEach { it?.let { it1 -> controlador.guardarUsuario(it1) } }
+        getUsuarios(controlador).forEach {  it1 ->
+            if (it1 != null) {
+                controlador.guardarUsuario(it1)
+            }
+        }
         val listaUsuarios = controlador.listarUsuarios()
         listaUsuarios.collect { println(it) }
     }
