@@ -34,6 +34,7 @@ private val json = Json {
 }
 private val logger = KotlinLogging.logger{}
 // ¡ATENCIÓN! Esto borrará la base de datos y la volverá a inicializar con datos por defecto
+
 private const val INICIALIZAR_DATOS = true
 
 var usuarioActual: Usuario? = null

@@ -12,10 +12,22 @@ import java.time.LocalDate
 object ObjectIdSerializer : KSerializer<ObjectId> {
     override val descriptor = PrimitiveSerialDescriptor("LocalDate", PrimitiveKind.STRING)
 
+    /**
+     * TODO
+     *
+     * @param decoder
+     * @return
+     */
     override fun deserialize(decoder: Decoder): ObjectId {
         return ObjectId(decoder.decodeString())
     }
 
+    /**
+     * TODO
+     *
+     * @param encoder
+     * @param value
+     */
     override fun serialize(encoder: Encoder, value: ObjectId) {
         encoder.encodeString(value.toString())
     }

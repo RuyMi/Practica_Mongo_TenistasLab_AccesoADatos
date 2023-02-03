@@ -85,7 +85,7 @@ class Controlador
     }
 
     /**
-     * Encontrar maquina uuid
+     * Encontrar maquina por uuid
      *
      * @param uuid
      * @return Una MaquinaPersonalizacion
