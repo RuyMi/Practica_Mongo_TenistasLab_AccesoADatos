@@ -3,8 +3,10 @@ package controller
 
 import com.mongodb.reactivestreams.client.ChangeStreamPublisher
 import es.ar.practica_spring_tenistaslab.models.Maquina
+import es.ar.practica_spring_tenistaslab.models.Pedidos
 import es.ar.practica_spring_tenistaslab.repositories.*
 import es.ar.practica_spring_tenistaslab.repositories.KtorFitRepository.UsuarioRepositoryKtorfit
+import es.ar.practica_spring_tenistaslab.repositories.RemoteCached.UsuarioCachedRepositoryImpl
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.count
@@ -13,21 +15,11 @@ import kotlinx.coroutines.flow.filter
 import models.*
 import models.enums.TipoPerfil
 import mu.KotlinLogging
-import org.koin.core.annotation.Named
-import org.koin.core.annotation.Single
-import org.litote.kmongo.Id
+import org.bson.types.ObjectId
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.annotation.Id
-import repositories.maquina.MaquinaRepository
-import repositories.pedidos.PedidosRepository
-import repositories.producto.ProductoRepository
-import repositories.tarea.TareasRepository
-import repositories.turno.TurnoRepository
-import repositories.usuario.RemoteCachedRepositoryUsuario
-import repositories.usuario.UsuarioRepository
-import repositories.usuario.UsuarioRepositoryKtorfit
-import services.usuarios.UsuariosService
-import usuarioActual
+import org.springframework.stereotype.Controller
+
 
 private val logger = KotlinLogging.logger {}
 
@@ -43,17 +35,21 @@ private val logger = KotlinLogging.logger {}
  * @property usuarioActual
  */
 
-class Controlador(
-    @Named("MaquinaRepositoryImpl") private val maquinaRepositoryImpl: MaquinaRepository,
-    @Named("PedidosRepositoryImpl") private val pedidosRepositoryImpl: PedidosRepository,
-    @Named("ProductoRepositoryImpl") private val productoRepositoryImpl: ProductoRepository,
-    @Named("TareasRepositoryImpl") private val tareasRepositoryImpl: TareaRepository,
-    @Named("UsuarioRepositoryImpl") private val usuarioRepositoryImpl: UsuariosRepository,
-    @Named("TurnoRepositoryImpl") private val turnoRepositoryImpl: TurnoRepository,
-    @Named("UsuarioRepositoryKtorfit") private val ktorFitUsuario: UsuarioRepositoryKtorfit,
-    @Named("RemoteCachedRepositoryUsuario") private val cacheRepositoryImpl: RemoteCachedRepositoryUsuario,
-    @Named("UsuarioService") private val usuarioService: UsuariosService,
-    var usuarioActual: Usuario? = null
+/*
+ // private val usuarioService: UsuariosService
+ */
+@Controller
+class Controlador
+    @Autowired constructor(
+     private val maquinaRepositoryImpl: MaquinaRepository,
+   private val pedidosRepositoryImpl: PedidosRepository,
+     private val productoRepositoryImpl: ProductoRepository,
+    private val tareasRepositoryImpl: TareaRepository,
+     private val usuarioRepositoryImpl: UsuariosRepository,
+     private val turnoRepositoryImpl: TurnoRepository,
+    private val ktorFitUsuario: UsuarioRepositoryKtorfit,
+    private val cacheRepositoryImpl: UsuarioCachedRepositoryImpl,
+
 ) {
 
     //Maquina
@@ -79,7 +75,7 @@ class Controlador(
      * @param id
      * @return  Una Maquina
      */
-    suspend fun encontrarMaquinaID(id: Id<Maquina>): Maquina? {
+    suspend fun encontrarMaquinaID(id: ObjectId): Maquina? {
         return if(usuarioActual!!.perfil != TipoPerfil.USUARIO) {
             maquinaRepositoryImpl.findById(id)
         }else{
@@ -96,7 +92,7 @@ class Controlador(
      */
     suspend fun encontrarMaquinaUUID(uuid: String): Maquina? {
         return if(usuarioActual!!.perfil != TipoPerfil.USUARIO) {
-             maquinaRepositoryImpl.findByUUID(uuid)
+             maquinaRepositoryImpl.findMaquinaByNumSerie(uuid)
         }else{
             logger.error { "No tienes permiso para buscar una máquina" }
             null

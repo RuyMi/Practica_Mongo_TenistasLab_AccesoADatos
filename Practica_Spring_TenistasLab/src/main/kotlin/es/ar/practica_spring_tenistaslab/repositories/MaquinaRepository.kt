@@ -8,6 +8,6 @@ import java.util.*
 
 @Repository
 interface MaquinaRepository:CoroutineCrudRepository<Maquina, ObjectId> {
-    fun findByNumSerie(numSerie: UUID):Maquina?
+    fun findMaquinaByNumSerie(numSerie: String):Maquina?
 
 }

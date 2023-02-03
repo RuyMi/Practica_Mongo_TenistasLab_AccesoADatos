@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository
 import java.util.UUID
 @Repository
 interface ProductoRepository: CoroutineCrudRepository<Producto, ObjectId> {
-    fun findByUuidProducto(uuid: UUID):Producto?
+    fun findProductoByUuidProducto(uuid: String):Producto?
 }

@@ -75,7 +75,7 @@ class UsuarioCachedRepositoryImpl
     }
     @Cacheable("usuario")
     override suspend fun findByUuid(uuid: String): Usuario?= withContext(Dispatchers.IO) {
-        return@withContext usuarioRepository.findByUuidUsuario(uuid)
+        return@withContext usuarioRepository.findUsuarioByUuidUsuario(uuid)
     }
     @CachePut("usuario")
     override suspend fun save(usuario: Usuario): Usuario = withContext(Dispatchers.IO) {
@@ -100,7 +100,7 @@ class UsuarioCachedRepositoryImpl
     override suspend fun delete(usuario: Usuario): Usuario? = withContext(Dispatchers.IO) {
         logger.info { "Repositorio de usuario delete tenista: $usuario" }
 
-        val usuariodb = usuarioRepository.findByUuidUsuario(usuario.uuidUsuario)
+        val usuariodb = usuarioRepository.findUsuarioByUuidUsuario(usuario.uuidUsuario)
         usuariodb?.let {
             usuarioRepository.deleteById(it.id)
             return@withContext it
