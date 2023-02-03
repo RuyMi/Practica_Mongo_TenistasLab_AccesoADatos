@@ -1,14 +1,12 @@
 package es.ar.practica_spring_tenistaslab.models
 
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import models.enums.TipoEstado
-import org.bson.codecs.pojo.annotations.BsonId
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
-import serializers.LocalDateSerializer
-import serializers.UUIDSerializer
+import es.ar.practica_spring_tenistaslab.serializers.LocalDateSerializer
+import es.ar.practica_spring_tenistaslab.serializers.UUIDSerializer
 import java.time.LocalDate
 import java.util.*
 

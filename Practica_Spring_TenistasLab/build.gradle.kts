@@ -30,6 +30,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
     // Para serializar JSON
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
 
     // Ktorfit, es decir Ktor client modificado para parecerse a Retrofit
     ksp("de.jensklingenberg.ktorfit:ktorfit-ksp:1.0.0-beta16")
@@ -39,6 +40,8 @@ dependencies {
     implementation("io.ktor:ktor-client-content-negotiation:2.1.3")
     implementation("io.ktor:ktor-serialization-kotlinx-json:2.1.3")
 
+    //Serializar KMongo
+    implementation("org.litote.kmongo:kmongo-id-serialization:4.1.3")
     // BCrypt
     implementation("com.ToxicBakery.library.bcrypt:bcrypt:1.0.9")
     // Para hacer el logging

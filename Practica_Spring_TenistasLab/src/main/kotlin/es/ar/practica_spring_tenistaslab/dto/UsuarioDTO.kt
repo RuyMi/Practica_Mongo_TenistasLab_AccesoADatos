@@ -23,6 +23,6 @@ data class UsuarioDTO(
     val email: String,
     val perfil: TipoPerfil,
     val turno: String?,
-    val pedido: List<String>?
+    val pedido: MutableSet<String>?
 ) {
 }

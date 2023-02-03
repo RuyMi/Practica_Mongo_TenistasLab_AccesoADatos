@@ -2,6 +2,8 @@ package es.ar.practica_spring_tenistaslab.repositories.RemoteCached
 
 
 import es.ar.practica_spring_tenistaslab.models.Usuario
+import es.ar.practica_spring_tenistaslab.models.toUsuario
+import es.ar.practica_spring_tenistaslab.repositories.KtorFitRepository.UsuarioRepositoryKtorfit
 import es.ar.practica_spring_tenistaslab.repositories.UsuariosRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -14,7 +16,10 @@ import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.CachePut
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Repository
-import services.ktorfit.KtorFitClient
+import es.ar.practica_spring_tenistaslab.services.ktorfit.KtorFitClient
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
 import java.util.*
 
 
@@ -25,13 +30,13 @@ private const val REFRESH_TIME = 6 * 10000L
 class UsuarioCachedRepositoryImpl
 @Autowired constructor(
     private val usuarioRepository: UsuariosRepository,
-
+    private val remote : UsuarioRepositoryKtorfit
 
     ) : UsuarioCachedRepository {
 
-    private val remote = KtorFitClient.instance
 
-/*
+
+
     suspend fun refresh() = withContext(Dispatchers.IO) {
         // Lanzamos una corutina para que se ejecute en segundo plano
         logger.debug { "RemoteCachedRepository.refresh()" }
@@ -39,29 +44,18 @@ class UsuarioCachedRepositoryImpl
         launch {
             do {
                 logger.debug { "RemoteCachedRepository.refresh()" }
-
                 val res = mutableListOf<Usuario>()
-                remote.getAll().forEach { res.add(it.toUsuario()) }
-
+                remote.findAll().collect { res.add(it) }
                 res.forEach { user ->
-                    cached.insertUser(
-                        user.id.toString(),
-                        user.uuidUsuario,
-                        user.nombre,
-                        user.apellido,
-                        user.email,
-                        user.password.toString(),
-                        user.perfil.toString(),
-                        user.turno.toString(),
-                        user.pedido.toString()
-                    )
-                    //mappearlo
+                    usuarioRepository.findByUuidUsuario(user.uuidUsuario).toList().firstOrNull()?.let {
+                        usuarioRepository.save(it)
+                    }
                 }
                 delay(REFRESH_TIME)
             } while (true)
 
         }
-    }*/
+    }
 
     override suspend fun findAll(): Flow<Usuario> = withContext(Dispatchers.IO)  {
         logger.debug { "RemoteCachedRepository.getAll()" }
@@ -75,7 +69,7 @@ class UsuarioCachedRepositoryImpl
     }
     @Cacheable("usuario")
     override suspend fun findByUuid(uuid: String): Usuario?= withContext(Dispatchers.IO) {
-        return@withContext usuarioRepository.findUsuarioByUuidUsuario(uuid)
+        return@withContext usuarioRepository.findByUuidUsuario(uuid).toList().firstOrNull()
     }
     @CachePut("usuario")
     override suspend fun save(usuario: Usuario): Usuario = withContext(Dispatchers.IO) {
@@ -88,8 +82,6 @@ class UsuarioCachedRepositoryImpl
                 password=usuario.password,
                 perfil=usuario.perfil,
                 turno=usuario.turno,
-                pedido=usuario.pedido,
-
             )
 
         return@withContext usuarioRepository.save(usuario)
@@ -100,7 +92,7 @@ class UsuarioCachedRepositoryImpl
     override suspend fun delete(usuario: Usuario): Usuario? = withContext(Dispatchers.IO) {
         logger.info { "Repositorio de usuario delete tenista: $usuario" }
 
-        val usuariodb = usuarioRepository.findUsuarioByUuidUsuario(usuario.uuidUsuario)
+        val usuariodb = usuarioRepository.findByUuidUsuario(usuario.uuidUsuario).toList().firstOrNull()
         usuariodb?.let {
             usuarioRepository.deleteById(it.id)
             return@withContext it

@@ -1,4 +1,4 @@
-package services.password
+package es.ar.practica_spring_tenistaslab.services.password
 
 import com.toxicbakery.bcrypt.Bcrypt
 

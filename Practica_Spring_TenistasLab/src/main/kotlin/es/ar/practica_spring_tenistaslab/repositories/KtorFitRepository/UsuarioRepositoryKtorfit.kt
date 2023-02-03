@@ -2,14 +2,15 @@ package es.ar.practica_spring_tenistaslab.repositories.KtorFitRepository
 
 import es.ar.practica_spring_tenistaslab.models.Usuario
 import es.ar.practica_spring_tenistaslab.models.UsuarioAPI
-import exceptions.RestException
+import es.ar.practica_spring_tenistaslab.exceptions.RestException
+import es.ar.practica_spring_tenistaslab.models.toUsuario
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.withContext
 import mu.KotlinLogging
 import org.springframework.stereotype.Repository
-import services.ktorfit.KtorFitClient
+import es.ar.practica_spring_tenistaslab.services.ktorfit.KtorFitClient
 
 
 
@@ -19,13 +20,14 @@ class UsuarioRepositoryKtorfit {
 
     private val client by lazy { KtorFitClient.instance }
 
-     suspend fun findAll(): Flow<UsuarioAPI> = withContext(Dispatchers.IO) {
+     suspend fun findAll(): Flow<Usuario> = withContext(Dispatchers.IO) {
         logger.debug { "findAll()" }
         val call = client.getAll()
         try {
             logger.debug { "findAll() - OK" }
             logger.debug { call }
-            return@withContext call.asFlow()
+            val res = call.map { it.toUsuario() }
+            return@withContext res.asFlow()
         } catch (e: Exception) {
             logger.error { "findAll() - ERROR" }
             throw RestException("Error al obtener los usuarios: ${e.message}")
