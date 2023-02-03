@@ -21,9 +21,9 @@ data class Usuario(
     val password: ByteArray,
     val perfil: TipoPerfil,
     @DocumentReference(lookup = "{'turno':?#{#self._id} }")
-    val turno: String?,//es el id
+    val turno: Turno?,//es el id
 
 ){
     @DocumentReference(lookup = "{'pedidos':?#{#self._id} }")
-    var pedido: MutableSet<String>? = null
+    var pedido: MutableSet<Pedidos?>? = null
 }

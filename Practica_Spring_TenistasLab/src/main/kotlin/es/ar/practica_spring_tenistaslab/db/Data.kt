@@ -43,7 +43,7 @@ fun getTurnos(): List<Turno> {
 
 suspend fun getUsuarios(controlador: Controlador): List<Usuario?> {
     return listOf(
-        controlador.encontrarTurnoUUID("5f6cab09-31a4-46d0-8d69-e4e510d2a227")?.toList()?.firstOrNull()?.let {
+       /* controlador.encontrarTurnoUUID("5f6cab09-31a4-46d0-8d69-e4e510d2a227")?.toList()?.firstOrNull()?.let {
             Usuario(
                 ObjectId(),
                 "5e187396-a777-4a07-871d-90ed04e1af8a",
@@ -52,9 +52,9 @@ suspend fun getUsuarios(controlador: Controlador): List<Usuario?> {
                 "mario.sanchez@gmail.com",
                 Password().encriptar("marioSanchez"),
                 TipoPerfil.ENCORDADOR,
-                it.id.toString(),
+                it,
             )
-        },
+        },*/
         Usuario(
             ObjectId(),
             "4747bf2d-22dd-4a29-89c8-c1a7492769ae",
@@ -62,6 +62,16 @@ suspend fun getUsuarios(controlador: Controlador): List<Usuario?> {
             "Márquez",
             "andres.marquez@gmail.com",
             Password().encriptar("andresMarquez"),
+            TipoPerfil.USUARIO,
+            null,
+        ),
+        Usuario(
+            ObjectId(),
+            "4747bf2d-22dd-4a29-89c9-c1a7492769ae",
+            "pruebna",
+            "pruebna",
+            "pruebna.pruebna@gmail.com",
+            Password().encriptar("pruebna"),
             TipoPerfil.USUARIO,
             null,
         ),
@@ -74,7 +84,7 @@ suspend fun getUsuarios(controlador: Controlador): List<Usuario?> {
                 "rubengrm@gmail.com",
                 Password().encriptar("rubengrm"),
                 TipoPerfil.ENCORDADOR,
-                it.id.toString(),
+                it,
             )
         },
         controlador.encontrarTurnoUUID("b4023b8f-68a1-4d93-8519-8d0b54f7013d")?.toList()?.firstOrNull()?.let {
@@ -86,7 +96,7 @@ suspend fun getUsuarios(controlador: Controlador): List<Usuario?> {
                 "alvaro.yubero@gmail.com",
                 Password().encriptar("alvaroYubero"),
                 TipoPerfil.ENCORDADOR,
-                it.id.toString(),
+                it,
             )
         }
     )

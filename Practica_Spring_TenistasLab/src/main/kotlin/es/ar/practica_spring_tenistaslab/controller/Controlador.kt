@@ -343,13 +343,13 @@ class Controlador
      */
     suspend fun guardarTarea(tarea: Tarea): Tarea? {
         val temp = listarTareas()
-        val turnoActual = encontrarTurnoUUID(tarea.turno.uuidTurno)?.toList()?.firstOrNull()
+        val turnoActual = tarea.turno?.let { encontrarTurnoUUID(it.uuidTurno)?.toList()?.firstOrNull() }
         val empleado = encontrarUsuarioUUID(tarea.empleado.uuidUsuario)?.toList()?.firstOrNull()
         return if(usuarioActual!!.perfil != TipoPerfil.USUARIO) {
             if (turnoActual != null && empleado != null) {
                 val veces = temp
                     .filter { !it.estadoCompletado }
-                    .filter { it.turno.uuidTurno == turnoActual.uuidTurno }
+                    .filter { it.turno?.uuidTurno  == turnoActual.uuidTurno }
                     .count { it.empleado.uuidUsuario == empleado.uuidUsuario }
                 if (veces < 2) {
                     tareasRepositoryImpl.save(tarea)

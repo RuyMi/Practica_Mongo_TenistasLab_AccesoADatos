@@ -5,6 +5,7 @@ import org.bson.types.ObjectId
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 import es.ar.practica_spring_tenistaslab.serializers.UUIDSerializer
+import org.springframework.data.mongodb.core.mapping.DocumentReference
 import java.util.*
 
 @Document("tarea")
@@ -13,12 +14,16 @@ data class Tarea(
     val id: ObjectId = ObjectId.get(),
     @Serializable(UUIDSerializer::class)
     val uuidTarea: String = UUID.randomUUID().toString(),
+    @DocumentReference(lookup = "{'producto':?#{#self._id} }")
     val producto: Producto,
     val precio: Double,
     val descripcion: String,
+    @DocumentReference(lookup = "{'usuarios':?#{#self._id} }")
     val empleado:Usuario,
-    val turno:Turno,
+    @DocumentReference(lookup = "{'turno':?#{#self._id} }")
+    val turno:Turno?,
     val estadoCompletado:Boolean,
+    @DocumentReference(lookup = "{'maquinas':?#{#self._id} }")
     val maquina: Maquina?,
     val pedido:Pedidos
 ) {

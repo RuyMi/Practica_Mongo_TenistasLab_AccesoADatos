@@ -7,6 +7,7 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 import es.ar.practica_spring_tenistaslab.serializers.LocalDateSerializer
 import es.ar.practica_spring_tenistaslab.serializers.UUIDSerializer
+import org.springframework.data.mongodb.core.mapping.DocumentReference
 import java.time.LocalDate
 import java.util.*
 
@@ -24,7 +25,7 @@ data class Pedidos(
     @Serializable(LocalDateSerializer::class)
     val fechaEntrega: LocalDate?,
     val precio: Double,
-
+    @DocumentReference(lookup = "{'usuarios':?#{#self._id} }")
     val usuario: Usuario,
 ) {
 
