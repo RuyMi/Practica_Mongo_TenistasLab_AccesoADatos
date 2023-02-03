@@ -6,7 +6,7 @@ import org.bson.types.ObjectId
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.DocumentReference
-import serializers.UUIDSerializer
+import es.ar.practica_spring_tenistaslab.serializers.UUIDSerializer
 import java.util.*
 
 @Document("usuario")
@@ -20,8 +20,10 @@ data class Usuario(
     val email: String,
     val password: ByteArray,
     val perfil: TipoPerfil,
-    @DocumentReference()
+    @DocumentReference(lookup = "{'turno':?#{#self._id} }")
     val turno: String?,//es el id
-    @DocumentReference()
-    val pedido: List<String>?
-)
+
+){
+    @DocumentReference(lookup = "{'pedidos':?#{#self._id} }")
+    var pedido: MutableSet<String>? = null
+}

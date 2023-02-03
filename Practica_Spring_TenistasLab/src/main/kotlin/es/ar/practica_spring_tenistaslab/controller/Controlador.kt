@@ -1,17 +1,12 @@
-package controller
+package es.ar.practica_spring_tenistaslab.controller
 
 
 import com.mongodb.reactivestreams.client.ChangeStreamPublisher
-import es.ar.practica_spring_tenistaslab.models.Maquina
-import es.ar.practica_spring_tenistaslab.models.Pedidos
+import es.ar.practica_spring_tenistaslab.models.*
 import es.ar.practica_spring_tenistaslab.repositories.*
 import es.ar.practica_spring_tenistaslab.repositories.KtorFitRepository.UsuarioRepositoryKtorfit
 import es.ar.practica_spring_tenistaslab.repositories.RemoteCached.UsuarioCachedRepositoryImpl
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.count
-import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.filter
 import models.*
 import models.enums.TipoPerfil
 import mu.KotlinLogging
@@ -19,6 +14,9 @@ import org.bson.types.ObjectId
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.annotation.Id
 import org.springframework.stereotype.Controller
+import es.ar.practica_spring_tenistaslab.services.usuarios.UsuariosService
+import kotlinx.coroutines.flow.*
+import org.springframework.data.mongodb.core.ChangeStreamEvent
 
 
 private val logger = KotlinLogging.logger {}
@@ -35,22 +33,24 @@ private val logger = KotlinLogging.logger {}
  * @property usuarioActual
  */
 
-/*
- // private val usuarioService: UsuariosService
- */
 @Controller
 class Controlador
     @Autowired constructor(
      private val maquinaRepositoryImpl: MaquinaRepository,
-   private val pedidosRepositoryImpl: PedidosRepository,
+     private val pedidosRepositoryImpl: PedidosRepository,
      private val productoRepositoryImpl: ProductoRepository,
-    private val tareasRepositoryImpl: TareaRepository,
+     private val tareasRepositoryImpl: TareaRepository,
      private val usuarioRepositoryImpl: UsuariosRepository,
      private val turnoRepositoryImpl: TurnoRepository,
-    private val ktorFitUsuario: UsuarioRepositoryKtorfit,
-    private val cacheRepositoryImpl: UsuarioCachedRepositoryImpl,
+     private val ktorFitUsuario: UsuarioRepositoryKtorfit,
+     private val cacheRepositoryImpl: UsuarioCachedRepositoryImpl,
+     private val usuarioService: UsuariosService,
 
 ) {
+    var usuarioActual: Usuario? = null
+    fun configurarUsuario(usuario: Usuario){
+        usuarioActual = usuario
+    }
 
     //Maquina
 
@@ -90,9 +90,9 @@ class Controlador
      * @param uuid
      * @return Una MaquinaPersonalizacion
      */
-    suspend fun encontrarMaquinaUUID(uuid: String): Maquina? {
+    suspend fun encontrarMaquinaUUID(uuid: String): Flow<Maquina?>? {
         return if(usuarioActual!!.perfil != TipoPerfil.USUARIO) {
-             maquinaRepositoryImpl.findMaquinaByNumSerie(uuid)
+             maquinaRepositoryImpl.findByNumSerie(uuid)
         }else{
             logger.error { "No tienes permiso para buscar una máquina" }
             null
@@ -125,6 +125,7 @@ class Controlador
         return if(temp.count{ it.maquina?.numSerie == maquina.numSerie} == 0){
             if(usuarioActual!!.perfil == TipoPerfil.ADMINISTRADOR) {
                 maquinaRepositoryImpl.delete(maquina)
+                true
             }else{
                 logger.error { "Solo un administrador puede borrar una máquina" }
                 false
@@ -145,7 +146,7 @@ class Controlador
             pedidosRepositoryImpl.findAll()
         }else{
             pedidosRepositoryImpl.findAll().filter{
-                it.usuario == usuarioActual!!.id
+                it.usuario.id == usuarioActual!!.id
             }
         }
     }
@@ -156,7 +157,7 @@ class Controlador
      * @param id
      * @return devuelve un Pedido
      */
-    suspend fun encontrarPedidoID(id: Id<Pedidos>): Pedidos? {
+    suspend fun encontrarPedidoID(id: ObjectId): Pedidos? {
         return if(usuarioActual!!.perfil != TipoPerfil.USUARIO) {
             pedidosRepositoryImpl.findById(id)
         }else{
@@ -171,9 +172,9 @@ class Controlador
      * @param uuid
      * @return devuelve un Pedido
      */
-    suspend fun encontrarPedidoUUID(uuid: String): Pedidos? {
+    suspend fun encontrarPedidoUUID(uuid: String): Flow<Pedidos?>? {
         return if(usuarioActual!!.perfil != TipoPerfil.USUARIO) {
-            pedidosRepositoryImpl.findByUUID(uuid)
+            pedidosRepositoryImpl.findByUuidPedidos(uuid)
         }else{
             logger.error { "No tienes permiso para encontrar pedidos" }
             null
@@ -205,6 +206,7 @@ class Controlador
     suspend fun borrarPedido(pedidos: Pedidos): Boolean {
         return if(usuarioActual!!.perfil == TipoPerfil.ADMINISTRADOR){
             pedidosRepositoryImpl.delete(pedidos)
+            true
         }else{
             logger.debug{"Solo los administradores pueden eliminar pedidos"}
             false
@@ -229,7 +231,7 @@ class Controlador
      * @param id
      * @return devuelve un Producto
      */
-    suspend fun encontrarProductoID(id: Id<Producto>): Producto? {
+    suspend fun encontrarProductoID(id: ObjectId): Producto? {
         return if(usuarioActual!!.perfil != TipoPerfil.USUARIO) {
             productoRepositoryImpl.findById(id)
         }else{
@@ -244,9 +246,9 @@ class Controlador
      * @param uuid
      * @return devuelve un Producto
      */
-    suspend fun encontrarProductoUUID(uuid: String): Producto? {
+    suspend fun encontrarProductoUUID(uuid: String): Flow<Producto?>? {
         return if(usuarioActual!!.perfil != TipoPerfil.USUARIO) {
-            productoRepositoryImpl.findByUUID(uuid)
+            productoRepositoryImpl.findByUuidProducto(uuid)
         }else{
             logger.error { "No tienes permiso para encontrar productos" }
             null
@@ -277,6 +279,7 @@ class Controlador
     suspend fun borrarProducto(producto: Producto): Boolean {
         return if(usuarioActual!!.perfil == TipoPerfil.ADMINISTRADOR){
             productoRepositoryImpl.delete(producto)
+            true
         }else{
             logger.error { "Solo los administradores pueden eliminar productos" }
             false
@@ -304,7 +307,7 @@ class Controlador
      * @param id
      * @return devuelve una Tarea
      */
-    suspend fun encontrarTareaID(id: Id<Tarea>): Tarea? {
+    suspend fun encontrarTareaID(id: ObjectId): Tarea? {
         return if(usuarioActual!!.perfil != TipoPerfil.USUARIO){
              tareasRepositoryImpl.findById(id)
         } else{
@@ -320,9 +323,9 @@ class Controlador
      * @param uuid
      *@return devuelve una Tarea
      */
-    suspend fun encontrarTareaUUID(uuid: String): Tarea? {
+    suspend fun encontrarTareaUUID(uuid: String): Flow<Tarea?>? {
         return if(usuarioActual!!.perfil != TipoPerfil.USUARIO){
-            tareasRepositoryImpl.findByUUID(uuid)
+            tareasRepositoryImpl.findByUuidTarea(uuid)
         } else{
             logger.error{"No tienes permiso para encontrar tareas"}
             null
@@ -340,8 +343,8 @@ class Controlador
      */
     suspend fun guardarTarea(tarea: Tarea): Tarea? {
         val temp = listarTareas()
-        val turnoActual = encontrarTurnoUUID(tarea.turno.uuidTurno)
-        val empleado = encontrarUsuarioUUID(tarea.empleado.uuidUsuario)
+        val turnoActual = encontrarTurnoUUID(tarea.turno.uuidTurno)?.toList()?.firstOrNull()
+        val empleado = encontrarUsuarioUUID(tarea.empleado.uuidUsuario)?.toList()?.firstOrNull()
         return if(usuarioActual!!.perfil != TipoPerfil.USUARIO) {
             if (turnoActual != null && empleado != null) {
                 val veces = temp
@@ -374,6 +377,7 @@ class Controlador
     suspend fun borrarTarea(tarea: Tarea): Boolean {
         return if(usuarioActual!!.perfil != TipoPerfil.USUARIO){
             tareasRepositoryImpl.delete(tarea)
+            true
         } else{
             logger.error{"No tienes permiso para encontrar tareas"}
             false
@@ -381,6 +385,10 @@ class Controlador
     }
 
     //Usuario
+
+    fun intentoSesion():  Flow<Usuario> {
+        return usuarioRepositoryImpl.findAll()
+    }
 
     /**
      * Listar usuarios
@@ -402,7 +410,7 @@ class Controlador
      * @param id
      * @return devuelve un Usuario
      */
-    suspend fun encontrarUsuarioID(id: Id<Usuario>): Usuario? {
+    suspend fun encontrarUsuarioID(id: ObjectId): Usuario? {
         return if(usuarioActual!!.perfil == TipoPerfil.ADMINISTRADOR){
             return usuarioRepositoryImpl.findById(id)
         } else{
@@ -417,9 +425,9 @@ class Controlador
      * @param uuid
      * @return devuelve un Usuario
      */
-    suspend fun encontrarUsuarioUUID(uuid: String): Usuario? {
+    suspend fun encontrarUsuarioUUID(uuid: String): Flow<Usuario?>? {
         return if(usuarioActual!!.perfil == TipoPerfil.ADMINISTRADOR){
-            usuarioRepositoryImpl.findByUUID(uuid)
+            usuarioRepositoryImpl.findByUuidUsuario(uuid)
         } else{
             logger.error{"Solo un administrador puede encontrar usuarios"}
             null
@@ -454,11 +462,13 @@ class Controlador
                     .count { it.empleado.uuidUsuario == usuario.uuidUsuario }
                 if (temp == 0) {
                     usuarioRepositoryImpl.delete(usuario)
+                    true
                 } else {
                     false
                 }
             } else {
                 usuarioRepositoryImpl.delete(usuario)
+                true
             }
         }else{
             logger.error{"No tienes permisos para borrar usuarios"}
@@ -486,7 +496,7 @@ class Controlador
      * @param id
      * @return  devuelve un turno
      */
-    suspend fun encontrarTurnoID(id: Id<Turno>): Turno? {
+    suspend fun encontrarTurnoID(id: ObjectId): Turno? {
         return if(usuarioActual!!.perfil == TipoPerfil.ADMINISTRADOR){
             turnoRepositoryImpl.findById(id)
         } else{
@@ -502,9 +512,9 @@ class Controlador
      * @param uuid
      * @return devuelve un turno
      */
-    suspend fun encontrarTurnoUUID(uuid: String): Turno? {
+    suspend fun encontrarTurnoUUID(uuid: String): Flow<Turno?>? {
         return if(usuarioActual!!.perfil == TipoPerfil.ADMINISTRADOR){
-            turnoRepositoryImpl.findByUUID(uuid)
+            turnoRepositoryImpl.findByUuidTurno(uuid)
         } else{
             logger.debug{"Solo un administrador puede encontrar turnos"}
             null
@@ -536,6 +546,7 @@ class Controlador
     suspend fun borrarTurno(turno: Turno): Boolean {
         return if (usuarioActual!!.perfil == TipoPerfil.ADMINISTRADOR) {
             turnoRepositoryImpl.delete(turno)
+            true
         } else {
             logger.debug("Solo un administrador puede eliminar el turno")
             false
@@ -555,14 +566,32 @@ class Controlador
     }
 
 
-    fun watchUsuarios(): ChangeStreamPublisher<Usuario> {
+    fun watchUsuarios(): Flow<ChangeStreamEvent<Usuario>> {
         logger.info("cambios en Tenistas")
-        return UsuariosService().watch()
+        return usuarioService.watch()
     }
 
     suspend fun refreshUsuarios(): Job {
         return cacheRepositoryImpl.refresh()
     }
+
+    suspend fun initDatabase(meterAdmin: Usuario) {
+        usuarioRepositoryImpl.save(meterAdmin)
+    }
+
+    suspend fun borrarDatos() {
+        maquinaRepositoryImpl.deleteAll()
+        pedidosRepositoryImpl
+        productoRepositoryImpl
+        tareasRepositoryImpl
+        usuarioRepositoryImpl
+        turnoRepositoryImpl
+        ktorFitUsuario
+        cacheRepositoryImpl
+        usuarioService
+    }
+
+
 }
 
 

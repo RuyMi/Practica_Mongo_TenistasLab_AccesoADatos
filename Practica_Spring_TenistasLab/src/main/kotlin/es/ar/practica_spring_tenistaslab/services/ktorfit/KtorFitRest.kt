@@ -1,7 +1,6 @@
-package services.ktorfit
+package es.ar.practica_spring_tenistaslab.services.ktorfit
 
 import de.jensklingenberg.ktorfit.http.*
-import dto.*
 import es.ar.practica_spring_tenistaslab.models.Tarea
 import es.ar.practica_spring_tenistaslab.models.Usuario
 import es.ar.practica_spring_tenistaslab.models.UsuarioAPI

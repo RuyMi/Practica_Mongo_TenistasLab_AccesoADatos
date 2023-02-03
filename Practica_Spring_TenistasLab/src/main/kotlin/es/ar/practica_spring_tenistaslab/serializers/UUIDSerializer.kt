@@ -1,4 +1,4 @@
-package serializers
+package es.ar.practica_spring_tenistaslab.serializers
 
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PrimitiveKind

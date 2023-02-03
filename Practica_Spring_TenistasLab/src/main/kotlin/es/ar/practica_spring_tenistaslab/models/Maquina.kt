@@ -7,10 +7,11 @@ import kotlinx.serialization.Serializable
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
-import serializers.LocalDateSerializer
-import serializers.UUIDSerializer
+import es.ar.practica_spring_tenistaslab.serializers.LocalDateSerializer
+import es.ar.practica_spring_tenistaslab.serializers.UUIDSerializer
 import java.time.LocalDate
 import java.util.*
+
 @Document("Maquina")
 data class Maquina(
     @Id

@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 import models.Address
 import models.Company
 import models.enums.TipoPerfil
-import services.password.Password
+import es.ar.practica_spring_tenistaslab.services.password.Password
 
 
 @Serializable
@@ -26,7 +26,6 @@ fun UsuarioAPI.toUsuario(): Usuario{
         password = Password().encriptar(this.name),
         perfil = perfilAleatorio(),
         turno = null,
-        pedido = null
     )
 }
 

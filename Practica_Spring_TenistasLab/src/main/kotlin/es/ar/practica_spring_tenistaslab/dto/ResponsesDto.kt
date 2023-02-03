@@ -1,4 +1,4 @@
-package dto
+package es.ar.practica_spring_tenistaslab.dto
 
 import es.ar.practica_spring_tenistaslab.models.Usuario
 import es.ar.practica_spring_tenistaslab.models.UsuarioAPI

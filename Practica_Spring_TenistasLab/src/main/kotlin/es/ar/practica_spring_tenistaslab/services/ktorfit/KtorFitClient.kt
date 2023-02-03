@@ -1,4 +1,4 @@
-package services.ktorfit
+package es.ar.practica_spring_tenistaslab.services.ktorfit
 
 import de.jensklingenberg.ktorfit.Ktorfit
 import de.jensklingenberg.ktorfit.create
@@ -10,8 +10,6 @@ import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
 import mu.KotlinLogging
-import org.springframework.context.annotation.Bean
-import org.springframework.stereotype.Repository
 
 
 private val logger = KotlinLogging.logger {}

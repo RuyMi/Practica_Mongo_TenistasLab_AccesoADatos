@@ -1,13 +1,11 @@
 package es.ar.practica_spring_tenistaslab.models
 
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
-import org.bson.codecs.pojo.annotations.BsonId
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.Id
 
 import org.springframework.data.mongodb.core.mapping.Document
-import serializers.UUIDSerializer
+import es.ar.practica_spring_tenistaslab.serializers.UUIDSerializer
 import java.util.*
 
 @Document("producto")
