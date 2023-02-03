@@ -16,14 +16,12 @@ data class Tarea(
     @Id @Serializable(ObjectIdSerializer::class)
     val id: ObjectId = ObjectId.get(),
     val uuidTarea: String = UUID.randomUUID().toString(),
-    @DocumentReference(lookup = "{'producto':?#{#self._id} }")
     val producto: Producto,
     val precio: Double,
     val descripcion: String,
     val empleado:UsuarioDTO,
     val turno:Turno,
     val estadoCompletado:Boolean,
-    @DocumentReference(lookup = "{'maquinas':?#{#self._id} }")
     val maquina: Maquina?,
     val pedido:Pedidos
 ) {
