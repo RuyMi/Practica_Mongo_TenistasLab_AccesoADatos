@@ -8,6 +8,16 @@ import org.litote.kmongo.newId
 import serializers.UUIDSerializer
 import java.util.*
 
+/**
+ * TODO
+ *
+ * @property id
+ * @property uuidProducto
+ * @property marca
+ * @property modelo
+ * @property precio
+ * @property stock
+ */
 @Serializable
 data class Producto(
     @BsonId @Contextual

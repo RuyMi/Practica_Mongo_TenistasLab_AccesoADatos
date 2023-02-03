@@ -10,6 +10,12 @@ import utils.PropertiesReader
 val logger = KotlinLogging.logger {}
 val properties = PropertiesReader("application.properties")
 
+/**
+ * Controlador de Entidades de Mongodb
+ *
+ *
+ */
+
 object MongoDbManager {
     private lateinit var mongoClient: CoroutineClient
     lateinit var database: CoroutineDatabase

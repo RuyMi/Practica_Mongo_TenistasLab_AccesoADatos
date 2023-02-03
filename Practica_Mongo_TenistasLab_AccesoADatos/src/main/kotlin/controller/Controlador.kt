@@ -56,7 +56,7 @@ class Controlador(
     /**
      * Listar maquinas
      *
-     * @return devuelve una lista de Maquina
+     * @return devuelve un flow de Maquina
      */
     fun listarMaquinas(): Flow<Maquina> {
         return if(usuarioActual!!.perfil != TipoPerfil.USUARIO){
@@ -84,10 +84,10 @@ class Controlador(
     }
 
     /**
-     * Encontrar maquina uuid
+     * Encontrar maquina uuid que es su numero de serie
      *
      * @param uuid
-     * @return Una MaquinaPersonalizacion
+     * @return Una Maquina
      */
     suspend fun encontrarMaquinaUUID(uuid: String): Maquina? {
         return if(usuarioActual!!.perfil != TipoPerfil.USUARIO) {
@@ -137,7 +137,7 @@ class Controlador(
     /**
      * Listar pedidos
      *
-     * @return una lista de Pedidos
+     * @return una Flow de Pedidos
      *///Pedidos
     fun listarPedidos(): Flow<Pedidos> {
         return if(usuarioActual!!.perfil != TipoPerfil.USUARIO) {
@@ -216,14 +216,14 @@ class Controlador(
     /**
      * Listar productos
      *
-     * @return una lista de productos
+     * @return una Flow de productos
      */
     fun listarProductos(): Flow<Producto> {
         return productoRepositoryImpl.findAll()
     }
 
     /**
-     * Encontrar producto i d
+     * Encontrar producto id
      *
      * @param id
      * @return devuelve un Producto
@@ -384,7 +384,7 @@ class Controlador(
     /**
      * Listar usuarios
      *
-     * @return devuelve una lista de Usuarios
+     * @return devuelve una Flow de Usuarios
      */
     fun listarUsuarios(): Flow<Usuario> {
         return if(usuarioActual!!.perfil== TipoPerfil.ADMINISTRADOR){
@@ -468,7 +468,7 @@ class Controlador(
     /**
      * Listar turnos
      *
-     *  @return una lista de turnos
+     *  @return una Flow de turnos
      *///Turnos
     fun listarTurnos(): Flow<Turno> {
         return if(usuarioActual!!.perfil == TipoPerfil.ADMINISTRADOR){
@@ -541,24 +541,50 @@ class Controlador(
         }
     }
 
+    /**
+     * Hace una peticion a la api con ktorfit
+     *
+     * @return un flow de usuarios
+     */
     suspend fun encontrarUsuariosAPI(): Flow<Usuario> {
         return ktorFitUsuario.findAll()
     }
 
+    /**
+     * guarda un usuario en la nube con ktorfit
+     *
+     * @param user
+     * @return el usuario
+     */
     suspend fun guardarUsuariosAPI(user: Usuario): Usuario {
         return ktorFitUsuario.save(user)
     }
 
+    /**
+     *metodo que añade un usuario a la cache
+     *
+     * @param user
+     * @return
+     */
     suspend fun añadirCacheUsuarios(user: Usuario): Usuario {
         return cacheRepositoryImpl.save(user)
     }
 
-
+    /**
+     * Un servicio para ver los cambios en tiempo real de usuario
+     *
+     * @return
+     */
     fun watchUsuarios(): ChangeStreamPublisher<Usuario> {
         logger.info("cambios en Tenistas")
         return UsuariosService().watch()
     }
 
+    /**
+     * Metodo para refrescar la cache
+     *
+     * @return
+     */
     suspend fun refreshUsuarios(): Job {
         return cacheRepositoryImpl.refresh()
     }

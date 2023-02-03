@@ -2,6 +2,13 @@ package models
 
 import kotlinx.serialization.Serializable
 
+/**
+ *
+ *
+ * @property bs
+ * @property catchPhrase
+ * @property name
+ */
 
 @Serializable
 data class Company(

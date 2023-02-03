@@ -4,6 +4,18 @@ import kotlinx.serialization.Serializable
 import models.enums.TipoPerfil
 import services.password.Password
 
+/**
+ * 
+ *
+ * @property address
+ * @property company
+ * @property email
+ * @property id
+ * @property name
+ * @property phone
+ * @property username
+ * @property website
+ */
 
 @Serializable
 data class UsuarioAPI(

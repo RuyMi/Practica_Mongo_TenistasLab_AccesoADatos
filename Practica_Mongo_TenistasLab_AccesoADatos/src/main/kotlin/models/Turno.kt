@@ -10,6 +10,14 @@ import serializers.UUIDSerializer
 import java.time.LocalDateTime
 import java.util.*
 
+/**
+ *
+ *
+ * @property id
+ * @property uuidTurno
+ * @property fechaInicio
+ * @property fechaFin
+ */
 @Serializable
 data class Turno(
     @BsonId @Contextual
