@@ -22,9 +22,7 @@ data class Usuario(
     val email: String,
     val password: ByteArray,
     val perfil: TipoPerfil,
-    //@DocumentReference()
-    val turno: Turno?,//es el id
-
+    val turno: Turno?,
 ){
 
 }
