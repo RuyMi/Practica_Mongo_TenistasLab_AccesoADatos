@@ -1,8 +1,10 @@
 package repositories.usuario
 
 import db.MongoDbManager
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.Contextual
 import models.Usuario
 import models.enums.TipoPerfil
@@ -18,6 +20,7 @@ import services.sqldelight.SqlDeLightClient
 import java.util.*
 
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class UsuarioRepositoryImplTest {
 
 
@@ -37,14 +40,14 @@ class UsuarioRepositoryImplTest {
     )
 
     @BeforeEach
-    fun setUp(): Unit = runBlocking {
+    fun setUp(): Unit = runTest {
         dataBaseService.drop()
         SqlDeLightClient.queries.deleteAll()
         repositorio.save(usuarioTest)
     }
 
     @Test
-    fun findAll(): Unit = runBlocking {
+    fun findAll(): Unit = runTest {
         val test = repositorio.findAll().toList()
         assertAll(
             { assertFalse(test.isEmpty()) },
@@ -58,7 +61,7 @@ class UsuarioRepositoryImplTest {
     }
 
     @Test
-    fun findById(): Unit = runBlocking {
+    fun findById(): Unit = runTest {
         val testId = repositorio.findById(usuarioTest.id)
         assertAll(
             { assertEquals(testId!!.uuidUsuario, usuarioTest.uuidUsuario) },
@@ -69,7 +72,7 @@ class UsuarioRepositoryImplTest {
     }
 
     @Test
-    fun findbyUUID(): Unit = runBlocking {
+    fun findbyUUID(): Unit = runTest {
         val testUUId = repositorio.findByUUID(usuarioTest.uuidUsuario)
         assertAll(
             { assertEquals(testUUId!!.uuidUsuario, usuarioTest.uuidUsuario) },
@@ -79,8 +82,9 @@ class UsuarioRepositoryImplTest {
         )
     }
 
+
     @Test
-    fun save(): Unit = runBlocking {
+    fun save(): Unit = runTest {
         SqlDeLightClient.queries.deleteAll()
         val testSave = repositorio.save(usuarioTest)!!
         assertAll(
@@ -92,7 +96,7 @@ class UsuarioRepositoryImplTest {
     }
 
     @Test
-    fun delete(): Unit = runBlocking {
+    fun delete(): Unit = runTest {
         val testDelete = repositorio.delete(usuarioTest)
         assertAll(
             { assertTrue(testDelete) },

@@ -1,8 +1,10 @@
 package repositories.usuario
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Contextual
 import models.Usuario
@@ -13,6 +15,7 @@ import org.junit.jupiter.api.Assertions.*
 import org.litote.kmongo.newId
 import services.password.Password
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class UsuarioRepositoryKtorfitTest {
 
     val repositorio = UsuarioRepositoryKtorfit()
@@ -32,7 +35,7 @@ class UsuarioRepositoryKtorfitTest {
 
 
     @Test
-    fun findAll()= runBlocking {
+    fun findAll()= runTest {
         val test = repositorio.findAll().toList()
         assertAll(
             { assertFalse(test.isEmpty()) },
@@ -46,7 +49,7 @@ class UsuarioRepositoryKtorfitTest {
     }
 
     @Test
-    fun findById()= runBlocking {
+    fun findById()= runTest {
         val testId = repositorio.findById(1)
         assertAll(
             { assertEquals("Leanne Graham", testId!!.nombre) },
@@ -59,7 +62,7 @@ class UsuarioRepositoryKtorfitTest {
     }
 
     @Test
-    fun save()= runBlocking {
+    fun save()= runTest {
         val testSave = repositorio.save(usuarioTest)
         assertAll(
             { assertEquals(usuarioTest.nombre, testSave.nombre) },
@@ -72,7 +75,7 @@ class UsuarioRepositoryKtorfitTest {
 
 
     @Test
-    fun delete()= runBlocking {
+    fun delete()= runTest {
         val usuarioDelete = repositorio.delete(usuarioTest)
         assertAll(
             { assertEquals(usuarioTest.nombre, usuarioDelete.nombre) },

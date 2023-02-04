@@ -11,6 +11,18 @@ import org.litote.kmongo.Id
 import org.litote.kmongo.newId
 import java.util.*
 
+/**
+ * Clase UsuarioDTO
+ *
+ * @property id
+ * @property uuidUsuario
+ * @property nombre
+ * @property apellido
+ * @property email
+ * @property perfil
+ * @property turno
+ * @property pedido
+ */
 @Serializable
 data class UsuarioDTO(
     val id: String,

@@ -28,12 +28,12 @@ class TareasRepositoryImpl:TareasRepository {
     override suspend fun findById(id: Id<Tarea>): Tarea? {
         logger.debug { "findById($id)" }
         return MongoDbManager.database.getCollection<Tarea>()
-            .findOneById(id) ?: throw Exception("No existe el Tarea con id $id")//TODO cambiar las excepciones
+            .findOneById(id) ?: throw Exception("No existe la tarea con id $id")
     }
 
     override suspend fun findByUUID(uuid: String): Tarea? {
         logger.debug { "findByUUID($uuid)" }
-        return MongoDbManager.database.getCollection<Tarea>().findOne(Tarea::uuidTarea eq uuid)
+        return MongoDbManager.database.getCollection<Tarea>().findOne(Tarea::uuidTarea eq uuid)?: throw Exception("No existe la tarea con el uuid $uuid")
     }
 
     override suspend fun save(entity: Tarea): Tarea? {

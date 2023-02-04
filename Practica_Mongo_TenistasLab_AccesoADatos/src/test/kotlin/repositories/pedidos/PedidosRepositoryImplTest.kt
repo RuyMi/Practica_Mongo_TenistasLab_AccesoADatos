@@ -1,6 +1,7 @@
 package repositories.pedidos
 
 import db.MongoDbManager
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
@@ -24,7 +25,9 @@ import services.password.Password
 import services.sqldelight.SqlDeLightClient
 import java.time.LocalDate
 import java.time.LocalDateTime
+import kotlinx.coroutines.test.runTest
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class PedidosRepositoryImplTest {
 
     val dataBaseService = MongoDbManager.database
@@ -93,7 +96,7 @@ class PedidosRepositoryImplTest {
 
 
     @BeforeEach
-    fun setUp(): Unit = runBlocking {
+    fun setUp(): Unit = runTest {
         dataBaseService.drop()
         SqlDeLightClient.queries.deleteAll()
         val turno =  Turno(
@@ -155,7 +158,7 @@ class PedidosRepositoryImplTest {
 
 
     @Test
-    fun findAll(): Unit = runBlocking {
+    fun findAll(): Unit = runTest {
         val pedidos = repositorio.findAll().toList()
         assertAll(
             { assertFalse(pedidos.isEmpty()) },
@@ -172,7 +175,7 @@ class PedidosRepositoryImplTest {
     }
 
     @Test
-    fun findById(): Unit = runBlocking {
+    fun findById(): Unit = runTest {
         val pedidoId = repositorio.findById(pedidoTest.id)!!
         assertAll(
             { assertEquals(pedidoTest.id, pedidoId.id) },
@@ -187,7 +190,7 @@ class PedidosRepositoryImplTest {
     }
 
     @Test
-    fun findByUUID(): Unit = runBlocking{
+    fun findByUUID(): Unit = runTest{
         val pedidoUuid = repositorio.findByUUID(pedidoTest.uuidPedidos)!!
         assertAll(
             { assertEquals(pedidoTest.id, pedidoUuid.id) },
@@ -202,7 +205,7 @@ class PedidosRepositoryImplTest {
     }
 
     @Test
-    fun save(): Unit = runBlocking {
+    fun save(): Unit = runTest {
         repositorio.delete(pedidoTest)
         val pedidoId = repositorio.save(pedidoTest)!!
         assertAll(
@@ -218,7 +221,7 @@ class PedidosRepositoryImplTest {
     }
 
     @Test
-    fun delete(): Unit = runBlocking {
+    fun delete(): Unit = runTest {
         val pedidoDelete = repositorio.delete(pedidoTest)
         assertAll(
             { assertTrue(pedidoDelete) }

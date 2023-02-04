@@ -1,5 +1,3 @@
-
-
 import controller.Controlador
 import db.*
 import di.DiAnnotationModule
@@ -34,13 +32,13 @@ private val json = Json {
     serializersModule = IdKotlinXSerializationModule
 }
 private val logger = KotlinLogging.logger{}
-private val cliente = SqlDeLightClient
 // ¡ATENCIÓN! Esto borrará la base de datos y la volverá a inicializar con datos por defecto
 private const val INICIALIZAR_DATOS = true
-
 var usuarioActual: Usuario? = null
+
+
 /**
- * Main
+ * Funcion principal Main
  *
  */
 fun main(){

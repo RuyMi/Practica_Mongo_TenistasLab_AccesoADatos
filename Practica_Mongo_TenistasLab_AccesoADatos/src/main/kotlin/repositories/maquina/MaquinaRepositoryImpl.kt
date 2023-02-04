@@ -1,6 +1,7 @@
 package repositories.maquina
 
 import db.MongoDbManager
+import exceptions.MaquinaException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.reactive.asFlow
 import models.Maquina
@@ -35,12 +36,12 @@ class MaquinaRepositoryImpl:MaquinaRepository {
     override suspend fun findById(id: Id<Maquina>): Maquina? {
        logger.debug { "findById($id)" }
         return MongoDbManager.database.getCollection<Maquina>()
-            .findOneById(id) ?: throw Exception("No existe el maquina con id $id")//TODO cambiar las excepciones
+            .findOneById(id) ?: throw MaquinaException("No existe el maquina con id $id")
     }
 
     override suspend fun findByUUID(uuid: String): Maquina? {
         logger.debug { "findByUUID($uuid)" }
-        return MongoDbManager.database.getCollection<Maquina>().findOne(Maquina::numSerie eq uuid)
+        return MongoDbManager.database.getCollection<Maquina>().findOne(Maquina::numSerie eq uuid) ?: throw MaquinaException("No existe el maquina con uuid $uuid")
     }
 
     override suspend fun save(entity: Maquina): Maquina? {
@@ -63,6 +64,6 @@ class MaquinaRepositoryImpl:MaquinaRepository {
     override suspend fun delete(entity: Maquina): Boolean {
        logger.debug { "delete($entity)" }
         return MongoDbManager.database.getCollection<Maquina>()
-            .deleteOneById(MongoOperator.id).let { true }
+            .deleteOneById(entity.id).let { true }
     }
 }
