@@ -7,16 +7,13 @@ import org.litote.kmongo.coroutine.coroutine
 import org.litote.kmongo.reactivestreams.KMongo
 import utils.PropertiesReader
 
-val logger = KotlinLogging.logger {}
-val properties = PropertiesReader("application.properties")
-
 /**
- * Controlador de Entidades de Mongodb
- *
+ * Manager de la base de datos de Mongo
  *
  */
-
 object MongoDbManager {
+    val logger = KotlinLogging.logger {}
+    val properties = PropertiesReader("application.properties")
     private lateinit var mongoClient: CoroutineClient
     lateinit var database: CoroutineDatabase
 

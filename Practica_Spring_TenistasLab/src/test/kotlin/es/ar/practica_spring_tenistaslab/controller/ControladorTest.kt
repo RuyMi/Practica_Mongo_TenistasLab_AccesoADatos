@@ -1,172 +1,639 @@
 package es.ar.practica_spring_tenistaslab.controller
 
+import es.ar.practica_spring_tenistaslab.mapper.toUsuarioDto
+import es.ar.practica_spring_tenistaslab.models.*
+import es.ar.practica_spring_tenistaslab.models.enums.TipoMaquina
+import es.ar.practica_spring_tenistaslab.services.password.Password
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.runBlocking
+import models.enums.TipoEstado
+import models.enums.TipoPerfil
+import org.bson.types.ObjectId
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.BeforeEach
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.SpringBootTest
+import java.time.LocalDate
+import java.time.LocalDateTime
 
-class ControladorTest {
+@SpringBootTest
+class ControladorTest
+@Autowired constructor(
+    private val controlador: Controlador
+) {
+    val usuario = Usuario(
+        ObjectId("63dc3ad64f5c531dfe3c3795"),
+        "492a7f86-c32d-43e3-ba77-8083a542f425",
+        "Admin",
+        "Admin",
+        "admin@admin.com",
+        Password().encriptar("1234"),
+        TipoPerfil.ADMINISTRADOR,
+        null
+    )
+    val setupUsuario = runBlocking { 
+        controlador.configurarUsuario(usuario)
+    }
+
+    val setup2 = runBlocking {
+        controlador.borrarDatos()
+        val turnoTest =  Turno(
+            ObjectId("63dc3ad64f5c531dfe3c3795"),
+            "492a7f86-c34d-4313-ba77-8083a542f425",
+            LocalDateTime.of(2022, 12, 5, 8, 0),
+            LocalDateTime.of(2022, 12, 5, 10, 0)
+        )
+        controlador.guardarTurno(turnoTest)
+
+        val res = mutableListOf<Turno>()
+        controlador.encontrarTurnoUUID("492a7f86-c34d-4313-ba77-8083a542f425").collect {
+            res.add(it)
+        }
+
+
+
+        val usuarioTest = Usuario(
+            ObjectId("63dc3ad64f5c531dfe3c3795"),
+            "492a7f86-c32d-43e3-ba77-8083a542f425",
+            "Mario",
+            "Sánchez",
+            "mario.sanchez@gmail.com",
+            Password().encriptar("marioSanchez"),
+            TipoPerfil.ADMINISTRADOR,
+            res[0],
+        )
+        controlador.guardarUsuario(usuarioTest)
+
+        val maquina = Maquina(
+            ObjectId("63dc3ad64f5c531dfe3c3795"),
+            "a016f77a-4698-4bd3-8294-1edb74311d27",
+            "nadal",
+            "rojo",
+            LocalDate.now(),
+            "true, 20.0, 12.4",
+            TipoMaquina.ENCORDAR
+        )
+        controlador.guardarMaquina(maquina)
+        val producto = Producto(
+            ObjectId("63dc3ad64f5c531dfe3c3795"),
+            "492a7f86-c34d-43e3-ba77-8183a542f425",
+            "Wilson",
+            "raqueta",
+            20.2,
+            12
+        )
+        controlador.guardarProducto(producto)
+        val resUsuario = mutableListOf<Usuario>()
+        controlador.encontrarUsuarioUUID("492a7f86-c32d-43e3-ba77-8083a542f425")!!.collect{
+            resUsuario.add(it!!)
+        }
+
+        val pedidoTest = Pedidos(
+            ObjectId("63dc3ad64f5c531dfe3c3795"),
+            "492a7f86-c34d-43e3-ba77-8083a542f425",
+            TipoEstado.RECIBIDO,
+            LocalDate.now(),
+            LocalDate.of(2022, 12, 12),
+            LocalDate.of(2022, 12, 13),
+            120.5,
+            resUsuario[0].toUsuarioDto()
+        )
+         controlador.guardarPedido(pedidoTest)
+
+        val tareaTest = runBlocking {
+            Tarea(
+                ObjectId("63dc3ad64f5c531dfe3c3795"),
+                "192a7f86-c34d-43e3-ba77-8083a542f425",
+                controlador.encontrarProductoUUID("492a7f86-c34d-43e3-ba77-8183a542f425")?.toList()?.firstOrNull()!!,
+                20.0,
+                "Personalizacion",
+                controlador.encontrarUsuarioUUID("492a7f86-c32d-43e3-ba77-8083a542f425")?.toList()?.firstOrNull()!!.toUsuarioDto(),
+                controlador.encontrarTurnoUUID("492a7f86-c34d-4313-ba77-8083a542f425")?.toList()?.firstOrNull()!!,
+                true,
+                controlador.encontrarMaquinaUUID("a016f77a-4698-4bd3-8294-1edb74311d27")?.toList()?.firstOrNull()!!,
+                controlador.encontrarPedidoUUID("492a7f86-c34d-43e3-ba77-8083a542f425")?.toList()?.firstOrNull()!!
+            )
+        }
+        controlador.guardarTarea(tareaTest)
+    }
+
+
+
+    val usuarioTest = runBlocking {
+        controlador.encontrarUsuarioUUID("492a7f86-c32d-43e3-ba77-8083a542f425")?.toList()?.firstOrNull()!!
+    }
+    val maquinaTest = runBlocking {
+        controlador.encontrarMaquinaUUID("a016f77a-4698-4bd3-8294-1edb74311d27")?.toList()?.firstOrNull()!!
+    }
+    val productoTest = runBlocking {
+        controlador.encontrarProductoUUID("492a7f86-c34d-43e3-ba77-8183a542f425")?.toList()?.firstOrNull()!!
+    }
+    val pedidoTest = runBlocking {
+        controlador.encontrarPedidoUUID("492a7f86-c34d-43e3-ba77-8083a542f425")?.toList()?.firstOrNull()!!
+    }
+    val tareaTest = runBlocking {
+        controlador.encontrarTareaUUID("192a7f86-c34d-43e3-ba77-8083a542f425")?.toList()?.firstOrNull()!!
+    }
+    val turnoTest = runBlocking {
+        controlador.encontrarTurnoUUID("492a7f86-c34d-4313-ba77-8083a542f425").toList().firstOrNull()!!
+    }
+
+    @BeforeEach
+    fun setUp(): Unit = runBlocking {
+        controlador.borrarDatos()
+        val turnoTest =  Turno(
+            ObjectId("63dc3ad64f5c531dfe3c3795"),
+            "492a7f86-c34d-4313-ba77-8083a542f425",
+            LocalDateTime.of(2022, 12, 5, 8, 0),
+            LocalDateTime.of(2022, 12, 5, 10, 0)
+        )
+        controlador.guardarTurno(turnoTest)
+
+        val res = mutableListOf<Turno>()
+        controlador.encontrarTurnoUUID("492a7f86-c34d-4313-ba77-8083a542f425").collect {
+            res.add(it)
+        }
+        val usuarioTest = Usuario(
+            ObjectId("63dc3ad64f5c531dfe3c3795"),
+            "492a7f86-c32d-43e3-ba77-8083a542f425",
+            "Mario",
+            "Sánchez",
+            "mario.sanchez@gmail.com",
+            Password().encriptar("marioSanchez"),
+            TipoPerfil.ADMINISTRADOR,
+            res[0],
+        )
+        controlador.guardarUsuario(usuarioTest)
+
+        val maquina = Maquina(
+            ObjectId("63dc3ad64f5c531dfe3c3795"),
+            "a016f77a-4698-4bd3-8294-1edb74311d27",
+            "nadal",
+            "rojo",
+            LocalDate.now(),
+            "true, 20.0, 12.4",
+            TipoMaquina.ENCORDAR
+        )
+        controlador.guardarMaquina(maquina)
+        val producto = Producto(
+            ObjectId("63dc3ad64f5c531dfe3c3795"),
+            "492a7f86-c34d-43e3-ba77-8183a542f425",
+            "Wilson",
+            "raqueta",
+            20.2,
+            12
+        )
+        controlador.guardarProducto(producto)
+        val resUsuario = mutableListOf<Usuario>()
+        controlador.encontrarUsuarioUUID("492a7f86-c32d-43e3-ba77-8083a542f425")!!.collect{
+            resUsuario.add(it!!)
+        }
+
+        val pedidoTest = Pedidos(
+            ObjectId("63dc3ad64f5c531dfe3c3795"),
+            "492a7f86-c34d-43e3-ba77-8083a542f425",
+            TipoEstado.RECIBIDO,
+            LocalDate.now(),
+            LocalDate.of(2022, 12, 12),
+            LocalDate.of(2022, 12, 13),
+            120.5,
+            resUsuario[0].toUsuarioDto()
+        )
+        controlador.guardarPedido(pedidoTest)
+
+        val tareaTest = runBlocking {
+            Tarea(
+                ObjectId("63dc3ad64f5c531dfe3c3795"),
+                "192a7f86-c34d-43e3-ba77-8083a542f425",
+                controlador.encontrarProductoUUID("492a7f86-c34d-43e3-ba77-8183a542f425")?.toList()?.firstOrNull()!!,
+                20.0,
+                "Personalizacion",
+                controlador.encontrarUsuarioUUID("492a7f86-c32d-43e3-ba77-8083a542f425")?.toList()?.firstOrNull()!!.toUsuarioDto(),
+                controlador.encontrarTurnoUUID("492a7f86-c34d-4313-ba77-8083a542f425")?.toList()?.firstOrNull()!!,
+                true,
+                controlador.encontrarMaquinaUUID("a016f77a-4698-4bd3-8294-1edb74311d27")?.toList()?.firstOrNull()!!,
+                controlador.encontrarPedidoUUID("492a7f86-c34d-43e3-ba77-8083a542f425")?.toList()?.firstOrNull()!!
+            )
+        }
+        controlador.guardarTarea(tareaTest)
+
+    }
+    
 
     @Test
-    fun getUsuarioActual() {
+    fun listarMaquinas(): Unit = runBlocking   {
+        val maquinas = controlador.listarMaquinas().toList()
+        assertAll(
+            {assertEquals(1, maquinas.size)},
+            { assertFalse(maquinas.isEmpty()) },
+            {assertEquals(maquinaTest.id, maquinas[0].id)},
+            {assertEquals(maquinaTest.numSerie, maquinas[0].numSerie)},
+            {assertEquals(maquinaTest.descripcion, maquinas[0].descripcion)},
+            {assertEquals(maquinaTest.marca, maquinas[0].marca)},
+            {assertEquals(maquinaTest.fechaAdquisicion, maquinas[0].fechaAdquisicion)},
+            {assertEquals(maquinaTest.modelo, maquinas[0].modelo)},
+            {assertEquals(maquinaTest.tipo, maquinas[0].tipo)},
+        )
     }
 
     @Test
-    fun setUsuarioActual() {
+    fun encontrarMaquinaID(): Unit = runBlocking   {
+        val testID = controlador.encontrarMaquinaID(maquinaTest.id)
+        assertAll(
+            { assertEquals(testID!!.id, maquinaTest.id) },
+            { assertEquals(testID!!.numSerie, maquinaTest.numSerie) },
+            { assertEquals(testID!!.marca, maquinaTest.marca) },
+            { assertEquals(testID!!.modelo, maquinaTest.modelo) },
+            { assertEquals(testID!!.descripcion, maquinaTest.descripcion) },
+            { assertEquals(testID!!.fechaAdquisicion, maquinaTest.fechaAdquisicion) },
+        )
     }
 
     @Test
-    fun configurarUsuario() {
+    fun encontrarMaquinaUUID(): Unit = runBlocking   {
+        val testUUID = controlador.encontrarMaquinaUUID(maquinaTest.numSerie)!!.toList().first()
+        assertAll(
+            { assertEquals(testUUID!!.id, maquinaTest.id) },
+            { assertEquals(testUUID!!.numSerie, maquinaTest.numSerie) },
+            { assertEquals(testUUID!!.marca, maquinaTest.marca) },
+            { assertEquals(testUUID!!.modelo, maquinaTest.modelo) },
+            { assertEquals(testUUID!!.descripcion, maquinaTest.descripcion) },
+            { assertEquals(testUUID!!.fechaAdquisicion, maquinaTest.fechaAdquisicion) },
+        )
     }
 
     @Test
-    fun listarMaquinas() {
+    fun guardarMaquina(): Unit = runBlocking   {
+        val testSave = controlador.guardarMaquina(maquinaTest)
+        assertAll(
+            { assertEquals(testSave!!.id, maquinaTest.id) },
+            { assertEquals(testSave!!.numSerie, maquinaTest.numSerie) },
+            { assertEquals(testSave!!.marca, maquinaTest.marca) },
+            { assertEquals(testSave!!.modelo, maquinaTest.modelo) },
+            { assertEquals(testSave!!.descripcion, maquinaTest.descripcion) },
+            { assertEquals(testSave!!.fechaAdquisicion, maquinaTest.fechaAdquisicion) },
+        )
     }
 
     @Test
-    fun encontrarMaquinaID() {
+    fun borrarMaquina(): Unit = runBlocking   {
+        val testDelete = controlador.borrarMaquina(maquinaTest)
+        assertAll(
+            { assertTrue(testDelete) },
+        )
     }
 
     @Test
-    fun encontrarMaquinaUUID() {
+    fun listarPedidos(): Unit = runBlocking   {
+        val pedidos = controlador.listarPedidos().toList()
+        assertAll(
+            { assertFalse(pedidos.isEmpty()) },
+            { assertEquals(1, pedidos.size) },
+            { assertEquals(pedidoTest.id, pedidos[0].id) },
+            { assertEquals(pedidoTest.uuidPedidos, pedidos[0].uuidPedidos) },
+            { assertEquals(pedidoTest.estado, pedidos[0].estado) },
+            { assertEquals(pedidoTest.fechaEntrada, pedidos[0].fechaEntrada) },
+            { assertEquals(pedidoTest.fechaSalidaProgramada, pedidos[0].fechaSalidaProgramada) },
+            { assertEquals(pedidoTest.fechaEntrega, pedidos[0].fechaEntrega) },
+            { assertEquals(pedidoTest.precio, pedidos[0].precio) },
+            { assertEquals(pedidoTest.usuario, pedidos[0].usuario) },
+        )
+
     }
 
     @Test
-    fun guardarMaquina() {
+    fun encontrarPedidoID(): Unit = runBlocking   {
+        val pedidoId = controlador.encontrarPedidoID(pedidoTest.id)!!
+        assertAll(
+            { assertEquals(pedidoTest.id, pedidoId.id) },
+            { assertEquals(pedidoTest.uuidPedidos, pedidoId.uuidPedidos) },
+            { assertEquals(pedidoTest.estado, pedidoId.estado) },
+            { assertEquals(pedidoTest.fechaEntrada, pedidoId.fechaEntrada) },
+            { assertEquals(pedidoTest.fechaSalidaProgramada, pedidoId.fechaSalidaProgramada) },
+            { assertEquals(pedidoTest.fechaEntrega, pedidoId.fechaEntrega) },
+            { assertEquals(pedidoTest.precio, pedidoId.precio) },
+            { assertEquals(pedidoTest.usuario, pedidoId.usuario) },
+        )
     }
 
     @Test
-    fun borrarMaquina() {
+    fun encontrarPedidoUUID(): Unit = runBlocking   {
+        val pedidoUuid = controlador.encontrarPedidoUUID(pedidoTest.uuidPedidos)!!.toList().first()!!
+        assertAll(
+            { assertEquals(pedidoTest.id, pedidoUuid.id) },
+            { assertEquals(pedidoTest.uuidPedidos, pedidoUuid.uuidPedidos) },
+            { assertEquals(pedidoTest.estado, pedidoUuid.estado) },
+            { assertEquals(pedidoTest.fechaEntrada, pedidoUuid.fechaEntrada) },
+            { assertEquals(pedidoTest.fechaSalidaProgramada, pedidoUuid.fechaSalidaProgramada) },
+            { assertEquals(pedidoTest.fechaEntrega, pedidoUuid.fechaEntrega) },
+            { assertEquals(pedidoTest.precio, pedidoUuid.precio) },
+            { assertEquals(pedidoTest.usuario, pedidoUuid.usuario) },
+        )
+
     }
 
     @Test
-    fun listarPedidos() {
+    fun guardarPedido(): Unit = runBlocking   {
+        controlador.borrarPedido(pedidoTest)
+        val pedidoId = controlador.guardarPedido(pedidoTest)!!
+        assertAll(
+            { assertEquals(pedidoTest.id, pedidoId.id) },
+            { assertEquals(pedidoTest.uuidPedidos, pedidoId.uuidPedidos) },
+            { assertEquals(pedidoTest.estado, pedidoId.estado) },
+            { assertEquals(pedidoTest.fechaEntrada, pedidoId.fechaEntrada) },
+            { assertEquals(pedidoTest.fechaSalidaProgramada, pedidoId.fechaSalidaProgramada) },
+            { assertEquals(pedidoTest.fechaEntrega, pedidoId.fechaEntrega) },
+            { assertEquals(pedidoTest.precio, pedidoId.precio) },
+            { assertEquals(pedidoTest.usuario, pedidoId.usuario) },
+        )
     }
 
     @Test
-    fun encontrarPedidoID() {
+    fun borrarPedido(): Unit = runBlocking   {
+        val pedidoDelete = controlador.borrarPedido(pedidoTest)
+        assertAll(
+            { assertTrue(pedidoDelete) }
+        )
     }
 
     @Test
-    fun encontrarPedidoUUID() {
+    fun listarProductos(): Unit = runBlocking   {
+        val productos = controlador.listarProductos().toList()
+        assertAll(
+            { assertFalse(productos.isEmpty()) },
+            { assertEquals(productos.first().uuidProducto, productoTest.uuidProducto) },
+            { assertEquals(productos.first().marca, productoTest.marca) },
+            { assertEquals(productos.first().modelo, productoTest.modelo) },
+            { assertEquals(productos.first().precio, productoTest.precio) },
+            { assertEquals(productos.first().stock, productoTest.stock) },
+            { assertEquals(productos.size, 1) }
+        )
     }
 
     @Test
-    fun guardarPedido() {
+    fun encontrarProductoID(): Unit = runBlocking   {
+        val testID = controlador.encontrarProductoID(productoTest.id)
+        assertAll(
+            { assertEquals(testID!!.uuidProducto, productoTest.uuidProducto) },
+            { assertEquals(testID!!.marca, productoTest.marca) },
+            { assertEquals(testID!!.modelo, productoTest.modelo) },
+            { assertEquals(testID!!.precio, productoTest.precio) },
+            { assertEquals(testID!!.stock, productoTest.stock) },
+        )
+
     }
 
     @Test
-    fun borrarPedido() {
+    fun encontrarProductoUUID(): Unit = runBlocking   {
+        val testUUID = controlador.encontrarProductoUUID(productoTest.uuidProducto)!!.toList().first()
+        assertAll(
+            { assertEquals(testUUID!!.uuidProducto, productoTest.uuidProducto) },
+            { assertEquals(testUUID!!.marca, productoTest.marca) },
+            { assertEquals(testUUID!!.modelo, productoTest.modelo) },
+            { assertEquals(testUUID!!.precio, productoTest.precio) },
+            { assertEquals(testUUID!!.stock, productoTest.stock) },
+        )
     }
 
     @Test
-    fun listarProductos() {
+    fun guardarProducto(): Unit = runBlocking   {
+        val testSave = controlador.guardarProducto(productoTest)
+        assertAll(
+            { assertEquals(testSave!!.uuidProducto, productoTest.uuidProducto) },
+            { assertEquals(testSave!!.marca, productoTest.marca) },
+            { assertEquals(testSave!!.modelo, productoTest.modelo) },
+            { assertEquals(testSave!!.precio, productoTest.precio) },
+            { assertEquals(testSave!!.stock, productoTest.stock) },
+        )
     }
 
     @Test
-    fun encontrarProductoID() {
+    fun borrarProducto(): Unit = runBlocking   {
+        val testDelete = controlador.borrarProducto(productoTest)
+        assertAll(
+            { assertTrue(testDelete) },
+        )
     }
 
     @Test
-    fun encontrarProductoUUID() {
+    fun listarTareas(): Unit = runBlocking   {
+        val test = controlador.listarTareas().toList()
+        assertAll(
+            { assertFalse(test.isEmpty()) },
+            { assertEquals(test.first().uuidTarea, tareaTest.uuidTarea) },
+            { assertEquals(test.first().producto, tareaTest.producto) },
+            { assertEquals(test.first().precio, tareaTest.precio) },
+            { assertEquals(test.first().descripcion, tareaTest.descripcion) },
+            { assertEquals(test.first().empleado, tareaTest.empleado) },
+            { assertEquals(test.first().turno, tareaTest.turno) },
+            { assertEquals(test.first().estadoCompletado, tareaTest.estadoCompletado) },
+            { assertEquals(test.first().maquina, tareaTest.maquina) },
+            { assertEquals(test.first().pedido, tareaTest.pedido) },
+            { assertEquals(test.size, 1) }
+        )
     }
 
     @Test
-    fun guardarProducto() {
+    fun encontrarTareaID(): Unit = runBlocking   {
+        val testID = controlador.encontrarTareaID(tareaTest.id)
+        assertAll(
+            { assertEquals(testID!!.uuidTarea, tareaTest.uuidTarea) },
+            { assertEquals(testID!!.producto, tareaTest.producto) },
+            { assertEquals(testID!!.precio, tareaTest.precio) },
+            { assertEquals(testID!!.descripcion, tareaTest.descripcion) },
+            { assertEquals(testID!!.empleado, tareaTest.empleado) },
+            { assertEquals(testID!!.turno, tareaTest.turno) },
+            { assertEquals(testID!!.estadoCompletado, tareaTest.estadoCompletado) },
+            { assertEquals(testID!!.maquina, tareaTest.maquina) },
+            { assertEquals(testID!!.pedido, tareaTest.pedido) },
+        )
     }
 
     @Test
-    fun borrarProducto() {
+    fun encontrarTareaUUID(): Unit = runBlocking   {
+        val testUUID = controlador.encontrarTareaUUID(tareaTest.uuidTarea)!!.toList().first()
+        assertAll(
+            { assertEquals(testUUID!!.uuidTarea, tareaTest.uuidTarea) },
+            { assertEquals(testUUID!!.producto, tareaTest.producto) },
+            { assertEquals(testUUID!!.precio, tareaTest.precio) },
+            { assertEquals(testUUID!!.descripcion, tareaTest.descripcion) },
+            { assertEquals(testUUID!!.empleado, tareaTest.empleado) },
+            { assertEquals(testUUID!!.turno, tareaTest.turno) },
+            { assertEquals(testUUID!!.estadoCompletado, tareaTest.estadoCompletado) },
+            { assertEquals(testUUID!!.maquina, tareaTest.maquina) },
+            { assertEquals(testUUID!!.pedido, tareaTest.pedido) },
+        )
     }
 
     @Test
-    fun listarTareas() {
+    fun guardarTarea(): Unit = runBlocking   {
+        val testSave = controlador.guardarTarea(tareaTest)
+        assertAll(
+            { assertEquals(testSave!!.uuidTarea, tareaTest.uuidTarea) },
+            { assertEquals(testSave!!.producto, tareaTest.producto) },
+            { assertEquals(testSave!!.precio, tareaTest.precio) },
+            { assertEquals(testSave!!.descripcion, tareaTest.descripcion) },
+            { assertEquals(testSave!!.empleado, tareaTest.empleado) },
+            { assertEquals(testSave!!.turno, tareaTest.turno) },
+            { assertEquals(testSave!!.estadoCompletado, tareaTest.estadoCompletado) },
+            { assertEquals(testSave!!.maquina, tareaTest.maquina) },
+            { assertEquals(testSave!!.pedido, tareaTest.pedido) },
+        )
     }
 
     @Test
-    fun encontrarTareaID() {
+    fun borrarTarea(): Unit = runBlocking   {
+        val testDelete = controlador.borrarTarea(tareaTest)
+        assertAll(
+            { assertTrue(testDelete) }
+        )
     }
 
     @Test
-    fun encontrarTareaUUID() {
+    fun intentoSesion(): Unit = runBlocking   {
+
     }
 
     @Test
-    fun guardarTarea() {
+    fun listarUsuarios(): Unit = runBlocking   {
+        val test = controlador.listarUsuarios().toList()
+        assertAll(
+            { assertFalse(test.isEmpty()) },
+            { assertEquals(test.first().uuidUsuario, usuarioTest.uuidUsuario) },
+            { assertEquals(test.first().nombre, usuarioTest.nombre) },
+            { assertEquals(test.first().apellido, usuarioTest.apellido) },
+            { assertEquals(test.first().email, usuarioTest.email) },
+            { assertEquals(1, test.size) }
+        )
+
     }
 
     @Test
-    fun borrarTarea() {
+    fun encontrarUsuarioID(): Unit = runBlocking   {
+        val testId = controlador.encontrarUsuarioID(usuarioTest.id)
+        assertAll(
+            { assertEquals(testId!!.uuidUsuario, usuarioTest.uuidUsuario) },
+            { assertEquals(testId!!.nombre, usuarioTest.nombre) },
+            { assertEquals(testId!!.apellido, usuarioTest.apellido) },
+            { assertEquals(testId!!.email, usuarioTest.email) },
+        )
+
     }
 
     @Test
-    fun intentoSesion() {
+    fun encontrarUsuarioUUID(): Unit = runBlocking   {
+        val testUUId = controlador.encontrarUsuarioUUID(usuarioTest.uuidUsuario)!!.toList().first()
+        assertAll(
+            { assertEquals(testUUId!!.uuidUsuario, usuarioTest.uuidUsuario) },
+            { assertEquals(testUUId!!.nombre, usuarioTest.nombre) },
+            { assertEquals(testUUId!!.apellido, usuarioTest.apellido) },
+            { assertEquals(testUUId!!.email, usuarioTest.email) },
+        )
+
     }
 
     @Test
-    fun listarUsuarios() {
+    fun guardarUsuario(): Unit = runBlocking   {
+        controlador.borrarUsuario(usuarioTest)
+        val testSave = controlador.guardarUsuario(usuarioTest)!!
+        assertAll(
+            { assertEquals(testSave.uuidUsuario, usuarioTest.uuidUsuario) },
+            { assertEquals(testSave.nombre, usuarioTest.nombre) },
+            { assertEquals(testSave.apellido, usuarioTest.apellido) },
+            { assertEquals(testSave.email, usuarioTest.email) },
+        )
+
     }
 
     @Test
-    fun encontrarUsuarioID() {
+    fun borrarUsuario(): Unit = runBlocking   {
+        val testDelete = controlador.borrarUsuario(usuarioTest)
+        assertAll(
+            { assertTrue(testDelete) },
+        )
+
     }
 
     @Test
-    fun encontrarUsuarioUUID() {
+    fun listarTurnos(): Unit = runBlocking   {
+        val test = controlador.listarTurnos().toList()
+        assertAll(
+            { assertFalse(test.isEmpty()) },
+            { assertEquals(test.first().uuidTurno, turnoTest.uuidTurno) },
+            { assertEquals(test.first().fechaInicio, turnoTest.fechaInicio) },
+            { assertEquals(test.first().fechaFin, turnoTest.fechaFin) },
+            { assertEquals(test.size, 1) }
+        )
+
     }
 
     @Test
-    fun guardarUsuario() {
+    fun encontrarTurnoID(): Unit = runBlocking   {
+        val testId = controlador.encontrarTurnoID(turnoTest.id)
+        assertAll(
+            { assertEquals(testId!!.uuidTurno, turnoTest.uuidTurno) },
+            { assertEquals(testId!!.fechaInicio, turnoTest.fechaInicio) },
+            { assertEquals(testId!!.fechaFin, turnoTest.fechaFin) }
+        )
     }
 
     @Test
-    fun borrarUsuario() {
+    fun encontrarTurnoUUID(): Unit = runBlocking   {
+        val testUUId = controlador.encontrarTurnoUUID(turnoTest.uuidTurno).toList().first()
+        assertAll(
+            { assertEquals(testUUId.uuidTurno, turnoTest.uuidTurno) },
+            { assertEquals(testUUId.fechaInicio, turnoTest.fechaInicio) },
+            { assertEquals(testUUId.fechaFin, turnoTest.fechaFin) }
+        )
+
     }
 
     @Test
-    fun listarTurnos() {
+    fun guardarTurno(): Unit = runBlocking   {
+        val testSave = controlador.guardarTurno(turnoTest)!!
+        assertAll(
+            { assertEquals(testSave.uuidTurno, turnoTest.uuidTurno) },
+            { assertEquals(testSave.fechaInicio, turnoTest.fechaInicio) },
+            { assertEquals(testSave.fechaFin, turnoTest.fechaFin) }
+        )
+
     }
 
     @Test
-    fun encontrarTurnoID() {
+    fun borrarTurno(): Unit = runBlocking   {
+        val testDelete = controlador.borrarTurno(turnoTest)
+        assertAll(
+            { assertTrue(testDelete) }
+        )
+
     }
 
     @Test
-    fun encontrarTurnoUUID() {
+    fun encontrarUsuariosAPI(): Unit = runBlocking   {
+        val test = controlador.encontrarUsuariosAPI().toList()
+        assertAll(
+            { assertFalse(test.isEmpty()) },
+            { assertEquals(10, test.size) },
+            { assertEquals("Leanne Graham", test[0].nombre) },
+            { assertEquals("Bret", test[0].apellido) },
+            { assertEquals("Sincere@april.biz", test[0].email) },
+            { assertEquals(null, test[0].turno) },
+        )
     }
 
     @Test
-    fun guardarTurno() {
+    fun guardarUsuariosAPI(): Unit = runBlocking   {
+        val testSave = controlador.guardarUsuariosAPI(usuarioTest)
+        assertAll(
+            { assertEquals(usuarioTest.nombre, testSave.nombre) },
+            { assertEquals(usuarioTest.apellido, testSave.apellido) },
+            { assertEquals(usuarioTest.email, testSave.email) },
+            { assertEquals(usuarioTest.turno, testSave.turno) },
+        )
+
     }
 
-    @Test
-    fun borrarTurno() {
-    }
-
-    @Test
-    fun encontrarUsuariosAPI() {
-    }
-
-    @Test
-    fun guardarUsuariosAPI() {
-    }
-
-    @Test
-    fun añadirCacheUsuarios() {
-    }
-
-    @Test
-    fun watchUsuarios() {
-    }
-
-    @Test
-    fun refreshUsuarios() {
-    }
-
-    @Test
-    fun initDatabase() {
-    }
-
-    @Test
-    fun borrarDatos() {
-    }
 }

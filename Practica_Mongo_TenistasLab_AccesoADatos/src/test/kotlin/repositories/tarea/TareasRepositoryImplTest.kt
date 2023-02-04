@@ -1,6 +1,7 @@
 package repositories.tarea
 
 import db.MongoDbManager
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
@@ -25,15 +26,91 @@ import services.sqldelight.SqlDeLightClient
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
+import kotlinx.coroutines.test.runTest
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class TareasRepositoryImplTest {
 
     val dataBaseService = MongoDbManager.database
     val repositorio = TareasRepositoryImpl()
 
+    val setup = runBlocking {
+        dataBaseService.drop()
+        SqlDeLightClient.queries.deleteAll()
+        val turno =  Turno(
+            ObjectId("63dc3ad64f5c531dfe3c3795").toId(),
+            "492a7f86-c34d-4313-ba77-8083a542f425",
+            LocalDateTime.of(2022, 12, 5, 8, 0),
+            LocalDateTime.of(2022, 12, 5, 10, 0)
+        )
+        TurnoRepositoryImpl().save(turno)
+
+        val usuarioTest = Usuario(
+            ObjectId("63dc3ad64f5c531dfe3c3795").toId(),
+            "492a7f86-c32d-43e3-ba77-8083a542f425",
+            "Mario",
+            "Sánchez",
+            "mario.sanchez@gmail.com",
+            Password().encriptar("marioSanchez"),
+            TipoPerfil.ENCORDADOR,
+            TurnoRepositoryImpl().findByUUID("492a7f86-c34d-4313-ba77-8083a542f425")!!.id,
+            null
+        )
+        UsuarioRepositoryImpl().save(usuarioTest)
+
+        val maquina = Maquina(
+            ObjectId("63dc3ad64f5c531dfe3c3795").toId(),
+            "a016f77a-4698-4bd3-8294-1edb74311d27",
+            "nadal",
+            "rojo",
+            LocalDate.now(),
+            "true, 20.0, 12.4",
+            TipoMaquina.ENCORDAR
+        )
+        MaquinaRepositoryImpl().save(maquina)
+        val producto = Producto(
+            ObjectId("63dc3ad64f5c531dfe3c3795").toId(),
+            "492a7f86-c34d-43e3-ba77-8183a542f425",
+            "Wilson",
+            "raqueta",
+            20.2,
+            12
+        )
+        ProductoRepositoryImpl().save(producto)
+
+        val pedidoTest = Pedidos(
+            ObjectId("63dc3ad64f5c531dfe3c3795").toId(),
+            "492a7f86-c34d-43e3-ba77-8083a542f425",
+            TipoEstado.RECIBIDO,
+            LocalDate.now(),
+            LocalDate.of(2022, 12, 12),
+            LocalDate.of(2022, 12, 13),
+            120.5,
+            UsuarioRepositoryImpl().findByUUID("492a7f86-c32d-43e3-ba77-8083a542f425")!!.id
+        )
+        val pedido = PedidosRepositoryImpl().save(pedidoTest)
+
+        val tareaTest = runBlocking {
+            Tarea(
+                ObjectId("63dc3ad64f5c531dfe3c3795").toId(),
+                "192a7f86-c34d-43e3-ba77-8083a542f425",
+                ProductoRepositoryImpl().findByUUID("492a7f86-c34d-43e3-ba77-8183a542f425")!!,
+                20.0,
+                "Personalizacion",
+                UsuarioRepositoryImpl().findByUUID("492a7f86-c32d-43e3-ba77-8083a542f425")!!.toUsuarioDto(),
+                TurnoRepositoryImpl().findByUUID("492a7f86-c34d-4313-ba77-8083a542f425")!!,
+                true,
+                MaquinaRepositoryImpl().findByUUID("a016f77a-4698-4bd3-8294-1edb74311d27")!!,
+                PedidosRepositoryImpl().findByUUID("492a7f86-c34d-43e3-ba77-8083a542f425")!!
+            )}
+        repositorio.save(tareaTest)
+
+    }
+
     val tareaTest = runBlocking {
         repositorio.findByUUID("192a7f86-c34d-43e3-ba77-8083a542f425")
     }
+
 
 
     @BeforeEach
@@ -112,7 +189,7 @@ class TareasRepositoryImplTest {
 
 
     @Test
-    fun findAll(): Unit = runBlocking  {
+    fun findAll(): Unit = runTest  {
         val test = repositorio.findAll().toList()
         Assertions.assertAll(
             { assertFalse(test.isEmpty()) },
@@ -131,7 +208,7 @@ class TareasRepositoryImplTest {
 
 
     @Test
-    fun findById(): Unit = runBlocking {
+    fun findById(): Unit = runTest {
         val testID = repositorio.findById(tareaTest!!.id)
         Assertions.assertAll(
             { assertEquals(testID!!.uuidTarea, tareaTest.uuidTarea) },
@@ -148,7 +225,7 @@ class TareasRepositoryImplTest {
 
 
     @Test
-    fun findbyUUID(): Unit = runBlocking {
+    fun findbyUUID(): Unit = runTest {
         val testUUID = repositorio.findByUUID(tareaTest!!.uuidTarea)
         Assertions.assertAll(
             { assertEquals(testUUID!!.uuidTarea, tareaTest.uuidTarea) },
@@ -165,7 +242,7 @@ class TareasRepositoryImplTest {
 
 
     @Test
-    fun save(): Unit = runBlocking {
+    fun save(): Unit = runTest {
         val testSave = repositorio.save(tareaTest!!)
         Assertions.assertAll(
             { assertEquals(testSave!!.uuidTarea, tareaTest.uuidTarea) },
@@ -182,7 +259,7 @@ class TareasRepositoryImplTest {
 
 
     @Test
-    fun delete(): Unit = runBlocking {
+    fun delete(): Unit = runTest {
         val testDelete = tareaTest?.let { repositorio.delete(it) }
         Assertions.assertAll(
             {

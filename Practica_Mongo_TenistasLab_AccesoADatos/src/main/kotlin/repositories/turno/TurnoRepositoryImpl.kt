@@ -1,6 +1,7 @@
 package repositories.turno
 
 import db.MongoDbManager
+import exceptions.TurnoException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.reactive.asFlow
 import models.Producto
@@ -28,12 +29,12 @@ class TurnoRepositoryImpl:TurnoRepository {
     override suspend fun findById(id: Id<Turno>): Turno? {
         logger.debug { "findById($id)" }
         return MongoDbManager.database.getCollection<Turno>()
-            .findOneById(id) ?: throw Exception("No existe el Turno con id $id")//TODO cambiar las excepciones
+            .findOneById(id) ?: throw TurnoException("No existe el Turno con id $id")
     }
 
     override suspend fun findByUUID(uuid: String): Turno? {
         logger.debug { "findByUUID($uuid)" }
-        return MongoDbManager.database.getCollection<Turno>().findOne(Turno::uuidTurno eq uuid)
+        return MongoDbManager.database.getCollection<Turno>().findOne(Turno::uuidTurno eq uuid)?: throw TurnoException("No existe el Turno con id $uuid")
     }
 
     override suspend fun save(entity: Turno): Turno? {

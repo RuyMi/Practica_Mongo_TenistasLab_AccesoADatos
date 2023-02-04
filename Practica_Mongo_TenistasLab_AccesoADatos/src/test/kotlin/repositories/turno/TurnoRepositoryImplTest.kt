@@ -1,8 +1,10 @@
 package repositories.turno
 
 import db.MongoDbManager
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import models.Turno
 import org.junit.jupiter.api.Test
 
@@ -14,6 +16,7 @@ import repositories.maquina.MaquinaRepositoryImpl
 import java.time.LocalDateTime
 import java.util.*
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class TurnoRepositoryImplTest {
 
 
@@ -28,15 +31,16 @@ class TurnoRepositoryImplTest {
         )
 
     @BeforeEach
-    fun setUp(): Unit = runBlocking {
+    fun setUp(): Unit = runTest {
         dataBaseService.drop()
         repositorio.save(turnoTest)
     }
 
 
 
+
     @Test
-    fun findAll(): Unit = runBlocking {
+    fun findAll(): Unit = runTest {
         val test = repositorio.findAll().toList()
         assertAll(
             { assertFalse(test.isEmpty()) },
@@ -49,7 +53,7 @@ class TurnoRepositoryImplTest {
 
 
     @Test
-    fun findById(): Unit = runBlocking {
+    fun findById(): Unit = runTest {
         val testId = repositorio.findById(turnoTest.id)
         assertAll(
             { assertEquals(testId!!.uuidTurno, turnoTest.uuidTurno) },
@@ -60,7 +64,7 @@ class TurnoRepositoryImplTest {
 
 
     @Test
-    fun findbyUUID(): Unit = runBlocking {
+    fun findbyUUID(): Unit = runTest {
         val testUUId = repositorio.findByUUID(turnoTest.uuidTurno)
         assertAll(
             { assertEquals(testUUId!!.uuidTurno, turnoTest.uuidTurno) },
@@ -71,7 +75,7 @@ class TurnoRepositoryImplTest {
 
 
     @Test
-    fun save(): Unit = runBlocking {
+    fun save(): Unit = runTest {
         val testSave = repositorio.save(turnoTest)!!
         assertAll(
             { assertEquals(testSave.uuidTurno, turnoTest.uuidTurno) },
@@ -82,7 +86,7 @@ class TurnoRepositoryImplTest {
 
 
     @Test
-    fun delete(): Unit = runBlocking {
+    fun delete(): Unit = runTest {
         val testDelete = repositorio.delete(turnoTest)
         assertAll(
             { assertTrue(testDelete) }

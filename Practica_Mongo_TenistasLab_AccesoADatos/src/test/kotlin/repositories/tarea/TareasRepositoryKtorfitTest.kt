@@ -1,6 +1,8 @@
 package repositories.tarea
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import mapper.toUsuarioDto
 import models.*
 import models.enums.TipoEstado
@@ -18,6 +20,7 @@ import services.password.Password
 import java.time.LocalDate
 import java.time.LocalDateTime
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class TareasRepositoryKtorfitTest {
 
     val tareaTest = Tarea(
@@ -94,7 +97,7 @@ class TareasRepositoryKtorfitTest {
     val repo = TareasRepositoryKtorfit()
 
     @Test
-    fun save(): Unit = runBlocking {
+    fun save(): Unit = runTest {
         val tareaSave = repo.save(tareaTest)
         assertAll(
             {  assertEquals(tareaSave.uuidTarea, tareaTest.uuidTarea) },

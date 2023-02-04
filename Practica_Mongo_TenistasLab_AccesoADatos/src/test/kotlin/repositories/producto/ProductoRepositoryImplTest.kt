@@ -1,6 +1,7 @@
 package repositories.producto
 
 import db.MongoDbManager
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import models.Producto
@@ -11,7 +12,9 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Order
 import org.litote.kmongo.newId
 import java.util.*
+import kotlinx.coroutines.test.runTest
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class ProductoRepositoryImplTest {
 
     val dataBaseService = MongoDbManager.database
@@ -26,14 +29,14 @@ class ProductoRepositoryImplTest {
     )
 
     @BeforeEach
-    fun setUp(): Unit = runBlocking {
+    fun setUp(): Unit = runTest {
         dataBaseService.drop()
         repositorio.save(productoTest)
 
     }
 
     @Test
-    fun findAll(): Unit = runBlocking {
+    fun findAll(): Unit = runTest {
         val test = repositorio.findAll().toList()
         assertAll(
             { assertFalse(test.isEmpty()) },
@@ -48,7 +51,7 @@ class ProductoRepositoryImplTest {
 
 
     @Test
-    fun findById(): Unit = runBlocking {
+    fun findById(): Unit = runTest {
         val testID = repositorio.findById(productoTest.id)
         assertAll(
             { assertEquals(testID!!.uuidProducto, productoTest.uuidProducto) },
@@ -61,7 +64,7 @@ class ProductoRepositoryImplTest {
 
 
     @Test
-    fun findbyUUID(): Unit = runBlocking {
+    fun findbyUUID(): Unit = runTest {
         val testUUID = repositorio.findByUUID(productoTest.uuidProducto)
         assertAll(
             { assertEquals(testUUID!!.uuidProducto, productoTest.uuidProducto) },
@@ -74,7 +77,7 @@ class ProductoRepositoryImplTest {
 
 
     @Test
-    fun save(): Unit = runBlocking {
+    fun save(): Unit = runTest {
         val testSave = repositorio.save(productoTest)
         assertAll(
             { assertEquals(testSave!!.uuidProducto, productoTest.uuidProducto) },
@@ -87,7 +90,7 @@ class ProductoRepositoryImplTest {
 
 
     @Test
-    fun delete(): Unit = runBlocking {
+    fun delete(): Unit = runTest {
         val testDelete = repositorio.delete(productoTest)
         assertAll(
             { assertTrue(testDelete) },

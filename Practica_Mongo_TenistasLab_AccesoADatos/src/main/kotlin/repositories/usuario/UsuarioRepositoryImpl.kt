@@ -1,6 +1,7 @@
 package repositories.usuario
 
 import db.MongoDbManager
+import exceptions.UsuarioException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.reactive.asFlow
 import models.Usuario
@@ -29,12 +30,12 @@ class UsuarioRepositoryImpl:UsuarioRepository {
     override suspend fun findById(id: Id<Usuario>): Usuario? {
         logger.debug { "findById($id)" }
         return MongoDbManager.database.getCollection<Usuario>()
-            .findOneById(id) ?: throw Exception("No existe el Usuario con id $id")
+            .findOneById(id) ?: throw UsuarioException("No existe el Usuario con id $id")
     }
 
     override suspend fun findByUUID(uuid: String): Usuario? {
         logger.debug { "findByUUID($uuid)" }
-        return MongoDbManager.database.getCollection<Usuario>().findOne(Usuario::uuidUsuario eq uuid)
+        return MongoDbManager.database.getCollection<Usuario>().findOne(Usuario::uuidUsuario eq uuid)?: throw UsuarioException("No existe el Usuario con el uuid $uuid")
     }
 
     override suspend fun save(entity: Usuario): Usuario? {

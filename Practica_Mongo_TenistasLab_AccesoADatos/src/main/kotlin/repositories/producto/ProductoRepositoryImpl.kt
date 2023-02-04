@@ -1,6 +1,7 @@
 package repositories.producto
 
 import db.MongoDbManager
+import exceptions.ProductoException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.reactive.asFlow
 import models.Producto
@@ -25,12 +26,12 @@ class ProductoRepositoryImpl: ProductoRepository {
     override suspend fun findById(id: Id<Producto>): Producto? {
         logger.debug { "findById($id)" }
         return MongoDbManager.database.getCollection<Producto>()
-            .findOneById(id) ?: throw Exception("No existe el producto con id $id")//TODO cambiar las excepciones
+            .findOneById(id) ?: throw ProductoException("No existe el producto con id $id")
     }
 
     override suspend fun findByUUID(uuid: String): Producto? {
         logger.debug { "findByUUID($uuid)" }
-        return MongoDbManager.database.getCollection<Producto>().findOne(Producto::uuidProducto eq uuid)
+        return MongoDbManager.database.getCollection<Producto>().findOne(Producto::uuidProducto eq uuid)?: throw ProductoException("No existe el producto con uuid $uuid")
     }
 
     override suspend fun save(entity: Producto): Producto? {

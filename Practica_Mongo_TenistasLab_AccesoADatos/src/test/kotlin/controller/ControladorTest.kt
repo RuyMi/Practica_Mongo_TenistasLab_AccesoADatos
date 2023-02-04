@@ -1,7 +1,9 @@
 package controller
 
 import db.MongoDbManager
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mapper.toUsuarioDto
 import models.*
@@ -28,7 +30,9 @@ import services.sqldelight.SqlDeLightClient
 import services.usuarios.UsuariosService
 import java.time.LocalDate
 import java.time.LocalDateTime
+import kotlinx.coroutines.test.runTest
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class ControladorTest {
     val dataBaseService = MongoDbManager.database
     val controlador = Controlador(
@@ -54,7 +58,7 @@ class ControladorTest {
         )
     )
 
-    val setup = runBlocking {
+    val setup = runTest {
         dataBaseService.drop()
         SqlDeLightClient.queries.deleteAll()
         val turnoTest =  Turno(
@@ -123,6 +127,7 @@ class ControladorTest {
                 MaquinaRepositoryImpl().findByUUID("a016f77a-4698-4bd3-8294-1edb74311d27")!!,
                 PedidosRepositoryImpl().findByUUID("492a7f86-c34d-43e3-ba77-8083a542f425")!!
             )
+
         }
         controlador.guardarTarea(tareaTest)
     }
@@ -227,7 +232,7 @@ class ControladorTest {
 
 
     @Test
-    fun listarMaquinas(): Unit = runBlocking  {
+    fun listarMaquinas(): Unit = runTest  {
         val maquinas = controlador.listarMaquinas().toList()
         assertAll(
             {assertEquals(1, maquinas.size)},
@@ -243,7 +248,7 @@ class ControladorTest {
     }
 
     @Test
-    fun encontrarMaquinaID(): Unit = runBlocking  {
+    fun encontrarMaquinaID(): Unit = runTest  {
         val testID = controlador.encontrarMaquinaID(maquinaTest.id)
         Assertions.assertAll(
             { assertEquals(testID!!.id, maquinaTest.id) },
@@ -256,7 +261,7 @@ class ControladorTest {
     }
 
     @Test
-    fun encontrarMaquinaUUID(): Unit = runBlocking  {
+    fun encontrarMaquinaUUID(): Unit = runTest  {
         val testUUID = controlador.encontrarMaquinaUUID(maquinaTest.numSerie)
         assertAll(
             { assertEquals(testUUID!!.id, maquinaTest.id) },
@@ -269,7 +274,7 @@ class ControladorTest {
     }
 
     @Test
-    fun guardarMaquina(): Unit = runBlocking  {
+    fun guardarMaquina(): Unit = runTest  {
         val testSave = controlador.guardarMaquina(maquinaTest)
         assertAll(
             { assertEquals(testSave!!.id, maquinaTest.id) },
@@ -282,7 +287,7 @@ class ControladorTest {
     }
 
     @Test
-    fun borrarMaquina(): Unit = runBlocking  {
+    fun borrarMaquina(): Unit = runTest  {
         val testDelete = controlador.borrarMaquina(maquinaTest)
         assertAll(
             { assertTrue(testDelete) },
@@ -290,7 +295,7 @@ class ControladorTest {
     }
 
     @Test
-    fun listarPedidos(): Unit = runBlocking  {
+    fun listarPedidos(): Unit = runTest  {
         val pedidos = controlador.listarPedidos().toList()
         assertAll(
             { assertFalse(pedidos.isEmpty()) },
@@ -307,7 +312,7 @@ class ControladorTest {
     }
 
     @Test
-    fun encontrarPedidoID(): Unit = runBlocking  {
+    fun encontrarPedidoID(): Unit = runTest  {
         val pedidoId = controlador.encontrarPedidoID(pedidoTest.id)!!
         assertAll(
             { assertEquals(pedidoTest.id, pedidoId.id) },
@@ -323,7 +328,7 @@ class ControladorTest {
     }
 
     @Test
-    fun encontrarPedidoUUID(): Unit = runBlocking  {
+    fun encontrarPedidoUUID(): Unit = runTest  {
         val pedidoUuid = controlador.encontrarPedidoUUID(pedidoTest.uuidPedidos)!!
         assertAll(
             { assertEquals(pedidoTest.id, pedidoUuid.id) },
@@ -338,7 +343,7 @@ class ControladorTest {
     }
 
     @Test
-    fun guardarPedido(): Unit = runBlocking  {
+    fun guardarPedido(): Unit = runTest  {
         controlador.borrarPedido(pedidoTest)
         val pedidoId = controlador.guardarPedido(pedidoTest)!!
         assertAll(
@@ -355,7 +360,7 @@ class ControladorTest {
     }
 
     @Test
-    fun borrarPedido(): Unit = runBlocking  {
+    fun borrarPedido(): Unit = runTest  {
         val pedidoDelete = controlador.borrarPedido(pedidoTest)
         assertAll(
             { assertTrue(pedidoDelete) }
@@ -363,7 +368,7 @@ class ControladorTest {
     }
 
     @Test
-    fun listarProductos(): Unit = runBlocking  {
+    fun listarProductos(): Unit = runTest  {
         val productos = controlador.listarProductos().toList()
         assertAll(
             { assertFalse(productos.isEmpty()) },
@@ -377,7 +382,7 @@ class ControladorTest {
     }
 
     @Test
-    fun encontrarProductoID(): Unit = runBlocking  {
+    fun encontrarProductoID(): Unit = runTest  {
         val testID = controlador.encontrarProductoID(productoTest.id)
         assertAll(
             { assertEquals(testID!!.uuidProducto, productoTest.uuidProducto) },
@@ -389,7 +394,7 @@ class ControladorTest {
     }
 
     @Test
-    fun encontrarProductoUUID(): Unit = runBlocking  {
+    fun encontrarProductoUUID(): Unit = runTest  {
         val testUUID = controlador.encontrarProductoUUID(productoTest.uuidProducto)
         assertAll(
             { assertEquals(testUUID!!.uuidProducto, productoTest.uuidProducto) },
@@ -401,7 +406,7 @@ class ControladorTest {
     }
 
     @Test
-    fun guardarProducto(): Unit = runBlocking  {
+    fun guardarProducto(): Unit = runTest  {
         val testSave = controlador.guardarProducto(productoTest)
         assertAll(
             { assertEquals(testSave!!.uuidProducto, productoTest.uuidProducto) },
@@ -413,7 +418,7 @@ class ControladorTest {
     }
 
     @Test
-    fun borrarProducto(): Unit = runBlocking  {
+    fun borrarProducto(): Unit = runTest  {
         val testDelete = controlador.borrarProducto(productoTest)
         assertAll(
             { assertTrue(testDelete) },
@@ -421,7 +426,7 @@ class ControladorTest {
     }
 
     @Test
-    fun listarTareas(): Unit = runBlocking  {
+    fun listarTareas(): Unit = runTest  {
         val test = controlador.listarTareas().toList()
         assertAll(
             { assertFalse(test.isEmpty()) },
@@ -439,7 +444,7 @@ class ControladorTest {
     }
 
     @Test
-    fun encontrarTareaID(): Unit = runBlocking  {
+    fun encontrarTareaID(): Unit = runTest  {
         val testID = controlador.encontrarTareaID(tareaTest.id)
         assertAll(
             { assertEquals(testID!!.uuidTarea, tareaTest.uuidTarea) },
@@ -455,7 +460,7 @@ class ControladorTest {
     }
 
     @Test
-    fun encontrarTareaUUID(): Unit = runBlocking  {
+    fun encontrarTareaUUID(): Unit = runTest  {
         val testUUID = controlador.encontrarTareaUUID(tareaTest.uuidTarea)
         assertAll(
             { assertEquals(testUUID!!.uuidTarea, tareaTest.uuidTarea) },
@@ -471,7 +476,7 @@ class ControladorTest {
     }
 
     @Test
-    fun guardarTarea(): Unit = runBlocking  {
+    fun guardarTarea(): Unit = runTest  {
         val testSave = controlador.guardarTarea(tareaTest)
         assertAll(
             { assertEquals(testSave!!.uuidTarea, tareaTest.uuidTarea) },
@@ -487,7 +492,7 @@ class ControladorTest {
     }
 
     @Test
-    fun borrarTarea(): Unit = runBlocking  {
+    fun borrarTarea(): Unit = runTest  {
         val testDelete = controlador.borrarTarea(tareaTest)
         assertAll(
             { assertTrue(testDelete) }
@@ -495,7 +500,7 @@ class ControladorTest {
     }
 
     @Test
-    fun listarUsuarios(): Unit = runBlocking  {
+    fun listarUsuarios(): Unit = runTest  {
         val test = controlador.listarUsuarios().toList()
         assertAll(
             { assertFalse(test.isEmpty()) },
@@ -508,7 +513,7 @@ class ControladorTest {
     }
 
     @Test
-    fun encontrarUsuarioID(): Unit = runBlocking  {
+    fun encontrarUsuarioID(): Unit = runTest  {
         val testId = controlador.encontrarUsuarioID(usuarioTest.id)
         assertAll(
             { assertEquals(testId!!.uuidUsuario, usuarioTest.uuidUsuario) },
@@ -519,7 +524,7 @@ class ControladorTest {
     }
 
     @Test
-    fun encontrarUsuarioUUID(): Unit = runBlocking  {
+    fun encontrarUsuarioUUID(): Unit = runTest  {
         val testUUId = controlador.encontrarUsuarioUUID(usuarioTest.uuidUsuario)
         assertAll(
             { assertEquals(testUUId!!.uuidUsuario, usuarioTest.uuidUsuario) },
@@ -530,7 +535,7 @@ class ControladorTest {
     }
 
     @Test
-    fun guardarUsuario(): Unit = runBlocking  {
+    fun guardarUsuario(): Unit = runTest  {
         SqlDeLightClient.queries.deleteAll()
         val testSave = controlador.guardarUsuario(usuarioTest)!!
         assertAll(
@@ -542,7 +547,7 @@ class ControladorTest {
     }
 
     @Test
-    fun borrarUsuario(): Unit = runBlocking  {
+    fun borrarUsuario(): Unit = runTest  {
         val testDelete = controlador.borrarUsuario(usuarioTest)
         assertAll(
             { assertTrue(testDelete) },
@@ -550,7 +555,7 @@ class ControladorTest {
     }
 
     @Test
-    fun listarTurnos(): Unit = runBlocking  {
+    fun listarTurnos(): Unit = runTest  {
         val test = controlador.listarTurnos().toList()
         assertAll(
             { assertFalse(test.isEmpty()) },
@@ -562,7 +567,7 @@ class ControladorTest {
     }
 
     @Test
-    fun encontrarTurnoID(): Unit = runBlocking  {
+    fun encontrarTurnoID(): Unit = runTest  {
         val testId = controlador.encontrarTurnoID(turnoTest.id)
         assertAll(
             { assertEquals(testId!!.uuidTurno, turnoTest.uuidTurno) },
@@ -572,7 +577,7 @@ class ControladorTest {
     }
 
     @Test
-    fun encontrarTurnoUUID(): Unit = runBlocking  {
+    fun encontrarTurnoUUID(): Unit = runTest  {
         val testUUId = controlador.encontrarTurnoUUID(turnoTest.uuidTurno)
         assertAll(
             { assertEquals(testUUId!!.uuidTurno, turnoTest.uuidTurno) },
@@ -582,7 +587,7 @@ class ControladorTest {
     }
 
     @Test
-    fun guardarTurno(): Unit = runBlocking  {
+    fun guardarTurno(): Unit = runTest  {
         val testSave = controlador.guardarTurno(turnoTest)!!
         assertAll(
             { assertEquals(testSave.uuidTurno, turnoTest.uuidTurno) },
@@ -592,7 +597,7 @@ class ControladorTest {
     }
 
     @Test
-    fun borrarTurno(): Unit = runBlocking  {
+    fun borrarTurno(): Unit = runTest  {
         val testDelete = controlador.borrarTurno(turnoTest)
         assertAll(
             { assertTrue(testDelete) }
@@ -600,7 +605,7 @@ class ControladorTest {
     }
 
     @Test
-    fun encontrarUsuariosAPI(): Unit = runBlocking  {
+    fun encontrarUsuariosAPI(): Unit = runTest  {
         val test = controlador.encontrarUsuariosAPI().toList()
         assertAll(
             { assertFalse(test.isEmpty()) },
@@ -614,7 +619,7 @@ class ControladorTest {
     }
 
     @Test
-    fun guardarUsuariosAPI(): Unit = runBlocking  {
+    fun guardarUsuariosAPI(): Unit = runTest  {
         val testSave = controlador.guardarUsuariosAPI(usuarioTest)
         assertAll(
             { assertEquals(usuarioTest.nombre, testSave.nombre) },

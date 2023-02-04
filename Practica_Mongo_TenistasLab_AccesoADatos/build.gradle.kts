@@ -28,6 +28,7 @@ dependencies {
     // Para hacer el logging
     implementation("io.github.microutils:kotlin-logging-jvm:3.0.4")
     implementation("ch.qos.logback:logback-classic:1.4.5")
+
     testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
 
     // Ktorfit, es decir Ktor client modificado para parecerse a Retrofit
@@ -38,6 +39,7 @@ dependencies {
     implementation("io.ktor:ktor-client-serialization:2.1.3")
     implementation("io.ktor:ktor-client-content-negotiation:2.1.3")
     implementation("io.ktor:ktor-serialization-kotlinx-json:2.1.3")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
 
     // Opcional, solo si vamos a usar asíncrono
     implementation("org.litote.kmongo:kmongo-async:4.7.2")

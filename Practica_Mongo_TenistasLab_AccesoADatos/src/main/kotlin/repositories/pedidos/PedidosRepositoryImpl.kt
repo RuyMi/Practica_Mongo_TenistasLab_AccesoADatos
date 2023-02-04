@@ -1,6 +1,7 @@
 package repositories.pedidos
 
 import db.MongoDbManager
+import exceptions.PedidoException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.reactive.asFlow
 import models.Pedidos
@@ -27,12 +28,12 @@ class PedidosRepositoryImpl:PedidosRepository {
     override suspend fun findById(id: Id<Pedidos>): Pedidos? {
         logger.debug { "findById($id)" }
         return MongoDbManager.database.getCollection<Pedidos>()
-            .findOneById(id) ?: throw Exception("No existe el Pedidos con id $id")//TODO cambiar las excepciones
+            .findOneById(id) ?: throw PedidoException("No existe el Pedidos con id $id")
     }
 
     override suspend fun findByUUID(uuid: String): Pedidos? {
         logger.debug { "findByUUID($uuid)" }
-        return MongoDbManager.database.getCollection<Pedidos>().findOne(Pedidos::uuidPedidos eq uuid)
+        return MongoDbManager.database.getCollection<Pedidos>().findOne(Pedidos::uuidPedidos eq uuid) ?: throw PedidoException("No existe el Pedidos con uuid $uuid")
     }
 
     override suspend fun save(entity: Pedidos): Pedidos? {

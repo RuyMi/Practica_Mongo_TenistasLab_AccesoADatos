@@ -14,7 +14,7 @@ import java.util.*
 @Document("producto")
 data class Producto(
     @Id @Serializable(ObjectIdSerializer::class)
-    val id: ObjectId= ObjectId.get(), // TODO Comprobar si hace falta tener el producto en lo de newId
+    val id: ObjectId= ObjectId.get(),
     val uuidProducto:  String = UUID.randomUUID().toString(),
     val marca: String,
     val modelo: String,
