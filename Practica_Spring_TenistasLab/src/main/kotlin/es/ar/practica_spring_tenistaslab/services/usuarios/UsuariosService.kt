@@ -20,7 +20,7 @@ class UsuariosService
     fun watch(): Flow<ChangeStreamEvent<Usuario>> {
         logger.info("watch()")
         return reactiveMongoTemplate.changeStream(
-            "tenistas",
+            "usuario",
             ChangeStreamOptions.empty(),
             Usuario::class.java
         ).asFlow()
