@@ -13,7 +13,7 @@ object ObjectIdSerializer : KSerializer<ObjectId> {
     override val descriptor = PrimitiveSerialDescriptor("LocalDate", PrimitiveKind.STRING)
 
     /**
-     * TODO
+     * Deserializador
      *
      * @param decoder
      * @return
@@ -23,7 +23,7 @@ object ObjectIdSerializer : KSerializer<ObjectId> {
     }
 
     /**
-     * TODO
+     * Serializador
      *
      * @param encoder
      * @param value

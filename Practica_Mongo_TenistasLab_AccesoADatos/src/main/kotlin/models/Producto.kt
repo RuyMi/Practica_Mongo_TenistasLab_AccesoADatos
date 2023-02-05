@@ -9,7 +9,7 @@ import serializers.UUIDSerializer
 import java.util.*
 
 /**
- * TODO
+ * Producto
  *
  * @property id
  * @property uuidProducto
@@ -21,7 +21,7 @@ import java.util.*
 @Serializable
 data class Producto(
     @BsonId @Contextual
-    val id: Id<Producto> = newId<Producto>(), // TODO Comprobar si hace falta tener el producto en lo de newId
+    val id: Id<Producto> = newId<Producto>(),
     val uuidProducto: String = UUID.randomUUID().toString(),
     val marca: String,
     val modelo: String,
