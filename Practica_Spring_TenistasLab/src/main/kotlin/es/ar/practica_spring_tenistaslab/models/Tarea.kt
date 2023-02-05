@@ -8,6 +8,7 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 import es.ar.practica_spring_tenistaslab.serializers.UUIDSerializer
 import kotlinx.serialization.Contextual
+import org.springframework.data.mongodb.core.mapping.DocumentReference
 import java.util.*
 
 @Serializable

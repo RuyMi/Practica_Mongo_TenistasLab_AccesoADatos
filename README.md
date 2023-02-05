@@ -8,4 +8,4 @@ En esta práctica gestionaremos una tienda de tenistas con bases de datos no rel
 
 Documentación se puede encontrar dentro del proyecto
 
-Enlace a video de youtube explicando el proyecto: 
+Enlace a video de youtube explicando el proyecto: https://youtu.be/lmQ4H4HHT5Q
