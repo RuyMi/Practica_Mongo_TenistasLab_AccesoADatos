@@ -66,7 +66,7 @@ suspend fun initDataBase() {
         null,
         null
     )
-    println(meterAdmin.password)
+    println("La contraseña cifrada es = "+ meterAdmin.password)
     UsuarioRepositoryImpl().save(meterAdmin)
 }
 
@@ -91,7 +91,7 @@ class KoinApp : KoinComponent {
         }
         init.join()
         launch {
-            println("✔ Escuchando cambios en Tenistas...")
+            println("✔ Escuchando cambios en Usuarios...")
             controlador.watchUsuarios()
                 .collect {
                     println("Evento Usuario: ${it.operationType.value}")
