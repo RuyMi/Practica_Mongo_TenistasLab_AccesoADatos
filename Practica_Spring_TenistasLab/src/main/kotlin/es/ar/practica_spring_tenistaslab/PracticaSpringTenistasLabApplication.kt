@@ -28,7 +28,7 @@ import java.util.*
 import kotlin.system.exitProcess
 
 /**
- * Esto es el main de spring TODO este comentario es para ver sie serasda sd
+ * Esto es el main de spring
  */
 
 private val json = Json {

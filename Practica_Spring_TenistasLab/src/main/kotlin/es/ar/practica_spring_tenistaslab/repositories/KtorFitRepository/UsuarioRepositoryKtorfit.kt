@@ -46,7 +46,7 @@ class UsuarioRepositoryKtorfit {
             throw RestException("Error al obtener el usuario con id $id o no existe: ${e.message}")
         }
     }
-    //TODO coger los campos que queramos del usuario api para ponerlo en nuestro usuario
+
 
 
 
@@ -88,6 +88,5 @@ class UsuarioRepositoryKtorfit {
     }
 
 
-//TODO MIRAR COMENTARIOS DEL LOGGEr
 
 }
